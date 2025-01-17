@@ -1,7 +1,5 @@
 import React from "react";
 import { SafeAreaView, ScrollView, View } from "react-native";
-import { Pie, PolarChart } from "victory-native";
-import Slider from "@react-native-community/slider";
 
 import { dailyEnterScreenStyles } from "./DailyEnterScreen.styles";
 import MoodRating from "./partials/MoodRating";
@@ -29,24 +27,6 @@ export default function DailyEnterScreen() {
       <ScrollView>
         <MoodRating />
         <ProductivityRating />
-        <View style={dailyEnterScreenStyles.chartContainer}>
-          <PolarChart
-            data={data()}
-            labelKey="label"
-            valueKey={"value"}
-            colorKey={"color"}
-          >
-            <Pie.Chart />
-          </PolarChart>
-        </View>
-
-        <Slider
-          style={dailyEnterScreenStyles.slider}
-          minimumValue={0}
-          maximumValue={1}
-          minimumTrackTintColor="#FFFFFF"
-          maximumTrackTintColor="#000000"
-        />
       </ScrollView>
     </SafeAreaView>
   );
