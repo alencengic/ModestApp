@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { View, Text, TouchableOpacity } from "react-native";
 import { productivityRatingStyles } from "./ProductivityRating.styles";
 
-// Productivity Rating component
 export const ProductivityRating = () => {
   const [selectedProductivity, setSelectedProductivity] = useState<
     number | null

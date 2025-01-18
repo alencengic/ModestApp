@@ -46,12 +46,19 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="trends"
+        name="trends/trends"
         options={{
           title: "Trends and analytics",
           tabBarIcon: ({ color }) => (
             <IconSymbol size={28} name="chart.bar" color={color} />
           ),
+        }}
+      />
+      <Tabs.Screen
+        name="daily/partials"
+        options={{
+          tabBarButton: () => null, // Hides the tab bar button
+          headerShown: false, // Hides the header
         }}
       />
     </Tabs>
