@@ -7,17 +7,14 @@ export const openDatabase = async () => {
   await db.execAsync(`
     PRAGMA journal_mode = WAL;
     CREATE TABLE IF NOT EXISTS food_intakes (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      breakfast TEXT,
-      lunch TEXT,
-      dinner TEXT,
-      snacks TEXT
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        breakfast TEXT,
+        lunch TEXT,
+        dinner TEXT,
+        snacks TEXT,
+        date TEXT
     );
   `);
-
-  const tables = await db.getAllAsync(
-    "SELECT name FROM sqlite_master WHERE type='table'"
-  );
 
   return db;
 };
@@ -27,17 +24,17 @@ export const insertFoodIntake = async (foodIntake: {
   lunch: string;
   dinner: string;
   snacks: string;
+  date: string;
 }) => {
   const db = await openDatabase();
-  const result = await db.runAsync(
-    "INSERT INTO food_intakes (breakfast, lunch, dinner, snacks) VALUES (?, ?, ?, ?)",
+  return await db.runAsync(
+    "INSERT INTO food_intakes (breakfast, lunch, dinner, snacks, date) VALUES (?, ?, ?, ?, ?)",
     foodIntake.breakfast,
     foodIntake.lunch,
     foodIntake.dinner,
-    foodIntake.snacks
+    foodIntake.snacks,
+    foodIntake.date
   );
-
-  return result;
 };
 
 export const updateFoodIntake = async (
@@ -162,4 +159,14 @@ export const getDistinctMeals = async (): Promise<
     "breakfast" | "lunch" | "dinner" | "snacks",
     string[]
   >;
+};
+
+export const clearFoodIntakes = async () => {
+  const db = await openDatabase();
+  await db.runAsync("DELETE FROM food_intakes");
+};
+
+export const dropFoodIntakeTable = async () => {
+  const db = await openDatabase();
+  await db.execAsync("DROP TABLE IF EXISTS food_intakes");
 };

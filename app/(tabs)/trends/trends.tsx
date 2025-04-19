@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import {
   SafeAreaView,
   ScrollView,
@@ -8,8 +8,9 @@ import {
 } from "react-native";
 import { Pie, PolarChart } from "victory-native";
 import Slider from "@react-native-community/slider";
-import { getFoodIntakeChartData } from "@/storage/database";
+import { useQuery } from "@tanstack/react-query";
 import { useFont } from "@shopify/react-native-skia";
+import { useQueryFoodIntakeChartData } from "@/hooks/queries/useMutationInsertFoodIntake";
 
 export interface ChartData extends Record<string, unknown> {
   label: string;
@@ -18,34 +19,22 @@ export interface ChartData extends Record<string, unknown> {
 }
 
 const TrendsAndAnalyticsScreen: React.FC = () => {
-  const [chartData, setChartData] = useState<ChartData[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-
   const font = useFont(require("@/assets/fonts/SpaceMono-Regular.ttf"), 12);
 
-  useEffect(() => {
-    fetchChartData();
-  }, []);
-
-  const fetchChartData = async (): Promise<void> => {
-    setLoading(true);
-    try {
-      const data: ChartData[] = await getFoodIntakeChartData();
-
-      setChartData(data);
-    } catch (error) {
-      console.error("Error fetching chart data:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const {
+    data: chartData = [],
+    isLoading,
+    isError,
+  } = useQuery(useQueryFoodIntakeChartData());
 
   return (
     <SafeAreaView>
       <ScrollView>
         <View style={{ height: 300 }}>
-          {loading ? (
+          {isLoading ? (
             <ActivityIndicator size="large" color="#0000ff" />
+          ) : isError ? (
+            <Text>Error loading data.</Text>
           ) : chartData.length > 0 ? (
             <View style={{ height: 300 }}>
               <PolarChart
@@ -55,19 +44,11 @@ const TrendsAndAnalyticsScreen: React.FC = () => {
                 colorKey="color"
               >
                 <Pie.Chart>
-                  {({ slice }) => {
-                    return (
-                      <>
-                        <Pie.Slice>
-                          <Pie.Label
-                            color={"white"}
-                            font={font}
-                            text={slice.label}
-                          />
-                        </Pie.Slice>
-                      </>
-                    );
-                  }}
+                  {({ slice }) => (
+                    <Pie.Slice>
+                      <Pie.Label color="white" font={font} text={slice.label} />
+                    </Pie.Slice>
+                  )}
                 </Pie.Chart>
               </PolarChart>
             </View>
