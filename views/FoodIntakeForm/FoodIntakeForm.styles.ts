@@ -15,10 +15,12 @@ export const foodIntakeFormStyles = StyleSheet.create({
   },
   inputContainer: {
     marginBottom: 15,
+    zIndex: 1000,
   },
   inputLabel: {
     fontSize: 16,
     fontWeight: "bold",
+    marginBottom: 6,
   },
   inputField: {
     height: 40,
@@ -28,5 +30,20 @@ export const foodIntakeFormStyles = StyleSheet.create({
     paddingLeft: 10,
     fontSize: 16,
     marginTop: 5,
+  },
+
+  dropdownContainer: {
+    borderColor: "#ccc",
+    borderWidth: 1,
+    borderRadius: 5,
+  },
+  dropdown: {
+    backgroundColor: "#fff",
+  },
+  dropdownText: {
+    fontSize: 16,
+  },
+  dropdownList: {
+    borderColor: "#ccc",
   },
 });

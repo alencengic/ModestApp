@@ -1,38 +1,81 @@
-import { SafeAreaView, ScrollView, StyleSheet, View } from "react-native";
-
+import React, { useEffect, useState } from "react";
+import {
+  SafeAreaView,
+  ScrollView,
+  View,
+  ActivityIndicator,
+  Text,
+} from "react-native";
 import { Pie, PolarChart } from "victory-native";
 import Slider from "@react-native-community/slider";
+import { getFoodIntakeChartData } from "@/storage/database";
+import { useFont } from "@shopify/react-native-skia";
 
-const randomNumber = (): number => {
-  return Math.floor(Math.random() * 26) + 125;
-};
-const generateRandomColor = (): string => {
-  const randomColor = Math.floor(Math.random() * 0xffffff);
+export interface ChartData extends Record<string, unknown> {
+  label: string;
+  value: number;
+  color: string;
+}
 
-  return `#${randomColor.toString(16).padStart(6, "0")}`;
-};
+const TrendsAndAnalyticsScreen: React.FC = () => {
+  const [chartData, setChartData] = useState<ChartData[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
 
-const data = (numberPoints = 5) =>
-  Array.from({ length: numberPoints }, (_, index) => ({
-    value: randomNumber(),
-    color: generateRandomColor(),
-    label: `Label ${index + 1}`,
-  }));
+  const font = useFont(require("@/assets/fonts/SpaceMono-Regular.ttf"), 12);
 
-export default function TrendsAndAnalyticsScreen() {
+  useEffect(() => {
+    fetchChartData();
+  }, []);
+
+  const fetchChartData = async (): Promise<void> => {
+    setLoading(true);
+    try {
+      const data: ChartData[] = await getFoodIntakeChartData();
+
+      setChartData(data);
+    } catch (error) {
+      console.error("Error fetching chart data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <SafeAreaView>
       <ScrollView>
         <View style={{ height: 300 }}>
-          <PolarChart
-            data={data()}
-            labelKey="label"
-            valueKey={"value"}
-            colorKey={"color"}
-          >
-            <Pie.Chart />
-          </PolarChart>
+          {loading ? (
+            <ActivityIndicator size="large" color="#0000ff" />
+          ) : chartData.length > 0 ? (
+            <View style={{ height: 300 }}>
+              <PolarChart
+                data={chartData}
+                labelKey="label"
+                valueKey="value"
+                colorKey="color"
+              >
+                <Pie.Chart>
+                  {({ slice }) => {
+                    return (
+                      <>
+                        <Pie.Slice>
+                          <Pie.Label
+                            color={"white"}
+                            font={font}
+                            text={slice.label}
+                          />
+                        </Pie.Slice>
+                      </>
+                    );
+                  }}
+                </Pie.Chart>
+              </PolarChart>
+            </View>
+          ) : (
+            <Text>No food intake data available.</Text>
+          )}
         </View>
+
         <Slider
           style={{ width: 200, height: 40 }}
           minimumValue={0}
@@ -43,17 +86,6 @@ export default function TrendsAndAnalyticsScreen() {
       </ScrollView>
     </SafeAreaView>
   );
-}
+};
 
-const styles = StyleSheet.create({
-  headerImage: {
-    color: "#808080",
-    bottom: -90,
-    left: -35,
-    position: "absolute",
-  },
-  titleContainer: {
-    flexDirection: "row",
-    gap: 8,
-  },
-});
+export default TrendsAndAnalyticsScreen;

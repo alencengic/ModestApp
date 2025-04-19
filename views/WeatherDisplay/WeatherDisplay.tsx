@@ -6,7 +6,7 @@ import axios from "axios";
 import { weatherDisplayStyles } from "./WeatherDisplay.styles";
 
 interface WeatherDisplayProps {
-  location: string; // City name or coordinates
+  location: string;
 }
 
 const WeatherDisplay: React.FC<WeatherDisplayProps> = ({ location }) => {
@@ -22,7 +22,7 @@ const WeatherDisplay: React.FC<WeatherDisplayProps> = ({ location }) => {
         const response = await axios.get(
           `https://api.openweathermap.org/data/2.5/weather?q=${location}&appid=${apiKey}&units=metric`
         );
-        console.log(response);
+
         setWeatherData(response.data);
       } catch (error) {
         setError("Failed to fetch weather data.");

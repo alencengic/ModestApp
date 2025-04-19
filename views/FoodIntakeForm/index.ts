@@ -1,3 +1,3 @@
-import FoodIntakeForm from "./FoodIntakeForm";
+import { FoodIntakeForm } from "./FoodIntakeForm";
 
 export default FoodIntakeForm;
