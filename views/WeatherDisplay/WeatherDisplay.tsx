@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { View, Text, ActivityIndicator } from "react-native";
 import axios from "axios";
 import { weatherDisplayStyles } from "./WeatherDisplay.styles";
+import Constants from "expo-constants";
 
 interface WeatherDisplayProps {
   location: string;
@@ -16,7 +17,8 @@ const WeatherDisplay: React.FC<WeatherDisplayProps> = ({ location }) => {
     const fetchWeatherData = async () => {
       setLoading(true);
       try {
-        const apiKey = "a51474a85e4b86d8e1e879aa55a7c398";
+        const apiKey = Constants.expoConfig?.extra?.WEATHER_API_KEY;
+
         const response = await axios.get(
           `https://api.openweathermap.org/data/2.5/weather?q=${location}&appid=${apiKey}&units=metric`
         );
