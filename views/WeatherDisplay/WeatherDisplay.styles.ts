@@ -1,5 +1,3 @@
-// components/WeatherDisplay.styles.ts
-
 import { StyleSheet } from "react-native";
 
 export const weatherDisplayStyles = StyleSheet.create({

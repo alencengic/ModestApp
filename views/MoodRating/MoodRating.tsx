@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { View, Text, TouchableOpacity } from "react-native";
 import { moodRatingStyles } from "./MoodRating.styles";
 
-// Define Mood interface
 interface Mood {
   emoji: string;
   label: string;

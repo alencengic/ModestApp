@@ -1,15 +1,18 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   SafeAreaView,
   ScrollView,
   View,
   ActivityIndicator,
   Text,
+  Button,
 } from "react-native";
 import { Pie, PolarChart } from "victory-native";
 import Slider from "@react-native-community/slider";
 import { useQuery } from "@tanstack/react-query";
 import { useFont } from "@shopify/react-native-skia";
+
+import DateTimePicker from "@react-native-community/datetimepicker";
 import { useQueryFoodIntakeChartData } from "@/hooks/queries/useMutationInsertFoodIntake";
 
 export interface ChartData extends Record<string, unknown> {
@@ -20,16 +23,53 @@ export interface ChartData extends Record<string, unknown> {
 
 const TrendsAndAnalyticsScreen: React.FC = () => {
   const font = useFont(require("@/assets/fonts/SpaceMono-Regular.ttf"), 12);
+  const [range, setRange] = useState<"day" | "week" | "month" | "custom">(
+    "week"
+  );
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const [showDatePicker, setShowDatePicker] = useState(false);
 
   const {
     data: chartData = [],
     isLoading,
     isError,
-  } = useQuery(useQueryFoodIntakeChartData());
+  } = useQuery(useQueryFoodIntakeChartData(range, selectedDate));
 
   return (
     <SafeAreaView>
       <ScrollView>
+        <View style={{ paddingHorizontal: 20, marginBottom: 16 }}>
+          <Text style={{ fontWeight: "bold", fontSize: 18, marginBottom: 8 }}>
+            Filter By
+          </Text>
+          <View style={{ flexDirection: "row", gap: 8, flexWrap: "wrap" }}>
+            <Button title="Today" onPress={() => setRange("day")} />
+            <Button title="This Week" onPress={() => setRange("week")} />
+            <Button title="This Month" onPress={() => setRange("month")} />
+            <Button
+              title="Choose a Day"
+              onPress={() => {
+                setRange("custom");
+                setShowDatePicker(true);
+              }}
+            />
+          </View>
+          {showDatePicker && (
+            <DateTimePicker
+              value={selectedDate}
+              mode="date"
+              display="default"
+              onChange={(event, date) => {
+                setShowDatePicker(false);
+                if (date) {
+                  setSelectedDate(date);
+                  setRange("custom");
+                }
+              }}
+            />
+          )}
+        </View>
+
         <View style={{ height: 300 }}>
           {isLoading ? (
             <ActivityIndicator size="large" color="#0000ff" />
@@ -56,14 +96,6 @@ const TrendsAndAnalyticsScreen: React.FC = () => {
             <Text>No food intake data available.</Text>
           )}
         </View>
-
-        <Slider
-          style={{ width: 200, height: 40 }}
-          minimumValue={0}
-          maximumValue={1}
-          minimumTrackTintColor="#FFFFFF"
-          maximumTrackTintColor="#000000"
-        />
       </ScrollView>
     </SafeAreaView>
   );

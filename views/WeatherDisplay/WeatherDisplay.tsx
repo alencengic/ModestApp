@@ -1,5 +1,3 @@
-// components/WeatherDisplay.tsx
-
 import React, { useEffect, useState } from "react";
 import { View, Text, ActivityIndicator } from "react-native";
 import axios from "axios";

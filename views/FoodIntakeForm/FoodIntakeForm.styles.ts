@@ -1,5 +1,3 @@
-// components/FoodIntakeForm.styles.ts
-
 import { StyleSheet } from "react-native";
 
 export const foodIntakeFormStyles = StyleSheet.create({

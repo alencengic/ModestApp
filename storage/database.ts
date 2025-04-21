@@ -1,5 +1,6 @@
 import { ChartData } from "@/app/(tabs)/trends/trends";
 import * as SQLite from "expo-sqlite";
+import { DateTime } from "luxon";
 
 export const openDatabase = async () => {
   const db = await SQLite.openDatabaseAsync("modest_app.db");
@@ -69,7 +70,7 @@ export const deleteFoodIntake = async (id: number) => {
 export const getAllFoodIntakes = async () => {
   const db = await openDatabase();
   const allRows = await db.getAllAsync("SELECT * FROM food_intakes");
-  console.log(allRows);
+
   return allRows;
 };
 
@@ -83,36 +84,50 @@ export const getFoodIntakeById = async (id: number) => {
   return foodIntake;
 };
 
-interface FoodIntake {
-  id: number;
-  breakfast: string;
-  lunch: string;
-  dinner: string;
-  snacks: string;
-}
-
-const generateColorMap = () => {
-  const colorMap = new Map<string, string>();
-  return (label: string): string => {
-    if (!colorMap.has(label)) {
-      const randomColor = Math.floor(Math.random() * 0xffffff);
-      colorMap.set(label, `#${randomColor.toString(16).padStart(6, "0")}`);
-    }
-    return colorMap.get(label)!;
-  };
-};
-
-export const getFoodIntakeChartData = async (): Promise<ChartData[]> => {
+export const getFoodIntakeChartData = async (
+  range: "day" | "week" | "month" | "custom",
+  customDate?: Date
+): Promise<ChartData[]> => {
   const db = await openDatabase();
   try {
-    const foodIntakes: FoodIntake[] = await db.getAllAsync(
-      "SELECT * FROM food_intakes"
+    let fromDate: DateTime;
+
+    if (range === "custom" && customDate) {
+      fromDate = DateTime.fromJSDate(customDate).startOf("day");
+    } else {
+      const now = DateTime.now();
+      switch (range) {
+        case "day":
+          fromDate = now.startOf("day");
+          break;
+        case "week":
+          fromDate = now.startOf("week");
+          break;
+        case "month":
+          fromDate = now.startOf("month");
+          break;
+        default:
+          fromDate = now.startOf("day");
+          break;
+      }
+    }
+
+    const foodIntakes = await db.getAllAsync(
+      "SELECT * FROM food_intakes WHERE date >= ?",
+      fromDate.toISODate()
     );
 
     if (foodIntakes.length === 0) return [];
 
     const mealMap = new Map<string, number>();
-    const getColor = generateColorMap();
+    const colorMap = new Map<string, string>();
+    const getColor = (label: string) => {
+      if (!colorMap.has(label)) {
+        const randomColor = Math.floor(Math.random() * 0xffffff);
+        colorMap.set(label, `#${randomColor.toString(16).padStart(6, "0")}`);
+      }
+      return colorMap.get(label)!;
+    };
 
     for (const row of foodIntakes) {
       [row.breakfast, row.lunch, row.dinner, row.snacks].forEach((meal) => {
@@ -124,15 +139,11 @@ export const getFoodIntakeChartData = async (): Promise<ChartData[]> => {
       });
     }
 
-    const chartData: ChartData[] = Array.from(mealMap.entries()).map(
-      ([label, value]) => ({
-        label,
-        value,
-        color: getColor(label),
-      })
-    );
-
-    return chartData;
+    return Array.from(mealMap.entries()).map(([label, value]) => ({
+      label,
+      value,
+      color: getColor(label),
+    }));
   } catch (error) {
     console.error("Error fetching chart data:", error);
     return [];
