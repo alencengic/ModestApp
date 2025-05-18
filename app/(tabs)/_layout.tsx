@@ -1,10 +1,7 @@
-import { Tabs } from "expo-router";
 import React from "react";
-import { Platform } from "react-native";
-
-import { HapticTab } from "@/components/HapticTab";
+import { Platform, Pressable, Text, View } from "react-native";
+import { Drawer } from "expo-router/drawer";
 import { IconSymbol } from "@/components/ui/IconSymbol";
-import TabBarBackground from "@/components/ui/TabBarBackground";
 import { Colors } from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
 
@@ -12,54 +9,55 @@ export default function TabLayout() {
   const colorScheme = useColorScheme();
 
   return (
-    <Tabs
+    <Drawer
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
-        headerShown: false,
-        tabBarButton: HapticTab,
-        tabBarBackground: TabBarBackground,
-        tabBarStyle: Platform.select({
-          ios: {
-            position: "absolute",
-          },
-          default: {},
-        }),
+        drawerActiveTintColor: Colors[colorScheme ?? "light"].tint,
+        headerShown: true,
       }}
     >
-      <Tabs.Screen
+      <Drawer.Screen
         name="index"
         options={{
           title: "Home",
-          tabBarIcon: ({ color }) => (
-            <IconSymbol size={28} name="house.fill" color={color} />
+          drawerIcon: ({ color }) => (
+            <IconSymbol size={24} name="house.fill" color={color} />
           ),
         }}
       />
-      <Tabs.Screen
+      <Drawer.Screen
         name="daily/daily"
         options={{
-          title: "Daily entry",
-          tabBarIcon: ({ color }) => (
-            <IconSymbol size={28} name="slider.horizontal.3" color={color} />
+          title: "Daily Entry",
+          drawerIcon: ({ color }) => (
+            <IconSymbol size={24} name="slider.horizontal.3" color={color} />
           ),
         }}
       />
-      <Tabs.Screen
+      <Drawer.Screen
+        name="daily/journal"
+        options={{
+          title: "Daily Journal",
+          drawerIcon: ({ color }) => (
+            <IconSymbol size={24} name="book.closed.fill" color={color} />
+          ),
+        }}
+      />
+      <Drawer.Screen
         name="trends/trends"
         options={{
-          title: "Trends and analytics",
-          tabBarIcon: ({ color }) => (
-            <IconSymbol size={28} name="chart.bar" color={color} />
+          title: "Trends and Analytics",
+          drawerIcon: ({ color }) => (
+            <IconSymbol size={24} name="chart.bar" color={color} />
           ),
         }}
       />
-      <Tabs.Screen
+      <Drawer.Screen
         name="daily/(partials)"
         options={{
-          tabBarButton: () => null,
+          drawerItemStyle: { display: "none" },
           headerShown: false,
         }}
       />
-    </Tabs>
+    </Drawer>
   );
 }

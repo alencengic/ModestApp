@@ -1,7 +1,5 @@
 import { StyleSheet, ScrollView, SafeAreaView } from "react-native";
 
-import { HelloWave } from "@/components/HelloWave";
-
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 
@@ -11,7 +9,6 @@ export default function HomeScreen() {
       <ScrollView>
         <ThemedView style={styles.titleContainer}>
           <ThemedText type="title">Welcome!</ThemedText>
-          <HelloWave />
         </ThemedView>
       </ScrollView>
     </SafeAreaView>

@@ -63,5 +63,4 @@ export const styles = StyleSheet.create({
     borderRadius: 2,
     marginRight: 5,
   },
-  legendLabel: {},
 });

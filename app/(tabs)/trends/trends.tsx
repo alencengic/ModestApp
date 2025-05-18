@@ -42,9 +42,7 @@ const CustomLegend: React.FC<CustomLegendProps> = ({
           <View
             style={[styles.legendSwatch, { backgroundColor: item.symbol.fill }]}
           />
-          <Text style={[styles.legendLabel, { fontFamily, fontSize }]}>
-            {item.name}
-          </Text>
+          <Text style={[{ fontFamily, fontSize }]}>{item.name}</Text>
         </View>
       ))}
     </View>
