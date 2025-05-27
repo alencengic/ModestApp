@@ -52,6 +52,15 @@ export default function TabLayout() {
         }}
       />
       <Drawer.Screen
+        name="mood/analytics"
+        options={{
+          title: "Mood Analytics",
+          drawerIcon: ({ color }) => (
+            <IconSymbol size={24} name="face.smiling" color={color} />
+          ),
+        }}
+      />
+      <Drawer.Screen
         name="daily/(partials)"
         options={{
           drawerItemStyle: { display: "none" },

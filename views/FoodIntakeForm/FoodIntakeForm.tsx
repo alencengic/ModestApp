@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
   Alert,
 } from "react-native";
-import { getDistinctMeals, dropFoodIntakeTable } from "@/storage/database";
+import { dropEntryTables, getDistinctMeals } from "@/storage/database";
 import { foodIntakeFormStyles } from "./FoodIntakeForm.styles";
 import { Provider } from "react-native-paper";
 import { DateTime } from "luxon";
@@ -65,7 +65,7 @@ export const FoodIntakeForm: React.FC = () => {
 
   const handleDropTable = async () => {
     try {
-      await dropFoodIntakeTable();
+      await dropEntryTables();
       Alert.alert("Success", "Food intake table dropped successfully.");
     } catch (error) {
       console.error("Failed to drop table:", error);

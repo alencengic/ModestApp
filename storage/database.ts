@@ -15,6 +15,16 @@ export const openDatabase = async () => {
         snacks TEXT,
         date TEXT
     );
+    CREATE TABLE IF NOT EXISTS journal_entries (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      note TEXT,
+      date TEXT
+    );
+    CREATE TABLE IF NOT EXISTS mood_ratings (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      mood TEXT,
+      date TEXT UNIQUE
+    );
   `);
 
   return db;
@@ -182,16 +192,18 @@ export const dropFoodIntakeTable = async () => {
   await db.execAsync("DROP TABLE IF EXISTS food_intakes");
 };
 
-export const insertJournalEntry = async (note: string, date: string) => {
+export const dropEntryTables = async () => {
   const db = await openDatabase();
 
   await db.execAsync(`
-    CREATE TABLE IF NOT EXISTS journal_entries (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      note TEXT,
-      date TEXT
-    );
+    DROP TABLE IF EXISTS food_intakes;
+    DROP TABLE IF EXISTS mood_ratings;
+    DROP TABLE IF EXISTS journal_entries;
   `);
+};
+
+export const insertJournalEntry = async (note: string, date: string) => {
+  const db = await openDatabase();
 
   return await db.runAsync(
     "INSERT INTO journal_entries (note, date) VALUES (?, ?)",
@@ -206,8 +218,8 @@ export const getJournalEntriesByRange = async (
 ): Promise<{ content: string; date: string }[]> => {
   const db = await openDatabase();
 
-  const fromISO = DateTime.fromJSDate(fromDate).startOf("day").toISO();
-  const toISO = DateTime.fromJSDate(toDate).endOf("day").toISO();
+  const fromISO = DateTime.fromJSDate(fromDate).startOf("day").toISODate();
+  const toISO = DateTime.fromJSDate(toDate).endOf("day").toISODate();
 
   const rows = await db.getAllAsync(
     `SELECT note as content, date FROM journal_entries WHERE date BETWEEN ? AND ? ORDER BY date DESC`,
@@ -219,4 +231,39 @@ export const getJournalEntriesByRange = async (
     content: row.content,
     date: row.date,
   }));
+};
+
+export const insertOrUpdateMood = async (mood: string, date: string) => {
+  const db = await openDatabase();
+
+  return await db.runAsync(
+    `INSERT INTO mood_ratings (mood, date) VALUES (?, ?)
+     ON CONFLICT(date) DO UPDATE SET mood = excluded.mood`,
+    mood,
+    date
+  );
+};
+
+export const getMoodByDate = async (date: string): Promise<string | null> => {
+  const db = await openDatabase();
+  const row = await db.getFirstAsync(
+    "SELECT mood FROM mood_ratings WHERE date = ?",
+    date
+  );
+  return row?.mood ?? null;
+};
+
+export const getMoodDataForRange = async (
+  fromDate: Date,
+  toDate: Date
+): Promise<{ date: string; mood: string }[]> => {
+  const db = await openDatabase();
+  const fromISO = DateTime.fromJSDate(fromDate).startOf("day").toISODate();
+  const toISO = DateTime.fromJSDate(toDate).endOf("day").toISODate();
+
+  return await db.getAllAsync(
+    `SELECT date, mood FROM mood_ratings WHERE date BETWEEN ? AND ? ORDER BY date ASC`,
+    fromISO,
+    toISO
+  );
 };
