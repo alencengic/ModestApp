@@ -19,6 +19,7 @@ export const MoodRating = () => {
       insertOrUpdateMood(mood, DateTime.now().toISODate() as string),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["moodEntries"] });
+      queryClient.invalidateQueries({ queryKey: ["foodMoodCorrelation"] });
       Alert.alert("Mood Saved", "Your mood for today has been saved.");
     },
     onError: (error) => {
