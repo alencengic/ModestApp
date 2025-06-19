@@ -31,3 +31,14 @@ export const getMoodByDate = async (
   );
   return moodEntry;
 };
+
+export const insertOrUpdateMood = async (mood: string, date: string) => {
+  const db = await openDatabase();
+
+  return await db.runAsync(
+    `INSERT INTO mood_ratings (mood, date) VALUES (?, ?)
+     ON CONFLICT(date) DO UPDATE SET mood = excluded.mood`,
+    mood,
+    date
+  );
+};

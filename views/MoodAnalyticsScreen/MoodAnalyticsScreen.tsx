@@ -28,14 +28,14 @@ const MoodAnalyticsScreen: React.FC = () => {
   const NEUTRAL_MOOD_COLOR = "#A9A9A9";
   const NEGATIVE_MOOD_COLOR = "#CD5C5C";
 
-  const useQueryFoodMoodCorrelation = (minOccurrences: number = 3) => {
+  const useQueryFoodMoodCorrelation = () => {
     return {
       queryKey: ["foodMoodCorrelation"],
-      queryFn: async () => getFoodMoodCorrelationData(minOccurrences),
+      queryFn: async () => getFoodMoodCorrelationData(),
     };
   };
 
-  const foodMoodQueryOptions = useQueryFoodMoodCorrelation(3);
+  const foodMoodQueryOptions = useQueryFoodMoodCorrelation();
   const {
     data: rawFoodMoodData = [],
     isLoading: isLoadingFoodMood,

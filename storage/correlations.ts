@@ -1,18 +1,10 @@
 import { openDatabase } from "./db_connection";
+import { FoodIntake } from "./food_intakes";
 
 export interface FoodMoodCorrelation {
   foodName: string;
   averageMoodScore: number;
   occurrences: number;
-}
-
-export interface FoodIntake {
-  id: number;
-  breakfast: string | null;
-  lunch: string | null;
-  dinner: string | null;
-  snacks: string | null;
-  date: string;
 }
 
 export interface MoodRating {

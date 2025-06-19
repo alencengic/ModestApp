@@ -1,6 +1,7 @@
-// For db object methods
 import { DateTime } from "luxon";
 import { openDatabase } from "./db_connection";
+
+type JournalEntryRow = { content: string; date: string };
 
 export const insertJournalEntry = async (note: string, date: string) => {
   const db = await openDatabase();
@@ -35,7 +36,7 @@ export const getJournalEntriesByRange = async (
     toISO
   );
 
-  return rows.map((row) => ({
+  return (rows as JournalEntryRow[]).map((row) => ({
     content: row.content,
     date: row.date,
   }));
