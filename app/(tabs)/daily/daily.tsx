@@ -7,6 +7,7 @@ import ProductivityRating from "@/views/ProductivityRating";
 import FoodIntakeForm from "@/views/FoodIntakeForm";
 import WeatherDisplay from "@/views/WeatherDisplay";
 import MoodRating from "@/views/MoodRating";
+import SymptomForm from "@/views/SymptomForm/SymptomForm";
 
 export default function DailyEnterScreen() {
   return (
@@ -15,7 +16,8 @@ export default function DailyEnterScreen() {
         <MoodRating />
         <ProductivityRating />
         <FoodIntakeForm />
-        <WeatherDisplay location="New York" />
+        <SymptomForm />
+        <WeatherDisplay location="Zagreb" />
       </ScrollView>
     </SafeAreaView>
   );

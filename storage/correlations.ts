@@ -90,3 +90,66 @@ export const getFoodMoodCorrelationData = async (): Promise<
     occurrences: stats.occurrences,
   }));
 };
+
+export interface ProductivityRating {
+  id: number;
+  rating: number;
+  date: string;
+}
+
+export interface FoodProductivityCorrelation {
+  foodName: string;
+  averageProductivityScore: number;
+  occurrences: number;
+}
+
+export const getFoodProductivityCorrelationData = async (): Promise<
+  FoodProductivityCorrelation[]
+> => {
+  const db = await openDatabase();
+
+  const foodIntakes: FoodIntake[] = await db.getAllAsync(
+    "SELECT * FROM food_intakes"
+  );
+  const productivityRatings: ProductivityRating[] = await db.getAllAsync(
+    "SELECT * FROM productivity_ratings"
+  );
+
+  if (!foodIntakes.length || !productivityRatings.length) return [];
+
+  const prodByDate: Record<string, number> = {};
+  productivityRatings.forEach((rating) => {
+    if (typeof rating.rating === "number") {
+      prodByDate[rating.date] = rating.rating;
+    }
+  });
+
+  const foodStats: Record<
+    string,
+    { sumProductivity: number; occurrences: number }
+  > = {};
+
+  foodIntakes.forEach((intake) => {
+    const productivityScore = prodByDate[intake.date];
+    if (productivityScore === undefined) return;
+
+    [intake.breakfast, intake.lunch, intake.dinner, intake.snacks].forEach(
+      (mealString) => {
+        const items = splitMealItems(mealString);
+        items.forEach((item) => {
+          if (!foodStats[item]) {
+            foodStats[item] = { sumProductivity: 0, occurrences: 0 };
+          }
+          foodStats[item].sumProductivity += productivityScore;
+          foodStats[item].occurrences += 1;
+        });
+      }
+    );
+  });
+
+  return Object.entries(foodStats).map(([foodName, stats]) => ({
+    foodName,
+    averageProductivityScore: stats.sumProductivity / stats.occurrences,
+    occurrences: stats.occurrences,
+  }));
+};

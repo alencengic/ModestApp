@@ -67,6 +67,23 @@ export default function TabLayout() {
           headerShown: false,
         }}
       />
+      <Drawer.Screen
+        name="symptoms/trends"
+        options={{
+          title: "Symptom Trends",
+          drawerIcon: ({ color }) => (
+            <IconSymbol size={24} name="chart.bar" color={color} />
+          ),
+        }}
+      />
+      <Drawer.Screen
+        name="symptoms/post-meal"
+        options={{
+          drawerItemStyle: { display: "none" },
+          headerShown: true,
+          title: "Symptoms",
+        }}
+      />
     </Drawer>
   );
 }

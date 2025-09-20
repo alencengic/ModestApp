@@ -4,3 +4,4 @@ export * from "./correlations";
 export * from "./food_intakes";
 export * from "./journal_entries";
 export * from "./mood_entries";
+export * from "./productivity_entries";

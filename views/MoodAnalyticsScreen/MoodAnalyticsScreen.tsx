@@ -10,89 +10,102 @@ import { useQuery } from "@tanstack/react-query";
 import { Picker } from "@react-native-picker/picker";
 import {
   getFoodMoodCorrelationData,
+  getFoodProductivityCorrelationData,
   FoodMoodCorrelation,
+  FoodProductivityCorrelation,
 } from "@/storage/database";
 import { styles as externalStyles } from "./MoodAnalyticsScreen.styles";
 
-export interface MoodDataItem {
-  date: string;
-  mood: string;
-  color: string;
-  value: number;
-}
-
 const PICKER_PLACEHOLDER_VALUE = "##PICKER_PLACEHOLDER##";
 
-const MoodAnalyticsScreen: React.FC = () => {
-  const POSITIVE_MOOD_COLOR = "#3CB371";
-  const NEUTRAL_MOOD_COLOR = "#A9A9A9";
-  const NEGATIVE_MOOD_COLOR = "#CD5C5C";
+type CorrelationType = "mood" | "productivity";
 
-  const useQueryFoodMoodCorrelation = () => {
+const MoodAnalyticsScreen: React.FC = () => {
+  const POSITIVE_COLOR = "#3CB371";
+  const NEUTRAL_COLOR = "#A9A9A9";
+  const NEGATIVE_COLOR = "#CD5C5C";
+
+  const [correlationType, setCorrelationType] =
+    useState<CorrelationType>("mood");
+
+  const useQueryFoodCorrelation = () => {
     return {
-      queryKey: ["foodMoodCorrelation"],
-      queryFn: async () => getFoodMoodCorrelationData(),
+      queryKey: ["foodCorrelation", correlationType],
+      queryFn: async () => {
+        return correlationType === "mood"
+          ? getFoodMoodCorrelationData()
+          : getFoodProductivityCorrelationData();
+      },
     };
   };
 
-  const foodMoodQueryOptions = useQueryFoodMoodCorrelation();
+  const correlationQueryOptions = useQueryFoodCorrelation();
   const {
-    data: rawFoodMoodData = [],
-    isLoading: isLoadingFoodMood,
-    isError: isErrorFoodMood,
-    error: foodMoodQueryError,
-  } = useQuery<FoodMoodCorrelation[], Error>(foodMoodQueryOptions);
+    data: rawData = [],
+    isLoading,
+    isError,
+    error,
+  } = useQuery<(FoodMoodCorrelation | FoodProductivityCorrelation)[], Error>(
+    correlationQueryOptions
+  );
+  console.log(rawData);
+  const getScore = (
+    item: FoodMoodCorrelation | FoodProductivityCorrelation
+  ) => {
+    return "averageMoodScore" in item
+      ? item.averageMoodScore
+      : item.averageProductivityScore;
+  };
 
-  const getMoodCategory = (score: number): string => {
+  const getCategory = (score: number): string => {
     if (score > 0.2) return "Positive";
     if (score < -0.2) return "Negative";
     return "Neutral";
   };
 
-  const getMoodColor = (score: number): string => {
-    if (score > 0.2) return POSITIVE_MOOD_COLOR;
-    if (score < -0.2) return NEGATIVE_MOOD_COLOR;
-    return NEUTRAL_MOOD_COLOR;
+  const getColor = (score: number): string => {
+    if (score > 0.2) return POSITIVE_COLOR;
+    if (score < -0.2) return NEGATIVE_COLOR;
+    return NEUTRAL_COLOR;
   };
 
-  const topPositiveFoods: FoodMoodCorrelation[] = useMemo(() => {
-    return (rawFoodMoodData || [])
-      .filter((item) => item.averageMoodScore > 0.2)
-      .sort((a, b) => b.averageMoodScore - a.averageMoodScore)
+  const topPositiveFoods = useMemo(() => {
+    return (rawData || [])
+      .filter((item) => getScore(item) > 0.2)
+      .sort((a, b) => getScore(b) - getScore(a))
       .slice(0, 6);
-  }, [rawFoodMoodData]);
+  }, [rawData]);
 
-  const topNegativeFoods: FoodMoodCorrelation[] = useMemo(() => {
-    return (rawFoodMoodData || [])
-      .filter((item) => item.averageMoodScore < -0.2)
-      .sort((a, b) => a.averageMoodScore - b.averageMoodScore)
+  const topNegativeFoods = useMemo(() => {
+    return (rawData || [])
+      .filter((item) => getScore(item) < -0.2)
+      .sort((a, b) => getScore(a) - getScore(b))
       .slice(0, 6);
-  }, [rawFoodMoodData]);
+  }, [rawData]);
 
   const allFoodNamesForPicker: string[] = useMemo(() => {
-    const foodNames = new Set(
-      (rawFoodMoodData || []).map((item) => item.foodName)
-    );
+    const foodNames = new Set((rawData || []).map((item) => item.foodName));
     return Array.from(foodNames).sort();
-  }, [rawFoodMoodData]);
+  }, [rawData]);
 
   const [selectedFoodName, setSelectedFoodName] = useState<string | null>(null);
 
-  const selectedFoodRawDetails: FoodMoodCorrelation | undefined =
-    useMemo(() => {
-      if (!selectedFoodName) return undefined;
-      return (rawFoodMoodData || []).find(
-        (item) => item.foodName === selectedFoodName
-      );
-    }, [rawFoodMoodData, selectedFoodName]);
+  const selectedFoodRawDetails = useMemo(() => {
+    if (!selectedFoodName) return undefined;
+    return (rawData || []).find((item) => item.foodName === selectedFoodName);
+  }, [rawData, selectedFoodName]);
 
   const FoodListItemDetail: React.FC<{
-    item: FoodMoodCorrelation;
+    item: FoodMoodCorrelation | FoodProductivityCorrelation;
     isLastItem?: boolean;
   }> = ({ item, isLastItem = false }) => {
-    const moodScore = item.averageMoodScore;
-    const moodColor = getMoodColor(moodScore);
-    const moodCategory = getMoodCategory(moodScore);
+    const score = getScore(item);
+    const color = getColor(score);
+    const category = getCategory(score);
+    const label =
+      correlationType === "mood"
+        ? "Avg. Mood Score"
+        : "Avg. Productivity Score";
 
     return (
       <View
@@ -103,20 +116,17 @@ const MoodAnalyticsScreen: React.FC = () => {
       >
         <Text style={externalStyles.foodListItemName}>{item.foodName}</Text>
         <View style={externalStyles.detailRow}>
-          <Text style={externalStyles.detailLabel}>Avg. Mood Score:</Text>
+          <Text style={externalStyles.detailLabel}>{label}:</Text>
           <Text
-            style={[
-              externalStyles.detailValue,
-              { color: moodColor, fontWeight: "bold" },
-            ]}
+            style={[externalStyles.detailValue, { color, fontWeight: "bold" }]}
           >
-            {moodScore.toFixed(2)}
+            {score.toFixed(2)}
           </Text>
         </View>
         <View style={externalStyles.detailRow}>
-          <Text style={externalStyles.detailLabel}>Mood Category:</Text>
-          <Text style={[externalStyles.detailValue, { color: moodColor }]}>
-            {moodCategory}
+          <Text style={externalStyles.detailLabel}>Category:</Text>
+          <Text style={[externalStyles.detailValue, { color }]}>
+            {category}
           </Text>
         </View>
         <View style={externalStyles.detailRow}>
@@ -124,11 +134,11 @@ const MoodAnalyticsScreen: React.FC = () => {
           <Text style={externalStyles.detailValue}>{item.occurrences}</Text>
         </View>
         <View style={externalStyles.moodIndicatorRow}>
-          <Text style={externalStyles.detailLabel}>Mood Association:</Text>
+          <Text style={externalStyles.detailLabel}>Association:</Text>
           <View
             style={[
               externalStyles.moodIndicatorSwatch,
-              { backgroundColor: moodColor },
+              { backgroundColor: color },
             ]}
           />
         </View>
@@ -136,25 +146,25 @@ const MoodAnalyticsScreen: React.FC = () => {
     );
   };
 
-  if (isLoadingFoodMood) {
+  if (isLoading) {
     return (
       <SafeAreaView style={externalStyles.container}>
         <View style={externalStyles.centered}>
           <ActivityIndicator size="large" color="#007AFF" />
           <Text style={externalStyles.centeredText}>
-            Loading food & mood insights...
+            Loading food correlation data...
           </Text>
         </View>
       </SafeAreaView>
     );
   }
 
-  if (isErrorFoodMood) {
+  if (isError) {
     return (
       <SafeAreaView style={externalStyles.container}>
         <View style={externalStyles.centered}>
           <Text style={externalStyles.errorText}>
-            Error loading food-mood data. {foodMoodQueryError?.message}
+            Error loading data. {error?.message}
           </Text>
         </View>
       </SafeAreaView>
@@ -164,6 +174,24 @@ const MoodAnalyticsScreen: React.FC = () => {
   return (
     <SafeAreaView style={externalStyles.container}>
       <ScrollView>
+        <View style={externalStyles.chartWrapper}>
+          <Text style={externalStyles.chartSectionTitle}>Correlation Type</Text>
+          <View style={externalStyles.pickerContainer}>
+            <Picker
+              selectedValue={correlationType}
+              onValueChange={(value) =>
+                setCorrelationType(value as CorrelationType)
+              }
+              style={externalStyles.picker}
+              mode="dropdown"
+              prompt="Select correlation type"
+            >
+              <Picker.Item label="Mood" value="mood" />
+              <Picker.Item label="Productivity" value="productivity" />
+            </Picker>
+          </View>
+        </View>
+
         <View style={externalStyles.chartWrapper}>
           <Text style={externalStyles.chartSectionTitle}>
             Explore Specific Food
@@ -211,12 +239,12 @@ const MoodAnalyticsScreen: React.FC = () => {
 
         <View style={externalStyles.chartWrapper}>
           <Text style={externalStyles.chartSectionTitle}>
-            Top Positive Mood Foods
+            Top Positive Foods
           </Text>
           {topPositiveFoods.length > 0 ? (
             topPositiveFoods.map((food, index) => (
               <FoodListItemDetail
-                key={food.foodName + food.averageMoodScore + "positive"}
+                key={food.foodName + index + "positive"}
                 item={food}
                 isLastItem={index === topPositiveFoods.length - 1}
               />
@@ -224,7 +252,7 @@ const MoodAnalyticsScreen: React.FC = () => {
           ) : (
             <View style={externalStyles.centered}>
               <Text style={externalStyles.centeredText}>
-                Not enough data for positive mood foods.
+                Not enough data for positive foods.
               </Text>
             </View>
           )}
@@ -232,12 +260,12 @@ const MoodAnalyticsScreen: React.FC = () => {
 
         <View style={externalStyles.chartWrapper}>
           <Text style={externalStyles.chartSectionTitle}>
-            Top Negative Mood Foods
+            Top Negative Foods
           </Text>
           {topNegativeFoods.length > 0 ? (
             topNegativeFoods.map((food, index) => (
               <FoodListItemDetail
-                key={food.foodName + food.averageMoodScore + "negative"}
+                key={food.foodName + index + "negative"}
                 item={food}
                 isLastItem={index === topNegativeFoods.length - 1}
               />
@@ -245,7 +273,7 @@ const MoodAnalyticsScreen: React.FC = () => {
           ) : (
             <View style={externalStyles.centered}>
               <Text style={externalStyles.centeredText}>
-                Not enough data for negative mood foods.
+                Not enough data for negative foods.
               </Text>
             </View>
           )}
