@@ -91,6 +91,124 @@ export const getFoodMoodCorrelationData = async (): Promise<
   }));
 };
 
+import { SymptomRow, BloatingLevel } from "./symptom_entries";
+
+export type SymptomType =
+  | "bloating"
+  | "energy"
+  | "stool_consistency"
+  | "diarrhea"
+  | "nausea"
+  | "pain";
+
+export interface FoodSymptomCorrelation {
+  foodName: string;
+  averageSymptomScore: number;
+  occurrences: number;
+}
+
+const BLOATING_TO_NUM: Record<BloatingLevel, 0 | 1 | 2 | 3> = {
+  None: 0,
+  Mild: 1,
+  Moderate: 2,
+  Severe: 3,
+};
+
+const calculateSymptomScore = (
+  symptom: SymptomRow,
+  symptomType: SymptomType
+): number => {
+  switch (symptomType) {
+    case "bloating":
+      return BLOATING_TO_NUM[symptom.bloating] || 0;
+    case "energy":
+      return symptom.energy;
+    case "stool_consistency":
+      return symptom.stool_consistency;
+    case "diarrhea":
+      return symptom.diarrhea;
+    case "nausea":
+      return symptom.nausea;
+    case "pain":
+      return symptom.pain;
+    default:
+      return 0;
+  }
+};
+
+export const getFoodSymptomCorrelationData = async (
+  symptomType: SymptomType
+): Promise<FoodSymptomCorrelation[]> => {
+  const db = await openDatabase();
+
+  const foodIntakes: FoodIntake[] = await db.getAllAsync(
+    "SELECT * FROM food_intakes"
+  );
+  const symptoms: SymptomRow[] = await db.getAllAsync(
+    "SELECT * FROM symptom_entries"
+  );
+
+  if (!foodIntakes.length || !symptoms.length) {
+    return [];
+  }
+
+  const symptomsByDate: Record<string, { totalScore: number; count: number }> =
+    {};
+  symptoms.forEach((symptom) => {
+    const date = symptom.created_at.split("T")[0];
+    if (!symptomsByDate[date]) {
+      symptomsByDate[date] = { totalScore: 0, count: 0 };
+    }
+    symptomsByDate[date].totalScore += calculateSymptomScore(
+      symptom,
+      symptomType
+    );
+    symptomsByDate[date].count += 1;
+  });
+
+  const averageSymptomScoreByDate: Record<string, number> = {};
+  for (const date in symptomsByDate) {
+    averageSymptomScoreByDate[date] =
+      symptomsByDate[date].totalScore / symptomsByDate[date].count;
+  }
+
+  const foodStats: Record<
+    string,
+    { sumSymptomScore: number; occurrences: number }
+  > = {};
+
+  foodIntakes.forEach((intake) => {
+    const symptomScore = averageSymptomScoreByDate[intake.date];
+    if (symptomScore === undefined) {
+      return;
+    }
+
+    const meals = [
+      intake.breakfast,
+      intake.lunch,
+      intake.dinner,
+      intake.snacks,
+    ];
+
+    meals.forEach((mealString) => {
+      const items = splitMealItems(mealString);
+      items.forEach((item) => {
+        if (!foodStats[item]) {
+          foodStats[item] = { sumSymptomScore: 0, occurrences: 0 };
+        }
+        foodStats[item].sumSymptomScore += symptomScore;
+        foodStats[item].occurrences += 1;
+      });
+    });
+  });
+
+  return Object.entries(foodStats).map(([foodName, stats]) => ({
+    foodName,
+    averageSymptomScore: stats.sumSymptomScore / stats.occurrences,
+    occurrences: stats.occurrences,
+  }));
+};
+
 export interface ProductivityRating {
   id: number;
   rating: number;

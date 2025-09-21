@@ -12,6 +12,7 @@ const MAPPING = {
   "chevron.right": "chevron-right",
   "book.closed.fill": "menu-book",
   "face.smiling": "sentiment-satisfied-alt",
+  "fork.knife": "restaurant",
 } as const;
 
 export type IconSymbolName = keyof typeof MAPPING;

@@ -61,19 +61,19 @@ export default function TabLayout() {
         }}
       />
       <Drawer.Screen
+        name="trends/food-analytics"
+        options={{
+          title: "Food Analytics",
+          drawerIcon: ({ color }) => (
+            <IconSymbol size={24} name="fork.knife" color={color} />
+          ),
+        }}
+      />
+      <Drawer.Screen
         name="daily/(partials)"
         options={{
           drawerItemStyle: { display: "none" },
           headerShown: false,
-        }}
-      />
-      <Drawer.Screen
-        name="symptoms/trends"
-        options={{
-          title: "Symptom Trends",
-          drawerIcon: ({ color }) => (
-            <IconSymbol size={24} name="chart.bar" color={color} />
-          ),
         }}
       />
       <Drawer.Screen
