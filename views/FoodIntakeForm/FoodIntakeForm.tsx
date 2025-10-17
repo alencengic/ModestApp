@@ -16,7 +16,17 @@ import { useMutationInsertFoodIntake } from "@/hooks/queries/useMutationInsertFo
 
 type MealType = "breakfast" | "lunch" | "dinner" | "snacks";
 
-export const FoodIntakeForm: React.FC = () => {
+interface FoodIntakeFormProps {
+  autoSave?: boolean;
+  onChange?: (meals: Record<MealType, string>) => void;
+  onSave?: () => Promise<void>;
+}
+
+export const FoodIntakeForm: React.FC<FoodIntakeFormProps> = ({
+  autoSave = true,
+  onChange,
+  onSave: onSaveCallback,
+}) => {
   const [meals, setMeals] = useState<Record<MealType, string>>({
     breakfast: "",
     lunch: "",
@@ -41,7 +51,9 @@ export const FoodIntakeForm: React.FC = () => {
   const { mutateAsync: saveFoodIntake } = useMutationInsertFoodIntake();
 
   const handleChange = (type: MealType, value: string) => {
-    setMeals((prev) => ({ ...prev, [type]: value }));
+    const newMeals = { ...meals, [type]: value };
+    setMeals(newMeals);
+    onChange?.(newMeals);
   };
 
   const handleSave = async () => {
@@ -49,7 +61,11 @@ export const FoodIntakeForm: React.FC = () => {
     const dataToSave = { ...meals, date: currentDate };
 
     try {
-      await saveFoodIntake(dataToSave);
+      if (onSaveCallback) {
+        await onSaveCallback();
+      } else {
+        await saveFoodIntake(dataToSave);
+      }
       setMeals({ breakfast: "", lunch: "", dinner: "", snacks: "" });
       setMenuVisible({
         breakfast: false,
@@ -62,6 +78,13 @@ export const FoodIntakeForm: React.FC = () => {
       Alert.alert("Error", "Failed to save food entry. Please try again.");
     }
   };
+
+  // Expose save method to parent if needed
+  React.useEffect(() => {
+    if (!autoSave && onSaveCallback) {
+      // Store reference for external access if needed
+    }
+  }, [autoSave, onSaveCallback]);
 
   const handleDropTable = async () => {
     try {
@@ -143,14 +166,18 @@ export const FoodIntakeForm: React.FC = () => {
         {renderDropdown("Lunch", "lunch")}
         {renderDropdown("Dinner", "dinner")}
         {renderDropdown("Snacks", "snacks")}
-        <Button title="Save Entry" onPress={handleSave} />
-        <View style={{ marginTop: 10 }}>
-          <Button
-            title="Drop Table (DEV)"
-            onPress={handleDropTable}
-            color="red"
-          />
-        </View>
+        {autoSave && (
+          <>
+            <Button title="Save Entry" onPress={handleSave} />
+            <View style={{ marginTop: 10 }}>
+              <Button
+                title="Drop Table (DEV)"
+                onPress={handleDropTable}
+                color="red"
+              />
+            </View>
+          </>
+        )}
       </View>
     </Provider>
   );

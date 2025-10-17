@@ -5,14 +5,28 @@ import { View } from "react-native";
 
 type MealType = "breakfast" | "lunch" | "dinner" | "snack";
 
+export interface SymptomFormData {
+  bloating: "None" | "Mild" | "Moderate" | "Severe";
+  energy: 1 | 2 | 3 | 4 | 5;
+  stool: 1 | 2 | 3 | 4 | 5 | 6 | 7;
+  diarrhea: boolean;
+  nausea: boolean;
+  pain: boolean;
+  mealTag?: MealType;
+}
+
 export default function SymptomForm({
   mealId,
   defaultMealType,
   onSaved,
+  autoSave = true,
+  onChange,
 }: {
   mealId?: string;
   defaultMealType?: MealType;
   onSaved?: () => void;
+  autoSave?: boolean;
+  onChange?: (data: SymptomFormData) => void;
 }) {
   const create = useCreateSymptom();
   const [bloating, setBloating] = useState<
@@ -25,7 +39,28 @@ export default function SymptomForm({
   const [pain, setPain] = useState(false);
   const [mealTag, setMealTag] = useState<MealType | undefined>(defaultMealType);
 
+  // Notify parent of changes
+  React.useEffect(() => {
+    if (onChange) {
+      onChange({
+        bloating,
+        energy,
+        stool,
+        diarrhea,
+        nausea,
+        pain,
+        mealTag,
+      });
+    }
+  }, [bloating, energy, stool, diarrhea, nausea, pain, mealTag, onChange]);
+
   const onSave = async () => {
+    if (!autoSave) {
+      // Just call onSaved callback without actually saving
+      onSaved?.();
+      return;
+    }
+
     await create.mutateAsync({
       meal_id: mealId ?? null,
       meal_type_tag: mealTag ?? null,
@@ -100,9 +135,11 @@ export default function SymptomForm({
           { value: "snack", label: "Snack" },
         ]}
       />
-      <Button mode="contained" onPress={onSave} loading={create.isPending}>
-        Save Symptoms
-      </Button>
+      {autoSave && (
+        <Button mode="contained" onPress={onSave} loading={create.isPending}>
+          Save Symptoms
+        </Button>
+      )}
     </View>
   );
 }
