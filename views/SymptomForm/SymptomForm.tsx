@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { Button, Text, SegmentedButtons, Switch } from "react-native-paper";
+import { View, Text, TouchableOpacity } from "react-native";
 import { useCreateSymptom } from "../../hooks/symptoms";
-import { View } from "react-native";
+import { symptomFormStyles } from "./SymptomForm.styles";
 
 type MealType = "breakfast" | "lunch" | "dinner" | "snack";
 
@@ -54,92 +54,163 @@ export default function SymptomForm({
     }
   }, [bloating, energy, stool, diarrhea, nausea, pain, mealTag, onChange]);
 
-  const onSave = async () => {
-    if (!autoSave) {
-      // Just call onSaved callback without actually saving
-      onSaved?.();
-      return;
-    }
+  const bloatingOptions: Array<"None" | "Mild" | "Moderate" | "Severe"> = [
+    "None",
+    "Mild",
+    "Moderate",
+    "Severe",
+  ];
 
-    await create.mutateAsync({
-      meal_id: mealId ?? null,
-      meal_type_tag: mealTag ?? null,
-      bloating,
-      energy,
-      stool_consistency: stool,
-      diarrhea: diarrhea ? 1 : 0,
-      nausea: nausea ? 1 : 0,
-      pain: pain ? 1 : 0,
-    });
-    onSaved?.();
-  };
+  const mealTagOptions: Array<{ value: MealType; label: string }> = [
+    { value: "breakfast", label: "Breakfast" },
+    { value: "lunch", label: "Lunch" },
+    { value: "dinner", label: "Dinner" },
+    { value: "snack", label: "Snack" },
+  ];
 
   return (
-    <View style={{ gap: 12 }}>
-      <Text variant="titleMedium">How do you feel after your meal?</Text>
-      <SegmentedButtons
-        value={bloating}
-        onValueChange={(v: any) => setBloating(v)}
-        buttons={[
-          { value: "None", label: "None" },
-          { value: "Mild", label: "Mild" },
-          { value: "Moderate", label: "Moderate" },
-          { value: "Severe", label: "Severe" },
-        ]}
-      />
-      <Text>Energy (1–5)</Text>
-      <SegmentedButtons
-        value={String(energy)}
-        onValueChange={(v: any) => setEnergy(Number(v) as any)}
-        buttons={[1, 2, 3, 4, 5].map((n) => ({
-          value: String(n),
-          label: String(n),
-        }))}
-      />
-      <Text>Stool (Bristol 1–7)</Text>
-      <SegmentedButtons
-        value={String(stool)}
-        onValueChange={(v: any) => setStool(Number(v) as any)}
-        buttons={[1, 2, 3, 4, 5, 6, 7].map((n) => ({
-          value: String(n),
-          label: String(n),
-        }))}
-      />
-      {(
-        [
-          ["Diarrhea", diarrhea, setDiarrhea],
-          ["Nausea", nausea, setNausea],
-          ["Pain", pain, setPain],
-        ] as const
-      ).map(([label, val, setter]) => (
-        <View
-          key={label}
-          style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-        >
-          <Text>{label}</Text>
-          <Switch value={val} onValueChange={setter} />
+    <View style={symptomFormStyles.container}>
+      <Text style={symptomFormStyles.sectionTitle}>
+        How do you feel after your meal?
+      </Text>
+
+      {/* Bloating */}
+      <View style={symptomFormStyles.section}>
+        <Text style={symptomFormStyles.label}>Bloating</Text>
+        <View style={symptomFormStyles.buttonRow}>
+          {bloatingOptions.map((option) => (
+            <TouchableOpacity
+              key={option}
+              style={[
+                symptomFormStyles.button,
+                symptomFormStyles.bloatingButton,
+                bloating === option && symptomFormStyles.selectedButton,
+              ]}
+              onPress={() => setBloating(option)}
+            >
+              <Text
+                style={[
+                  symptomFormStyles.buttonText,
+                  bloating === option && symptomFormStyles.selectedButtonText,
+                ]}
+              >
+                {option}
+              </Text>
+            </TouchableOpacity>
+          ))}
         </View>
-      ))}
-      <Text>Tag meal (optional)</Text>
-      <SegmentedButtons
-        value={mealTag ?? ""}
-        onValueChange={(v: any) => setMealTag(v as MealType)}
-        buttons={[
-          { value: "breakfast", label: "Breakfast" },
-          { value: "lunch", label: "Lunch" },
-          { value: "dinner", label: "Dinner" },
-          { value: "snack", label: "Snack" },
-        ]}
-      />
-      {autoSave && (
-        <Button mode="contained" onPress={onSave} loading={create.isPending}>
-          Save Symptoms
-        </Button>
-      )}
+      </View>
+
+      {/* Energy */}
+      <View style={symptomFormStyles.section}>
+        <Text style={symptomFormStyles.label}>Energy Level (1-5)</Text>
+        <View style={symptomFormStyles.buttonRow}>
+          {[1, 2, 3, 4, 5].map((level) => (
+            <TouchableOpacity
+              key={level}
+              style={[
+                symptomFormStyles.button,
+                energy === level && symptomFormStyles.selectedButton,
+              ]}
+              onPress={() => setEnergy(level as any)}
+            >
+              <Text
+                style={[
+                  symptomFormStyles.buttonText,
+                  energy === level && symptomFormStyles.selectedButtonText,
+                ]}
+              >
+                {level}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+      </View>
+
+      {/* Stool */}
+      <View style={symptomFormStyles.section}>
+        <Text style={symptomFormStyles.label}>Bristol Stool Scale (1-7)</Text>
+        <View style={symptomFormStyles.buttonRow}>
+          {[1, 2, 3, 4, 5, 6, 7].map((scale) => (
+            <TouchableOpacity
+              key={scale}
+              style={[
+                symptomFormStyles.button,
+                symptomFormStyles.buttonSmall,
+                stool === scale && symptomFormStyles.selectedButton,
+              ]}
+              onPress={() => setStool(scale as any)}
+            >
+              <Text
+                style={[
+                  symptomFormStyles.buttonText,
+                  stool === scale && symptomFormStyles.selectedButtonText,
+                ]}
+              >
+                {scale}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+      </View>
+
+      {/* Boolean Symptoms */}
+      <View style={symptomFormStyles.toggleSection}>
+        <Text style={symptomFormStyles.label}>Additional Symptoms</Text>
+        {[
+          { label: "Diarrhea", value: diarrhea, setter: setDiarrhea },
+          { label: "Nausea", value: nausea, setter: setNausea },
+          { label: "Pain", value: pain, setter: setPain },
+        ].map(({ label, value, setter }) => (
+          <View key={label} style={symptomFormStyles.toggleRow}>
+            <Text style={symptomFormStyles.toggleLabel}>{label}</Text>
+            <TouchableOpacity
+              style={[
+                symptomFormStyles.toggleButton,
+                value && symptomFormStyles.toggleButtonActive,
+              ]}
+              onPress={() => setter(!value)}
+            >
+              <Text
+                style={[
+                  symptomFormStyles.toggleButtonText,
+                  value && symptomFormStyles.toggleButtonTextActive,
+                ]}
+              >
+                {value ? "Yes" : "No"}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        ))}
+      </View>
+
+      {/* Meal Tag */}
+      <View style={symptomFormStyles.section}>
+        <Text style={symptomFormStyles.label}>Meal Type (Optional)</Text>
+        <View style={symptomFormStyles.buttonRow}>
+          {mealTagOptions.map((option) => (
+            <TouchableOpacity
+              key={option.value}
+              style={[
+                symptomFormStyles.button,
+                symptomFormStyles.mealTagButton,
+                mealTag === option.value && symptomFormStyles.selectedButton,
+              ]}
+              onPress={() => setMealTag(option.value)}
+            >
+              <Text
+                style={[
+                  symptomFormStyles.buttonText,
+                  mealTag === option.value &&
+                    symptomFormStyles.selectedButtonText,
+                ]}
+              >
+                {option.label}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+      </View>
     </View>
   );
 }

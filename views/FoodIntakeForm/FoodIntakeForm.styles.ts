@@ -6,42 +6,122 @@ export const foodIntakeFormStyles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   title: {
-    fontSize: 20,
-    marginBottom: 10,
+    fontSize: 24,
+    marginBottom: 20,
     fontWeight: "bold",
     textAlign: "center",
+    color: "#333",
   },
-  inputContainer: {
-    marginBottom: 15,
-    zIndex: 1000,
+  subtitle: {
+    fontSize: 14,
+    marginBottom: 25,
+    textAlign: "center",
+    color: "#666",
   },
-  inputLabel: {
-    fontSize: 16,
+  mealSection: {
+    marginBottom: 25,
+  },
+  mealCard: {
+    backgroundColor: "#f8f9fa",
+    borderRadius: 12,
+    padding: 15,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  mealCardFilled: {
+    backgroundColor: "#e3f2fd",
+    borderWidth: 1,
+    borderColor: "#007AFF",
+  },
+  mealHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 10,
+  },
+  mealIcon: {
+    fontSize: 24,
+    marginRight: 10,
+  },
+  mealLabel: {
+    fontSize: 18,
     fontWeight: "bold",
-    marginBottom: 6,
+    color: "#333",
+    flex: 1,
+  },
+  clearButton: {
+    padding: 5,
+  },
+  clearButtonText: {
+    color: "#ff6b6b",
+    fontSize: 14,
+    fontWeight: "600",
   },
   inputField: {
-    height: 40,
-    borderColor: "#ccc",
+    height: 48,
+    borderColor: "#ddd",
     borderWidth: 1,
-    borderRadius: 5,
-    paddingLeft: 10,
+    borderRadius: 8,
+    paddingHorizontal: 15,
     fontSize: 16,
-    marginTop: 5,
-  },
-
-  dropdownContainer: {
-    borderColor: "#ccc",
-    borderWidth: 1,
-    borderRadius: 5,
-  },
-  dropdown: {
     backgroundColor: "#fff",
+    color: "#333",
   },
-  dropdownText: {
+  inputFieldFocused: {
+    borderColor: "#007AFF",
+    borderWidth: 2,
+  },
+  suggestionsContainer: {
+    marginTop: 10,
+    maxHeight: 180,
+    borderRadius: 8,
+    backgroundColor: "#fff",
+    borderWidth: 1,
+    borderColor: "#ddd",
+    overflow: "hidden",
+  },
+  suggestionItem: {
+    padding: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: "#f0f0f0",
+  },
+  suggestionItemLast: {
+    borderBottomWidth: 0,
+  },
+  suggestionText: {
     fontSize: 16,
+    color: "#333",
   },
-  dropdownList: {
-    borderColor: "#ccc",
+  noSuggestions: {
+    padding: 15,
+    alignItems: "center",
+  },
+  noSuggestionsText: {
+    fontSize: 14,
+    color: "#999",
+    fontStyle: "italic",
+  },
+  closeButton: {
+    marginTop: 10,
+    padding: 12,
+    backgroundColor: "#f0f0f0",
+    borderRadius: 8,
+    alignItems: "center",
+  },
+  closeButtonText: {
+    color: "#007AFF",
+    fontSize: 14,
+    fontWeight: "600",
+  },
+  emptyState: {
+    padding: 20,
+    alignItems: "center",
+  },
+  emptyStateText: {
+    fontSize: 14,
+    color: "#999",
+    textAlign: "center",
   },
 });
