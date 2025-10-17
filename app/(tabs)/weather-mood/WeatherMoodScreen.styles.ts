@@ -1,0 +1,193 @@
+import { StyleSheet } from "react-native";
+
+export const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#f8f9fa",
+  },
+  centered: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+  },
+  loadingText: {
+    marginTop: 16,
+    color: "#666",
+    fontSize: 16,
+  },
+  header: {
+    padding: 20,
+    paddingTop: 10,
+  },
+  headerTitle: {
+    fontSize: 32,
+    fontWeight: "700",
+    color: "#1a1a1a",
+    marginBottom: 8,
+    letterSpacing: -0.5,
+  },
+  headerSubtitle: {
+    fontSize: 16,
+    color: "#666",
+    lineHeight: 24,
+  },
+  summaryCard: {
+    margin: 16,
+    marginTop: 0,
+    padding: 20,
+    backgroundColor: "#ffffff",
+    borderRadius: 16,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    elevation: 4,
+  },
+  cardTitle: {
+    fontSize: 18,
+    fontWeight: "700",
+    color: "#1a1a1a",
+    marginBottom: 8,
+  },
+  summaryText: {
+    fontSize: 15,
+    color: "#666",
+    lineHeight: 22,
+  },
+  section: {
+    marginBottom: 20,
+    paddingHorizontal: 16,
+  },
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: "700",
+    color: "#1a1a1a",
+    marginBottom: 12,
+    letterSpacing: -0.3,
+  },
+  patternCard: {
+    backgroundColor: "#ffffff",
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 12,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  patternHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 12,
+  },
+  patternEmoji: {
+    fontSize: 32,
+    marginRight: 12,
+  },
+  patternMood: {
+    fontSize: 20,
+    fontWeight: "700",
+    color: "#1a1a1a",
+    flex: 1,
+  },
+  patternStats: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    paddingVertical: 12,
+    borderTopWidth: 1,
+    borderTopColor: "#f0f0f0",
+    borderBottomWidth: 1,
+    borderBottomColor: "#f0f0f0",
+  },
+  patternStat: {
+    alignItems: "center",
+  },
+  patternLabel: {
+    fontSize: 12,
+    color: "#666",
+    marginBottom: 4,
+  },
+  patternValue: {
+    fontSize: 18,
+    fontWeight: "700",
+    color: "#007AFF",
+  },
+  patternCondition: {
+    marginTop: 12,
+    paddingTop: 12,
+  },
+  patternConditionText: {
+    fontSize: 14,
+    color: "#666",
+    textAlign: "center",
+  },
+  entryCard: {
+    backgroundColor: "#ffffff",
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 6,
+    elevation: 2,
+  },
+  entryHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 12,
+    paddingBottom: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: "#f0f0f0",
+  },
+  entryDate: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#666",
+  },
+  entryMoodEmoji: {
+    fontSize: 28,
+  },
+  entryDetails: {
+    gap: 8,
+  },
+  entryRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  entryLabel: {
+    fontSize: 14,
+    color: "#666",
+    fontWeight: "500",
+  },
+  entryValue: {
+    fontSize: 14,
+    color: "#1a1a1a",
+    fontWeight: "600",
+  },
+  emptyStateContainer: {
+    padding: 40,
+    alignItems: "center",
+    marginTop: 40,
+  },
+  emptyStateIcon: {
+    fontSize: 64,
+    marginBottom: 20,
+  },
+  emptyStateText: {
+    fontSize: 16,
+    color: "#666",
+    textAlign: "center",
+    lineHeight: 24,
+  },
+  errorText: {
+    color: "#ff3b30",
+    textAlign: "center",
+    fontSize: 16,
+    fontWeight: "600",
+  },
+});

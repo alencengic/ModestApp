@@ -70,6 +70,15 @@ export default function TabLayout() {
         }}
       />
       <Drawer.Screen
+        name="weather-mood/weather-mood"
+        options={{
+          title: "Weather & Mood",
+          drawerIcon: ({ color }) => (
+            <IconSymbol size={24} name="chart.bar" color={color} />
+          ),
+        }}
+      />
+      <Drawer.Screen
         name="daily/(partials)"
         options={{
           drawerItemStyle: { display: "none" },

@@ -37,6 +37,12 @@ export default {
       ],
       "expo-sqlite",
       "expo-font",
+      [
+        "expo-location",
+        {
+          locationAlwaysAndWhenInUsePermission: "Allow $(PRODUCT_NAME) to use your location to track weather data for mood correlation.",
+        },
+      ],
     ],
     experiments: {
       typedRoutes: true,

@@ -40,6 +40,25 @@ export const openDatabase = async () => {
       nausea INTEGER NOT NULL,
       pain INTEGER NOT NULL
     );
+
+    CREATE TABLE IF NOT EXISTS weather_data (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      date TEXT UNIQUE NOT NULL,
+      temperature REAL NOT NULL,
+      condition TEXT NOT NULL,
+      humidity INTEGER NOT NULL,
+      pressure REAL NOT NULL,
+      location_name TEXT,
+      fetched_at TEXT NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS mood_ratings (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      mood TEXT NOT NULL,
+      date TEXT UNIQUE NOT NULL,
+      weather_id INTEGER,
+      FOREIGN KEY (weather_id) REFERENCES weather_data(id)
+    );
   `);
 
   return db;

@@ -1,4 +1,5 @@
 import { openDatabase } from "./db_connection";
+import { syncWeatherData } from "@/services/weatherSyncService";
 
 export interface MoodEntry {
   id: number;
@@ -34,6 +35,9 @@ export const getMoodByDate = async (
 
 export const insertOrUpdateMood = async (mood: string, date: string) => {
   const db = await openDatabase();
+
+  // Sync weather data when saving mood
+  await syncWeatherData();
 
   return await db.runAsync(
     `INSERT INTO mood_ratings (mood, date) VALUES (?, ?)

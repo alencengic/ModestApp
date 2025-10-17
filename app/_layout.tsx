@@ -12,6 +12,7 @@ import "react-native-reanimated";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 import { useColorScheme } from "@/hooks/useColorScheme";
+import { useWeatherSync } from "@/hooks/useWeatherSync";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -22,6 +23,9 @@ export default function RootLayout() {
   const [loaded] = useFonts({
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
   });
+
+  // Initialize weather sync
+  useWeatherSync();
 
   useEffect(() => {
     if (loaded) {
