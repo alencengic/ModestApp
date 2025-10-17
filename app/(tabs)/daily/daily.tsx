@@ -41,6 +41,7 @@ export default function DailyEnterScreen() {
     snacks: "",
   });
   const [symptomData, setSymptomData] = useState<SymptomFormData | null>(null);
+  const [resetKey, setResetKey] = useState(0); // Used to force component remount
 
   const { mutateAsync: saveFoodIntake } = useMutationInsertFoodIntake();
   const createSymptom = useCreateSymptom();
@@ -86,6 +87,9 @@ export default function DailyEnterScreen() {
       setProductivityValue(null);
       setFoodMeals({ breakfast: "", lunch: "", dinner: "", snacks: "" });
       setSymptomData(null);
+
+      // Force remount of all components
+      setResetKey((prev) => prev + 1);
     } catch (error) {
       console.error("Failed to save daily entries:", error);
       Alert.alert("Error", "Failed to save daily entries. Please try again.");
@@ -97,7 +101,7 @@ export default function DailyEnterScreen() {
     {
       title: "How are you feeling?",
       component: (
-        <ScrollView showsVerticalScrollIndicator={false}>
+        <ScrollView key={`mood-${resetKey}`} showsVerticalScrollIndicator={false}>
           <RatingComponent
             title="How are you feeling today?"
             options={moodOptions}
@@ -118,7 +122,7 @@ export default function DailyEnterScreen() {
     {
       title: "Productivity Level",
       component: (
-        <ScrollView showsVerticalScrollIndicator={false}>
+        <ScrollView key={`productivity-${resetKey}`} showsVerticalScrollIndicator={false}>
           <RatingComponent
             title="How productive were you today?"
             options={productivityOptions}
@@ -139,8 +143,9 @@ export default function DailyEnterScreen() {
     {
       title: "Food Intake",
       component: (
-        <ScrollView showsVerticalScrollIndicator={false}>
+        <ScrollView key={`food-${resetKey}`} showsVerticalScrollIndicator={false}>
           <FoodIntakeForm
+            key={`food-form-${resetKey}`}
             autoSave={false}
             onChange={setFoodMeals}
           />
@@ -150,8 +155,9 @@ export default function DailyEnterScreen() {
     {
       title: "Symptoms",
       component: (
-        <ScrollView showsVerticalScrollIndicator={false}>
+        <ScrollView key={`symptoms-${resetKey}`} showsVerticalScrollIndicator={false}>
           <SymptomForm
+            key={`symptom-form-${resetKey}`}
             autoSave={false}
             onChange={setSymptomData}
           />

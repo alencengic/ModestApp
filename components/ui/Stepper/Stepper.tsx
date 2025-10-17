@@ -28,6 +28,11 @@ export const Stepper: React.FC<StepperProps> = ({
       setIsCompleting(true);
       try {
         await onComplete();
+        // Reset to first step after successful save
+        setCurrentStep(0);
+        onStepChange?.(0);
+      } catch (error) {
+        console.error("Error completing stepper:", error);
       } finally {
         setIsCompleting(false);
       }

@@ -29,7 +29,16 @@ export const FoodIntakeForm: React.FC<FoodIntakeFormProps> = ({
   onChange,
   onSave: onSaveCallback,
 }) => {
-  const [meals, setMeals] = useState<Record<MealType, string>>({
+  // Store multiple items per meal type
+  const [mealItems, setMealItems] = useState<Record<MealType, string[]>>({
+    breakfast: [],
+    lunch: [],
+    dinner: [],
+    snacks: [],
+  });
+
+  // Current text in input field
+  const [currentInput, setCurrentInput] = useState<Record<MealType, string>>({
     breakfast: "",
     lunch: "",
     dinner: "",
@@ -52,11 +61,16 @@ export const FoodIntakeForm: React.FC<FoodIntakeFormProps> = ({
     snacks: [],
   });
 
-  const handleChange = (type: MealType, value: string) => {
-    const newMeals = { ...meals, [type]: value };
-    setMeals(newMeals);
-    onChange?.(newMeals);
-  };
+  // Notify parent of changes - join items with commas
+  useEffect(() => {
+    const mealsAsString: Record<MealType, string> = {
+      breakfast: mealItems.breakfast.join(", "),
+      lunch: mealItems.lunch.join(", "),
+      dinner: mealItems.dinner.join(", "),
+      snacks: mealItems.snacks.join(", "),
+    };
+    onChange?.(mealsAsString);
+  }, [mealItems, onChange]);
 
   useEffect(() => {
     const refreshSuggestions = async () => {
@@ -66,60 +80,125 @@ export const FoodIntakeForm: React.FC<FoodIntakeFormProps> = ({
     refreshSuggestions();
   }, []);
 
-  const handleClear = (type: MealType) => {
-    handleChange(type, "");
+  const handleAddItem = (type: MealType, item: string) => {
+    const trimmedItem = item.trim();
+    if (trimmedItem && !mealItems[type].includes(trimmedItem)) {
+      setMealItems((prev) => ({
+        ...prev,
+        [type]: [...prev[type], trimmedItem],
+      }));
+      setCurrentInput((prev) => ({ ...prev, [type]: "" }));
+      setMenuVisible((prev) => ({ ...prev, [type]: false }));
+    }
+  };
+
+  const handleRemoveItem = (type: MealType, itemToRemove: string) => {
+    setMealItems((prev) => ({
+      ...prev,
+      [type]: prev[type].filter((item) => item !== itemToRemove),
+    }));
+  };
+
+  const handleClearAll = (type: MealType) => {
+    setMealItems((prev) => ({ ...prev, [type]: [] }));
+    setCurrentInput((prev) => ({ ...prev, [type]: "" }));
     setMenuVisible((prev) => ({ ...prev, [type]: false }));
   };
 
   const renderMealInput = (type: MealType) => {
     const config = MEAL_CONFIG[type];
     const filteredItems = suggestions[type].filter((item) =>
-      item.toLowerCase().includes(meals[type].toLowerCase())
+      item.toLowerCase().includes(currentInput[type].toLowerCase())
     );
-    const hasValue = meals[type].trim() !== "";
+    const hasItems = mealItems[type].length > 0;
     const isFocused = focusedInput === type;
+    const canAdd = currentInput[type].trim() !== "";
 
     return (
       <View style={foodIntakeFormStyles.mealSection}>
         <View
           style={[
             foodIntakeFormStyles.mealCard,
-            hasValue && foodIntakeFormStyles.mealCardFilled,
+            hasItems && foodIntakeFormStyles.mealCardFilled,
           ]}
         >
           <View style={foodIntakeFormStyles.mealHeader}>
             <Text style={foodIntakeFormStyles.mealIcon}>{config.icon}</Text>
             <Text style={foodIntakeFormStyles.mealLabel}>{config.label}</Text>
-            {hasValue && (
+            {hasItems && (
               <TouchableOpacity
                 style={foodIntakeFormStyles.clearButton}
-                onPress={() => handleClear(type)}
+                onPress={() => handleClearAll(type)}
               >
-                <Text style={foodIntakeFormStyles.clearButtonText}>Clear</Text>
+                <Text style={foodIntakeFormStyles.clearButtonText}>
+                  Clear All
+                </Text>
               </TouchableOpacity>
             )}
           </View>
+
+          {/* Display added items as chips */}
+          {hasItems && (
+            <View style={foodIntakeFormStyles.chipContainer}>
+              {mealItems[type].map((item) => (
+                <View key={item} style={foodIntakeFormStyles.chip}>
+                  <Text style={foodIntakeFormStyles.chipText}>{item}</Text>
+                  <TouchableOpacity
+                    style={foodIntakeFormStyles.chipRemove}
+                    onPress={() => handleRemoveItem(type, item)}
+                  >
+                    <Text style={foodIntakeFormStyles.chipRemoveText}>×</Text>
+                  </TouchableOpacity>
+                </View>
+              ))}
+            </View>
+          )}
 
           <TextInput
             style={[
               foodIntakeFormStyles.inputField,
               isFocused && foodIntakeFormStyles.inputFieldFocused,
             ]}
-            value={meals[type]}
+            value={currentInput[type]}
             placeholder={config.placeholder}
             placeholderTextColor="#999"
             onFocus={() => {
               setFocusedInput(type);
-              setMenuVisible((prev) => ({ ...prev, [type]: true }));
+              if (currentInput[type].trim() !== "") {
+                setMenuVisible((prev) => ({ ...prev, [type]: true }));
+              }
             }}
             onBlur={() => setFocusedInput(null)}
             onChangeText={(text) => {
-              handleChange(type, text);
-              setMenuVisible((prev) => ({ ...prev, [type]: true }));
+              setCurrentInput((prev) => ({ ...prev, [type]: text }));
+              setMenuVisible((prev) => ({ ...prev, [type]: text.trim() !== "" }));
             }}
+            onSubmitEditing={() => {
+              if (canAdd) {
+                handleAddItem(type, currentInput[type]);
+              }
+            }}
+            returnKeyType="done"
+            blurOnSubmit={false}
           />
 
-          {menuVisible[type] && meals[type].trim() !== "" && (
+          {/* Add button */}
+          {canAdd && (
+            <TouchableOpacity
+              style={[
+                foodIntakeFormStyles.addButton,
+                !canAdd && foodIntakeFormStyles.addButtonDisabled,
+              ]}
+              onPress={() => handleAddItem(type, currentInput[type])}
+              disabled={!canAdd}
+            >
+              <Text style={foodIntakeFormStyles.addButtonText}>
+                + Add Item
+              </Text>
+            </TouchableOpacity>
+          )}
+
+          {menuVisible[type] && currentInput[type].trim() !== "" && (
             <View style={foodIntakeFormStyles.suggestionsContainer}>
               <ScrollView nestedScrollEnabled>
                 {filteredItems.length > 0 ? (
@@ -132,8 +211,7 @@ export const FoodIntakeForm: React.FC<FoodIntakeFormProps> = ({
                           foodIntakeFormStyles.suggestionItemLast,
                       ]}
                       onPress={() => {
-                        handleChange(type, item);
-                        setMenuVisible((prev) => ({ ...prev, [type]: false }));
+                        handleAddItem(type, item);
                       }}
                     >
                       <Text style={foodIntakeFormStyles.suggestionText}>
@@ -178,7 +256,7 @@ export const FoodIntakeForm: React.FC<FoodIntakeFormProps> = ({
       {renderMealInput("dinner")}
       {renderMealInput("snacks")}
 
-      {Object.values(meals).every((meal) => meal.trim() === "") && (
+      {Object.values(mealItems).every((items) => items.length === 0) && (
         <View style={foodIntakeFormStyles.emptyState}>
           <Text style={foodIntakeFormStyles.emptyStateText}>
             Start by adding what you ate for each meal

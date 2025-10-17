@@ -124,4 +124,53 @@ export const foodIntakeFormStyles = StyleSheet.create({
     color: "#999",
     textAlign: "center",
   },
+  chipContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
+    marginTop: 10,
+  },
+  chip: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#007AFF",
+    borderRadius: 20,
+    paddingVertical: 6,
+    paddingLeft: 12,
+    paddingRight: 8,
+    gap: 6,
+  },
+  chipText: {
+    color: "#fff",
+    fontSize: 14,
+    fontWeight: "500",
+  },
+  chipRemove: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    backgroundColor: "rgba(255, 255, 255, 0.3)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  chipRemoveText: {
+    color: "#fff",
+    fontSize: 12,
+    fontWeight: "bold",
+  },
+  addButton: {
+    marginTop: 10,
+    padding: 12,
+    backgroundColor: "#007AFF",
+    borderRadius: 8,
+    alignItems: "center",
+  },
+  addButtonDisabled: {
+    backgroundColor: "#ccc",
+  },
+  addButtonText: {
+    color: "#fff",
+    fontSize: 14,
+    fontWeight: "600",
+  },
 });
