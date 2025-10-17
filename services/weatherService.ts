@@ -4,23 +4,22 @@ import { DateTime } from "luxon";
 import Constants from "expo-constants";
 
 const WEATHER_API_KEY = Constants.expoConfig?.extra?.WEATHER_API_KEY || "a51474a85e4b86d8e1e879aa55a7c398";
-const WEATHER_API_BASE_URL = "https://api.weatherapi.com/v1";
+const WEATHER_API_BASE_URL = "https://api.openweathermap.org/data/2.5";
 
 export interface WeatherApiResponse {
-  location: {
-    name: string;
-    region: string;
+  name: string;
+  sys: {
     country: string;
   };
-  current: {
-    temp_c: number;
-    temp_f: number;
-    condition: {
-      text: string;
-    };
+  main: {
+    temp: number;
     humidity: number;
-    pressure_mb: number;
+    pressure: number;
   };
+  weather: Array<{
+    main: string;
+    description: string;
+  }>;
 }
 
 export const fetchWeatherData = async (
@@ -36,9 +35,9 @@ export const fetchWeatherData = async (
     }
 
     const { latitude, longitude } = location;
-    const url = `${WEATHER_API_BASE_URL}/current.json?key=${WEATHER_API_KEY}&q=${latitude},${longitude}`;
+    const url = `${WEATHER_API_BASE_URL}/weather?lat=${latitude}&lon=${longitude}&appid=${WEATHER_API_KEY}&units=metric`;
 
-    console.log("Fetching weather from:", url.replace(WEATHER_API_KEY, "***"));
+    console.log("Fetching weather from OpenWeatherMap:", url.replace(WEATHER_API_KEY, "***"));
 
     const response = await fetch(url);
 
@@ -50,6 +49,7 @@ export const fetchWeatherData = async (
     }
 
     const data: WeatherApiResponse = await response.json();
+    console.log("Weather data received:", data);
     return data;
   } catch (error) {
     console.error("Error fetching weather data:", error);
@@ -74,14 +74,14 @@ export const fetchAndSaveWeatherData = async (): Promise<boolean> => {
       return true;
     }
 
-    // Save to database
+    // Save to database (OpenWeatherMap format)
     await insertWeatherData({
       date: currentDate,
-      temperature: weatherData.current.temp_c,
-      condition: weatherData.current.condition.text,
-      humidity: weatherData.current.humidity,
-      pressure: weatherData.current.pressure_mb,
-      location_name: `${weatherData.location.name}, ${weatherData.location.country}`,
+      temperature: weatherData.main.temp,
+      condition: weatherData.weather[0]?.description || "Unknown",
+      humidity: weatherData.main.humidity,
+      pressure: weatherData.main.pressure,
+      location_name: `${weatherData.name}, ${weatherData.sys.country}`,
       fetched_at: DateTime.now().toISO(),
     });
 

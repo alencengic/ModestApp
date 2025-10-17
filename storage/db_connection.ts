@@ -61,5 +61,38 @@ export const openDatabase = async () => {
     );
   `);
 
+  // Migration: Add missing columns to weather_data if they don't exist
+  try {
+    const tableInfo = await db.getAllAsync(`PRAGMA table_info(weather_data)`);
+    const columnNames = tableInfo.map((col: any) => col.name);
+
+    if (!columnNames.includes('condition')) {
+      console.log('Migrating weather_data: adding condition column');
+      await db.execAsync(`ALTER TABLE weather_data ADD COLUMN condition TEXT NOT NULL DEFAULT 'Unknown';`);
+    }
+
+    if (!columnNames.includes('humidity')) {
+      console.log('Migrating weather_data: adding humidity column');
+      await db.execAsync(`ALTER TABLE weather_data ADD COLUMN humidity INTEGER NOT NULL DEFAULT 0;`);
+    }
+
+    if (!columnNames.includes('pressure')) {
+      console.log('Migrating weather_data: adding pressure column');
+      await db.execAsync(`ALTER TABLE weather_data ADD COLUMN pressure REAL NOT NULL DEFAULT 0;`);
+    }
+
+    if (!columnNames.includes('location_name')) {
+      console.log('Migrating weather_data: adding location_name column');
+      await db.execAsync(`ALTER TABLE weather_data ADD COLUMN location_name TEXT;`);
+    }
+
+    if (!columnNames.includes('fetched_at')) {
+      console.log('Migrating weather_data: adding fetched_at column');
+      await db.execAsync(`ALTER TABLE weather_data ADD COLUMN fetched_at TEXT NOT NULL DEFAULT '';`);
+    }
+  } catch (error) {
+    console.log('Weather data migration error:', error);
+  }
+
   return db;
 };
