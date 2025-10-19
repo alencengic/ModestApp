@@ -13,6 +13,8 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import { useQuery } from "@tanstack/react-query";
 import { useQueryFoodIntakeChartData } from "@/hooks/queries/useMutationInsertFoodIntake";
 import { styles } from "./TrendsScreen.styles";
+import { BannerAd } from "@/components/ads";
+import { BrightTheme } from "@/constants/Theme";
 
 export interface ChartDataItem {
   label: string;
@@ -23,16 +25,16 @@ export interface ChartDataItem {
 
 // Modern color palette for charts
 const CHART_COLORS = [
-  "#007AFF", // Blue
-  "#5856D6", // Purple
-  "#AF52DE", // Pink
-  "#FF2D55", // Red
-  "#FF3B30", // Orange-Red
-  "#FF9500", // Orange
-  "#FFCC00", // Yellow
-  "#34C759", // Green
-  "#00C7BE", // Teal
-  "#30B0C7", // Cyan
+  "#C88B6B",
+  "#E8B4A0",
+  "#F5DCC8",
+  "#D4CBBB",
+  "#A8B896",
+  "#E8C4B0",
+  "#C8B4A0",
+  "#B0A89C",
+  "#F5E6D3",
+  "#A67152",
 ];
 
 const TrendsAndAnalyticsScreen: React.FC = () => {
@@ -137,6 +139,8 @@ const TrendsAndAnalyticsScreen: React.FC = () => {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView>
+        <BannerAd size="small" position="top" />
+
         <View style={styles.filterContainer}>
           <Text style={styles.filterTitle}>Time Period</Text>
           <View style={styles.buttonGroup}>
@@ -238,8 +242,8 @@ const TrendsAndAnalyticsScreen: React.FC = () => {
 
           {isLoading ? (
             <View style={styles.centered}>
-              <ActivityIndicator size="large" color="#007AFF" />
-              <Text style={{ marginTop: 16, color: "#666" }}>
+              <ActivityIndicator size="large" color="#C88B6B" />
+              <Text style={{ marginTop: 16, color: BrightTheme.colors.textSecondary }}>
                 Loading chart data...
               </Text>
             </View>
@@ -345,6 +349,8 @@ const TrendsAndAnalyticsScreen: React.FC = () => {
             </>
           )}
         </View>
+
+        <BannerAd size="medium" position="bottom" />
       </ScrollView>
     </SafeAreaView>
   );

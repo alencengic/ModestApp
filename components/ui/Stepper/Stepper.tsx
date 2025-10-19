@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { BrightTheme } from "@/constants/Theme";
 
 export interface StepConfig {
   title: string;
@@ -120,96 +121,101 @@ export const Stepper: React.FC<StepperProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
+    padding: BrightTheme.spacing.lg,
+    backgroundColor: BrightTheme.colors.background,
   },
   progressContainer: {
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
-    marginBottom: 30,
+    marginBottom: BrightTheme.spacing.xl,
+    paddingTop: BrightTheme.spacing.sm,
   },
   stepIndicatorWrapper: {
     flexDirection: "row",
     alignItems: "center",
   },
   stepIndicator: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: "#e0e0e0",
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: BrightTheme.colors.surfaceLight,
     justifyContent: "center",
     alignItems: "center",
-    borderWidth: 2,
-    borderColor: "#ccc",
+    borderWidth: 3,
+    borderColor: BrightTheme.colors.border,
   },
   stepIndicatorActive: {
-    backgroundColor: "#007AFF",
-    borderColor: "#007AFF",
+    backgroundColor: BrightTheme.colors.primary,
+    borderColor: BrightTheme.colors.primary,
   },
   stepIndicatorCurrent: {
-    borderWidth: 3,
-    borderColor: "#005BBB",
+    borderWidth: 4,
+    borderColor: BrightTheme.colors.primaryDark,
+    ...BrightTheme.shadows.md,
   },
   stepNumber: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: "bold",
-    color: "#666",
+    color: BrightTheme.colors.textLight,
   },
   stepNumberActive: {
-    color: "#fff",
+    color: BrightTheme.colors.textOnPrimary,
   },
   stepConnector: {
     width: 40,
-    height: 2,
-    backgroundColor: "#ccc",
+    height: 3,
+    backgroundColor: BrightTheme.colors.border,
   },
   stepConnectorActive: {
-    backgroundColor: "#007AFF",
+    backgroundColor: BrightTheme.colors.primary,
   },
   stepTitle: {
     fontSize: 24,
-    fontWeight: "bold",
+    fontWeight: "600",
     textAlign: "center",
-    marginBottom: 20,
-    color: "#333",
+    marginBottom: BrightTheme.spacing.lg,
+    color: BrightTheme.colors.textPrimary,
+    letterSpacing: -0.3,
   },
   contentContainer: {
     flex: 1,
-    marginBottom: 20,
+    marginBottom: BrightTheme.spacing.lg,
   },
   navigationContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
-    gap: 10,
+    gap: BrightTheme.spacing.md,
   },
   button: {
     flex: 1,
-    padding: 15,
-    borderRadius: 8,
+    paddingVertical: BrightTheme.spacing.sm,
+    paddingHorizontal: BrightTheme.spacing.md,
+    borderRadius: BrightTheme.borderRadius.round,
     alignItems: "center",
   },
   backButton: {
-    backgroundColor: "#f0f0f0",
+    backgroundColor: BrightTheme.colors.background,
     borderWidth: 1,
-    borderColor: "#ccc",
+    borderColor: BrightTheme.colors.border,
   },
   nextButton: {
-    backgroundColor: "#007AFF",
+    backgroundColor: BrightTheme.colors.primary,
   },
   buttonDisabled: {
-    opacity: 0.3,
+    opacity: 0.4,
   },
   buttonText: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: "600",
-    color: "#333",
+    color: BrightTheme.colors.textPrimary,
   },
   buttonTextDisabled: {
-    color: "#999",
+    color: BrightTheme.colors.textLight,
   },
   nextButtonText: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: "600",
-    color: "#fff",
+    color: BrightTheme.colors.textOnPrimary,
   },
 });

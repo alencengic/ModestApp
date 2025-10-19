@@ -211,7 +211,7 @@ export const getFoodSymptomCorrelationData = async (
 
 export interface ProductivityRating {
   id: number;
-  rating: number;
+  productivity: number;
   date: string;
 }
 
@@ -237,8 +237,13 @@ export const getFoodProductivityCorrelationData = async (): Promise<
 
   const prodByDate: Record<string, number> = {};
   productivityRatings.forEach((rating) => {
-    if (typeof rating.rating === "number") {
-      prodByDate[rating.date] = rating.rating;
+    if (typeof rating.productivity === "number") {
+      // Extract just the date part from the ISO timestamp
+      const dateOnly = rating.date.split("T")[0];
+      // Normalize productivity from 1-5 scale to -2 to +2 scale (centered at 3)
+      // 1 -> -2, 2 -> -1, 3 -> 0, 4 -> 1, 5 -> 2
+      const normalizedScore = rating.productivity - 3;
+      prodByDate[dateOnly] = normalizedScore;
     }
   });
 

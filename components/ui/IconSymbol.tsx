@@ -13,6 +13,7 @@ const MAPPING = {
   "book.closed.fill": "menu-book",
   "face.smiling": "sentiment-satisfied-alt",
   "fork.knife": "restaurant",
+  "cloud.sun.fill": "wb-sunny",
 } as const;
 
 export type IconSymbolName = keyof typeof MAPPING;

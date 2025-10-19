@@ -1,20 +1,17 @@
 import { StyleSheet, Platform } from "react-native";
+import { BrightTheme } from "@/constants/Theme";
 
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F5F5F5",
+    backgroundColor: BrightTheme.colors.background,
   },
   chartWrapper: {
-    margin: 10,
-    padding: 15,
-    backgroundColor: "white",
-    borderRadius: 10,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
-    elevation: 3,
+    margin: BrightTheme.spacing.md,
+    padding: BrightTheme.spacing.lg,
+    backgroundColor: BrightTheme.colors.surface,
+    borderRadius: BrightTheme.borderRadius.lg,
+    ...BrightTheme.shadows.md,
   },
   centered: {
     flex: 1,

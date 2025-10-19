@@ -13,6 +13,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { useWeatherSync } from "@/hooks/useWeatherSync";
+import { requestNotificationPermissions, scheduleDailyNotifications } from "@/services/notificationService";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -24,7 +25,6 @@ export default function RootLayout() {
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
   });
 
-  // Initialize weather sync
   useWeatherSync();
 
   useEffect(() => {
@@ -32,6 +32,17 @@ export default function RootLayout() {
       SplashScreen.hideAsync();
     }
   }, [loaded]);
+
+  useEffect(() => {
+    const setupNotifications = async () => {
+      const hasPermission = await requestNotificationPermissions();
+      if (hasPermission) {
+        await scheduleDailyNotifications();
+      }
+    };
+
+    setupNotifications();
+  }, []);
 
   if (!loaded) {
     return null;

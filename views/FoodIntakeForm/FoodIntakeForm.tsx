@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import {
   View,
   Text,
@@ -8,6 +8,7 @@ import {
 } from "react-native";
 import { getDistinctMeals } from "@/storage/database";
 import { foodIntakeFormStyles } from "./FoodIntakeForm.styles";
+import { COMMON_FOODS } from "@/constants/FoodDatabase";
 
 type MealType = "breakfast" | "lunch" | "dinner" | "snacks";
 
@@ -18,23 +19,36 @@ const MEAL_CONFIG = {
   snacks: { label: "Snacks", icon: "🍎", placeholder: "e.g., Fruit, nuts, yogurt" },
 };
 
+export interface MealFeeling {
+  meal: string;
+  feeling: "great" | "good" | "okay" | "bad" | "terrible" | null;
+}
+
 interface FoodIntakeFormProps {
   autoSave?: boolean;
   onChange?: (meals: Record<MealType, string>) => void;
   onSave?: () => Promise<void>;
+  onFeelingChange?: (feelings: Record<MealType, MealFeeling["feeling"]>) => void;
 }
 
 export const FoodIntakeForm: React.FC<FoodIntakeFormProps> = ({
   autoSave = true,
   onChange,
   onSave: onSaveCallback,
+  onFeelingChange,
 }) => {
-  // Store multiple items per meal type
   const [mealItems, setMealItems] = useState<Record<MealType, string[]>>({
     breakfast: [],
     lunch: [],
     dinner: [],
     snacks: [],
+  });
+
+  const [mealFeelings, setMealFeelings] = useState<Record<MealType, MealFeeling["feeling"]>>({
+    breakfast: null,
+    lunch: null,
+    dinner: null,
+    snacks: null,
   });
 
   // Current text in input field
@@ -54,14 +68,13 @@ export const FoodIntakeForm: React.FC<FoodIntakeFormProps> = ({
 
   const [focusedInput, setFocusedInput] = useState<MealType | null>(null);
 
-  const [suggestions, setSuggestions] = useState<Record<MealType, string[]>>({
-    breakfast: [],
-    lunch: [],
-    dinner: [],
-    snacks: [],
-  });
+  const [userFoods, setUserFoods] = useState<string[]>([]);
 
-  // Notify parent of changes - join items with commas
+  const allFoods = useMemo(() => {
+    const combined = [...COMMON_FOODS, ...userFoods];
+    return Array.from(new Set(combined)).sort();
+  }, [userFoods]);
+
   useEffect(() => {
     const mealsAsString: Record<MealType, string> = {
       breakfast: mealItems.breakfast.join(", "),
@@ -73,11 +86,21 @@ export const FoodIntakeForm: React.FC<FoodIntakeFormProps> = ({
   }, [mealItems, onChange]);
 
   useEffect(() => {
-    const refreshSuggestions = async () => {
+    onFeelingChange?.(mealFeelings);
+  }, [mealFeelings, onFeelingChange]);
+
+  useEffect(() => {
+    const loadUserFoods = async () => {
       const data = await getDistinctMeals();
-      setSuggestions(data);
+      const allUserFoods = [
+        ...data.breakfast,
+        ...data.lunch,
+        ...data.dinner,
+        ...data.snacks,
+      ];
+      setUserFoods(Array.from(new Set(allUserFoods)));
     };
-    refreshSuggestions();
+    loadUserFoods();
   }, []);
 
   const handleAddItem = (type: MealType, item: string) => {
@@ -107,7 +130,7 @@ export const FoodIntakeForm: React.FC<FoodIntakeFormProps> = ({
 
   const renderMealInput = (type: MealType) => {
     const config = MEAL_CONFIG[type];
-    const filteredItems = suggestions[type].filter((item) =>
+    const filteredItems = allFoods.filter((item) =>
       item.toLowerCase().includes(currentInput[type].toLowerCase())
     );
     const hasItems = mealItems[type].length > 0;

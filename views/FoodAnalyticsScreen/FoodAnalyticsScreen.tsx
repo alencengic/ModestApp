@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from "react";
-import { ScrollView, View, StyleSheet } from "react-native";
-import { Text, List, Card, ActivityIndicator, Icon } from "react-native-paper";
+import { ScrollView, View, StyleSheet, Text } from "react-native";
+import { List, Card, ActivityIndicator, Icon } from "react-native-paper";
 import { Picker } from "@react-native-picker/picker";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -8,6 +8,8 @@ import {
   SymptomType,
   FoodSymptomCorrelation,
 } from "../../storage/correlations";
+import { BrightTheme } from "@/constants/Theme";
+import { BannerAd } from "@/components/ads";
 
 const symptomTypes: SymptomType[] = [
   "bloating",
@@ -54,14 +56,18 @@ export default function FoodAnalyticsScreen() {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text variant="titleLarge" style={styles.title}>
-        Food Symptom Correlations
-      </Text>
+      <View style={styles.header}>
+        <Text style={styles.headerEmoji}>🍎</Text>
+        <Text style={styles.headerTitle}>Food Analytics</Text>
+        <Text style={styles.headerSubtitle}>Track symptom correlations</Text>
+      </View>
+
+      <BannerAd size="small" position="top" />
 
       {/* --- Picker Section Refactored --- */}
       <Card style={styles.card}>
         <Card.Content>
-          <Text variant="titleMedium" style={styles.pickerLabel}>
+          <Text style={styles.pickerLabel}>
             Select Symptom
           </Text>
           <View style={styles.pickerWrapper}>
@@ -115,23 +121,45 @@ export default function FoodAnalyticsScreen() {
           )}
         </Card.Content>
       </Card>
+
+      <BannerAd size="medium" position="bottom" />
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    padding: 16,
-    gap: 24,
-    backgroundColor: "#f5f5f5",
+    paddingBottom: BrightTheme.spacing.xl,
+    backgroundColor: BrightTheme.colors.background,
     flexGrow: 1,
+  },
+  header: {
+    padding: BrightTheme.spacing.xl,
+    alignItems: "center",
+    backgroundColor: BrightTheme.colors.background,
+  },
+  headerEmoji: {
+    fontSize: 48,
+    marginBottom: BrightTheme.spacing.sm,
+  },
+  headerTitle: {
+    fontSize: 24,
+    fontWeight: "600",
+    color: BrightTheme.colors.textPrimary,
+    marginBottom: BrightTheme.spacing.xs,
+  },
+  headerSubtitle: {
+    fontSize: 14,
+    color: BrightTheme.colors.textSecondary,
   },
   title: {
     textAlign: "center",
     marginBottom: 10,
   },
   card: {
-    elevation: 4,
+    margin: BrightTheme.spacing.md,
+    borderRadius: BrightTheme.borderRadius.lg,
+    ...BrightTheme.shadows.md,
   },
   pickerLabel: {
     marginBottom: 12,

@@ -1,5 +1,4 @@
 import React from "react";
-import { Platform, Pressable, Text, View } from "react-native";
 import { Drawer } from "expo-router/drawer";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import { Colors } from "@/constants/Colors";
@@ -21,15 +20,6 @@ export default function TabLayout() {
           title: "Home",
           drawerIcon: ({ color }) => (
             <IconSymbol size={24} name="house.fill" color={color} />
-          ),
-        }}
-      />
-      <Drawer.Screen
-        name="daily/daily"
-        options={{
-          title: "Daily Entry",
-          drawerIcon: ({ color }) => (
-            <IconSymbol size={24} name="slider.horizontal.3" color={color} />
           ),
         }}
       />
@@ -70,16 +60,24 @@ export default function TabLayout() {
         }}
       />
       <Drawer.Screen
-        name="weather-mood/weather-mood"
+        name="weather/weather-mood"
         options={{
           title: "Weather & Mood",
           drawerIcon: ({ color }) => (
-            <IconSymbol size={24} name="chart.bar" color={color} />
+            <IconSymbol size={24} name="cloud.sun.fill" color={color} />
           ),
         }}
       />
       <Drawer.Screen
-        name="daily/(partials)"
+        name="daily/daily"
+        options={{
+          drawerItemStyle: { display: "none" },
+          headerShown: true,
+          title: "Daily Entry",
+        }}
+      />
+      <Drawer.Screen
+        name="weather"
         options={{
           drawerItemStyle: { display: "none" },
           headerShown: false,

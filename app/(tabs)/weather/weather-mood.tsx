@@ -9,6 +9,7 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { getWeatherMoodCorrelation } from "@/storage/weather_data";
 import { styles } from "./WeatherMoodScreen.styles";
+import { BannerAd, VideoAd } from "@/components/ads";
 
 interface MoodWeatherData {
   mood: string;
@@ -21,11 +22,11 @@ interface MoodWeatherData {
 
 const getMoodEmoji = (mood: string): string => {
   const moodMap: Record<string, string> = {
-    "Sad": "😢",
-    "Neutral": "😔",
-    "Happy": "🙂",
+    Sad: "😢",
+    Neutral: "😔",
+    Happy: "🙂",
     "Very Happy": "😄",
-    "Ecstatic": "😁",
+    Ecstatic: "😁",
   };
   return moodMap[mood] || "😐";
 };
@@ -40,9 +41,15 @@ const getWeatherEmoji = (condition: string): string => {
     return "🌧️";
   } else if (lowerCondition.includes("snow")) {
     return "❄️";
-  } else if (lowerCondition.includes("thunder") || lowerCondition.includes("storm")) {
+  } else if (
+    lowerCondition.includes("thunder") ||
+    lowerCondition.includes("storm")
+  ) {
     return "⛈️";
-  } else if (lowerCondition.includes("fog") || lowerCondition.includes("mist")) {
+  } else if (
+    lowerCondition.includes("fog") ||
+    lowerCondition.includes("mist")
+  ) {
     return "🌫️";
   }
   return "🌤️";
@@ -67,7 +74,10 @@ const WeatherMoodScreen: React.FC = () => {
       return null;
     }
 
-    const moodCounts: Record<string, { count: number; avgTemp: number; conditions: string[] }> = {};
+    const moodCounts: Record<
+      string,
+      { count: number; avgTemp: number; conditions: string[] }
+    > = {};
 
     correlationData.forEach((entry) => {
       if (!moodCounts[entry.mood]) {
@@ -84,27 +94,32 @@ const WeatherMoodScreen: React.FC = () => {
 
     // Calculate averages
     Object.keys(moodCounts).forEach((mood) => {
-      moodCounts[mood].avgTemp = moodCounts[mood].avgTemp / moodCounts[mood].count;
+      moodCounts[mood].avgTemp =
+        moodCounts[mood].avgTemp / moodCounts[mood].count;
     });
 
     // Find most common weather condition for each mood
-    const moodWeatherPatterns = Object.entries(moodCounts).map(([mood, data]) => {
-      const conditionCounts: Record<string, number> = {};
-      data.conditions.forEach((cond) => {
-        conditionCounts[cond] = (conditionCounts[cond] || 0) + 1;
-      });
+    const moodWeatherPatterns = Object.entries(moodCounts).map(
+      ([mood, data]) => {
+        const conditionCounts: Record<string, number> = {};
+        data.conditions.forEach((cond) => {
+          conditionCounts[cond] = (conditionCounts[cond] || 0) + 1;
+        });
 
-      const mostCommonCondition = Object.entries(conditionCounts).sort(
-        (a, b) => b[1] - a[1]
-      )[0];
+        const mostCommonCondition = Object.entries(conditionCounts).sort(
+          (a, b) => b[1] - a[1]
+        )[0];
 
-      return {
-        mood,
-        avgTemp: data.avgTemp,
-        count: data.count,
-        mostCommonCondition: mostCommonCondition ? mostCommonCondition[0] : "N/A",
-      };
-    });
+        return {
+          mood,
+          avgTemp: data.avgTemp,
+          count: data.count,
+          mostCommonCondition: mostCommonCondition
+            ? mostCommonCondition[0]
+            : "N/A",
+        };
+      }
+    );
 
     return moodWeatherPatterns.sort((a, b) => b.count - a.count);
   }, [correlationData]);
@@ -113,7 +128,7 @@ const WeatherMoodScreen: React.FC = () => {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.centered}>
-          <ActivityIndicator size="large" color="#007AFF" />
+          <ActivityIndicator size="large" color="#C88B6B" />
           <Text style={styles.loadingText}>Loading correlation data...</Text>
         </View>
       </SafeAreaView>
@@ -158,6 +173,8 @@ const WeatherMoodScreen: React.FC = () => {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView>
+        <BannerAd size="small" position="top" />
+
         <View style={styles.header}>
           <Text style={styles.headerTitle}>Weather & Mood</Text>
           <Text style={styles.headerSubtitle}>
@@ -180,7 +197,8 @@ const WeatherMoodScreen: React.FC = () => {
             <View key={pattern.mood} style={styles.patternCard}>
               <View style={styles.patternHeader}>
                 <Text style={styles.patternEmoji}>
-                  {getMoodEmoji(pattern.mood)} {getWeatherEmoji(pattern.mostCommonCondition)}
+                  {getMoodEmoji(pattern.mood)}{" "}
+                  {getWeatherEmoji(pattern.mostCommonCondition)}
                 </Text>
                 <Text style={styles.patternMood}>{pattern.mood}</Text>
               </View>
@@ -245,6 +263,8 @@ const WeatherMoodScreen: React.FC = () => {
             </View>
           ))}
         </View>
+
+        <BannerAd size="medium" position="bottom" />
       </ScrollView>
     </SafeAreaView>
   );

@@ -15,6 +15,8 @@ import {
   FoodProductivityCorrelation,
 } from "@/storage/database";
 import { styles as externalStyles } from "./MoodAnalyticsScreen.styles";
+import { BrightTheme } from "@/constants/Theme";
+import { BannerAd, VideoAd } from "@/components/ads";
 
 const PICKER_PLACEHOLDER_VALUE = "##PICKER_PLACEHOLDER##";
 
@@ -174,6 +176,35 @@ const MoodAnalyticsScreen: React.FC = () => {
   return (
     <SafeAreaView style={externalStyles.container}>
       <ScrollView>
+        <View
+          style={{
+            padding: BrightTheme.spacing.xl,
+            alignItems: "center",
+            backgroundColor: BrightTheme.colors.background,
+          }}
+        >
+          <Text style={{ fontSize: 48, marginBottom: BrightTheme.spacing.sm }}>
+            😊
+          </Text>
+          <Text
+            style={{
+              fontSize: 24,
+              fontWeight: "600",
+              color: BrightTheme.colors.textPrimary,
+              marginBottom: BrightTheme.spacing.xs,
+            }}
+          >
+            Mood Analytics
+          </Text>
+          <Text
+            style={{ fontSize: 14, color: BrightTheme.colors.textSecondary }}
+          >
+            Discover food-mood patterns
+          </Text>
+        </View>
+
+        <BannerAd size="small" position="top" />
+
         <View style={externalStyles.chartWrapper}>
           <Text style={externalStyles.chartSectionTitle}>Correlation Type</Text>
           <View style={externalStyles.pickerContainer}>
@@ -278,6 +309,8 @@ const MoodAnalyticsScreen: React.FC = () => {
             </View>
           )}
         </View>
+
+        <BannerAd size="medium" position="bottom" />
       </ScrollView>
     </SafeAreaView>
   );

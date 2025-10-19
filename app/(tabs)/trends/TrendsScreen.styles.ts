@@ -1,9 +1,10 @@
 import { StyleSheet } from "react-native";
+import { BrightTheme } from "@/constants/Theme";
 
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f8f9fa",
+    backgroundColor: BrightTheme.colors.background,
   },
   centered: {
     flex: 1,
@@ -12,22 +13,16 @@ export const styles = StyleSheet.create({
     padding: 20,
   },
   filterContainer: {
-    margin: 16,
-    padding: 20,
-    backgroundColor: "#ffffff",
-    borderRadius: 16,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
-    elevation: 4,
+    margin: BrightTheme.spacing.md,
+    padding: BrightTheme.spacing.lg,
+    backgroundColor: BrightTheme.colors.surface,
+    borderRadius: BrightTheme.borderRadius.lg,
   },
   filterTitle: {
-    fontWeight: "700",
-    fontSize: 22,
-    marginBottom: 16,
-    color: "#1a1a1a",
-    letterSpacing: -0.5,
+    fontWeight: "600",
+    fontSize: 16,
+    marginBottom: BrightTheme.spacing.md,
+    color: BrightTheme.colors.textPrimary,
   },
   buttonGroup: {
     flexDirection: "row",
@@ -38,56 +33,51 @@ export const styles = StyleSheet.create({
   filterButton: {
     paddingVertical: 10,
     paddingHorizontal: 16,
-    borderRadius: 12,
-    backgroundColor: "#f0f0f0",
-    borderWidth: 2,
-    borderColor: "transparent",
+    borderRadius: BrightTheme.borderRadius.round,
+    backgroundColor: BrightTheme.colors.background,
+    borderWidth: 1,
+    borderColor: BrightTheme.colors.border,
   },
   filterButtonActive: {
-    backgroundColor: "#007AFF",
-    borderColor: "#007AFF",
+    backgroundColor: BrightTheme.colors.primary,
+    borderColor: BrightTheme.colors.primary,
   },
   filterButtonText: {
     fontSize: 14,
-    fontWeight: "600",
-    color: "#666",
+    fontWeight: "500",
+    color: BrightTheme.colors.textSecondary,
   },
   filterButtonTextActive: {
-    color: "#fff",
+    color: BrightTheme.colors.textOnPrimary,
+    fontWeight: "600",
   },
   chartWrapper: {
-    margin: 16,
-    padding: 20,
-    backgroundColor: "#ffffff",
-    borderRadius: 20,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.1,
-    shadowRadius: 16,
-    elevation: 6,
+    margin: BrightTheme.spacing.md,
+    padding: BrightTheme.spacing.lg,
+    backgroundColor: BrightTheme.colors.surface,
+    borderRadius: BrightTheme.borderRadius.xl,
   },
   chartTitle: {
-    fontSize: 20,
-    fontWeight: "700",
-    marginBottom: 8,
-    color: "#1a1a1a",
-    letterSpacing: -0.5,
+    fontSize: 18,
+    fontWeight: "600",
+    marginBottom: BrightTheme.spacing.sm,
+    color: BrightTheme.colors.textPrimary,
   },
   chartSubtitle: {
     fontSize: 14,
-    color: "#666",
-    marginBottom: 20,
+    color: BrightTheme.colors.textSecondary,
+    marginBottom: BrightTheme.spacing.lg,
   },
   chartViewContainer: {
     height: 320,
     width: "100%",
     marginBottom: 20,
-    backgroundColor: "#fafbfc",
+    backgroundColor: BrightTheme.colors.background,
     borderRadius: 12,
     padding: 10,
   },
   errorText: {
-    color: "#ff3b30",
+    color: BrightTheme.colors.error,
     textAlign: "center",
     fontSize: 16,
     fontWeight: "600",
@@ -102,7 +92,7 @@ export const styles = StyleSheet.create({
   },
   emptyStateText: {
     fontSize: 16,
-    color: "#666",
+    color: BrightTheme.colors.textSecondary,
     textAlign: "center",
     lineHeight: 24,
   },
@@ -114,7 +104,7 @@ export const styles = StyleSheet.create({
     marginTop: 16,
     paddingTop: 16,
     borderTopWidth: 1,
-    borderTopColor: "#f0f0f0",
+    borderTopColor: BrightTheme.colors.border,
   },
   legendItem: {
     flexDirection: "row",
@@ -123,7 +113,7 @@ export const styles = StyleSheet.create({
     marginBottom: 8,
     paddingVertical: 6,
     paddingHorizontal: 12,
-    backgroundColor: "#f8f9fa",
+    backgroundColor: BrightTheme.colors.background,
     borderRadius: 8,
   },
   legendSwatch: {
@@ -134,7 +124,7 @@ export const styles = StyleSheet.create({
   },
   legendText: {
     fontSize: 13,
-    color: "#333",
+    color: BrightTheme.colors.textPrimary,
     fontWeight: "500",
   },
   statsContainer: {
@@ -143,7 +133,7 @@ export const styles = StyleSheet.create({
     marginTop: 16,
     paddingTop: 16,
     borderTopWidth: 1,
-    borderTopColor: "#f0f0f0",
+    borderTopColor: BrightTheme.colors.border,
   },
   statItem: {
     alignItems: "center",
@@ -151,12 +141,12 @@ export const styles = StyleSheet.create({
   statValue: {
     fontSize: 24,
     fontWeight: "700",
-    color: "#007AFF",
+    color: BrightTheme.colors.primary,
     marginBottom: 4,
   },
   statLabel: {
     fontSize: 12,
-    color: "#666",
+    color: BrightTheme.colors.textSecondary,
     fontWeight: "500",
   },
 });

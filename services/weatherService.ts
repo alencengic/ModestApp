@@ -3,7 +3,7 @@ import { insertWeatherData, getWeatherByDate } from "@/storage/weather_data";
 import { DateTime } from "luxon";
 import Constants from "expo-constants";
 
-const WEATHER_API_KEY = Constants.expoConfig?.extra?.WEATHER_API_KEY || "a51474a85e4b86d8e1e879aa55a7c398";
+const WEATHER_API_KEY = Constants.expoConfig?.extra?.WEATHER_API_KEY;
 const WEATHER_API_BASE_URL = "https://api.openweathermap.org/data/2.5";
 
 export interface WeatherApiResponse {
@@ -26,7 +26,6 @@ export const fetchWeatherData = async (
   coords?: LocationCoords
 ): Promise<WeatherApiResponse | null> => {
   try {
-    // Get location if not provided
     const location = coords || (await getCurrentLocation());
 
     if (!location) {
@@ -37,7 +36,10 @@ export const fetchWeatherData = async (
     const { latitude, longitude } = location;
     const url = `${WEATHER_API_BASE_URL}/weather?lat=${latitude}&lon=${longitude}&appid=${WEATHER_API_KEY}&units=metric`;
 
-    console.log("Fetching weather from OpenWeatherMap:", url.replace(WEATHER_API_KEY, "***"));
+    console.log(
+      "Fetching weather from OpenWeatherMap:",
+      url.replace(WEATHER_API_KEY, "***")
+    );
 
     const response = await fetch(url);
 
@@ -67,14 +69,11 @@ export const fetchAndSaveWeatherData = async (): Promise<boolean> => {
 
     const currentDate = DateTime.now().toISODate() as string;
 
-    // Check if we already have weather data for today
     const existingWeather = await getWeatherByDate(currentDate);
     if (existingWeather) {
-      console.log("Weather data already exists for today");
       return true;
     }
 
-    // Save to database (OpenWeatherMap format)
     await insertWeatherData({
       date: currentDate,
       temperature: weatherData.main.temp,
@@ -85,7 +84,6 @@ export const fetchAndSaveWeatherData = async (): Promise<boolean> => {
       fetched_at: DateTime.now().toISO(),
     });
 
-    console.log("Weather data saved successfully");
     return true;
   } catch (error) {
     console.error("Error in fetchAndSaveWeatherData:", error);

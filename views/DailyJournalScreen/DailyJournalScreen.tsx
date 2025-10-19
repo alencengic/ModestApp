@@ -3,7 +3,6 @@ import {
   View,
   Text,
   TextInput,
-  Button,
   StyleSheet,
   Alert,
   ScrollView,
@@ -12,10 +11,13 @@ import {
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { DateTime } from "luxon";
+import { LinearGradient } from "expo-linear-gradient";
 import {
   insertJournalEntry,
   getJournalEntriesByRange,
 } from "@/storage/database";
+import { BrightTheme } from "@/constants/Theme";
+import { BannerAd } from "@/components/ads";
 
 const CHARACTER_LIMIT = 1000;
 
@@ -84,18 +86,53 @@ const DailyJournalScreen: React.FC = () => {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>Daily Journal</Text>
-      <View style={styles.buttonGroup}>
-        <Button title="Today" onPress={() => setRange("day")} />
-        <Button title="This Week" onPress={() => setRange("week")} />
-        <Button title="This Month" onPress={() => setRange("month")} />
-        <Button
-          title="Choose a Day"
-          onPress={() => {
-            setRange("custom");
-            setShowDatePicker(true);
-          }}
-        />
+      <View style={styles.header}>
+        <Text style={styles.headerEmoji}>📔</Text>
+        <Text style={styles.title}>Daily Journal</Text>
+        <Text style={styles.subtitle}>Express your thoughts and feelings</Text>
+      </View>
+
+      <BannerAd size="small" position="top" />
+
+      <View style={styles.filterContainer}>
+        <Text style={styles.filterTitle}>Time Period</Text>
+        <View style={styles.buttonGroup}>
+          <TouchableOpacity
+            style={[styles.filterButton, range === "day" && styles.filterButtonActive]}
+            onPress={() => setRange("day")}
+          >
+            <Text style={[styles.filterButtonText, range === "day" && styles.filterButtonTextActive]}>
+              Today
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.filterButton, range === "week" && styles.filterButtonActive]}
+            onPress={() => setRange("week")}
+          >
+            <Text style={[styles.filterButtonText, range === "week" && styles.filterButtonTextActive]}>
+              Week
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.filterButton, range === "month" && styles.filterButtonActive]}
+            onPress={() => setRange("month")}
+          >
+            <Text style={[styles.filterButtonText, range === "month" && styles.filterButtonTextActive]}>
+              Month
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.filterButton, range === "custom" && styles.filterButtonActive]}
+            onPress={() => {
+              setRange("custom");
+              setShowDatePicker(true);
+            }}
+          >
+            <Text style={[styles.filterButtonText, range === "custom" && styles.filterButtonTextActive]}>
+              Custom
+            </Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
       {showDatePicker && (
@@ -112,47 +149,64 @@ const DailyJournalScreen: React.FC = () => {
         />
       )}
 
-      <TextInput
-        style={styles.textInput}
-        multiline
-        maxLength={CHARACTER_LIMIT}
-        placeholder="Write your thoughts..."
-        value={note}
-        onChangeText={setNote}
-      />
-      <Text style={styles.counter}>
-        {note.length} / {CHARACTER_LIMIT}
-      </Text>
-      <Button
-        title="Save Note"
-        onPress={handleSave}
-        disabled={mutation.isPending}
-      />
+      <View style={styles.inputContainer}>
+        <Text style={styles.inputLabel}>✍️ Today's Entry</Text>
+        <TextInput
+          style={styles.textInput}
+          multiline
+          maxLength={CHARACTER_LIMIT}
+          placeholder="Write your thoughts..."
+          placeholderTextColor={BrightTheme.colors.textLight}
+          value={note}
+          onChangeText={setNote}
+        />
+        <Text style={styles.counter}>
+          {note.length} / {CHARACTER_LIMIT}
+        </Text>
+        <TouchableOpacity
+          style={[styles.saveButton, mutation.isPending && styles.saveButtonDisabled]}
+          onPress={handleSave}
+          disabled={mutation.isPending}
+        >
+          <Text style={styles.saveButtonText}>
+            {mutation.isPending ? "Saving..." : "💾 Save Entry"}
+          </Text>
+        </TouchableOpacity>
+      </View>
 
-      <Text style={styles.subtitle}>Saved Entries</Text>
+      <Text style={styles.sectionTitle}>📚 Saved Entries</Text>
       {entries.length === 0 ? (
-        <Text style={styles.noEntries}>No entries for this range.</Text>
+        <View style={styles.emptyState}>
+          <Text style={styles.emptyStateIcon}>📖</Text>
+          <Text style={styles.noEntries}>No entries for this period</Text>
+        </View>
       ) : (
         entries.map((entry, index) => {
+          const isActive = activeEntryDate === entry?.date;
           return (
             <TouchableOpacity
               key={index}
-              onPress={() => setActiveEntryDate(entry?.date)}
-              style={styles.entryContainer}
+              onPress={() => setActiveEntryDate(isActive ? null : entry?.date)}
+              style={[styles.entryContainer, isActive && styles.entryContainerActive]}
             >
-              <Text style={styles.entryText}>
-                {DateTime.fromISO(entry?.date).toLocaleString(
-                  DateTime.DATETIME_MED
-                )}
-              </Text>
+              <View style={styles.entryHeader}>
+                <Text style={styles.entryDate}>
+                  {DateTime.fromISO(entry?.date).toLocaleString(
+                    DateTime.DATETIME_MED
+                  )}
+                </Text>
+                <Text style={styles.expandIcon}>{isActive ? "▲" : "▼"}</Text>
+              </View>
 
-              {activeEntryDate === entry?.date && (
+              {isActive && (
                 <Text style={styles.entryDetail}>{entry?.content}</Text>
               )}
             </TouchableOpacity>
           );
         })
       )}
+
+      <BannerAd size="medium" position="bottom" />
     </ScrollView>
   );
 };
@@ -161,58 +215,165 @@ export default DailyJournalScreen;
 
 const styles = StyleSheet.create({
   container: {
-    padding: 16,
+    paddingBottom: BrightTheme.spacing.xl,
+    backgroundColor: BrightTheme.colors.background,
+  },
+  header: {
+    padding: BrightTheme.spacing.xl,
+    alignItems: "center",
+    backgroundColor: BrightTheme.colors.background,
+  },
+  headerEmoji: {
+    fontSize: 48,
+    marginBottom: BrightTheme.spacing.sm,
   },
   title: {
-    fontSize: 20,
-    marginBottom: 12,
-    fontWeight: "bold",
+    fontSize: 24,
+    fontWeight: "600",
+    color: BrightTheme.colors.textPrimary,
+    marginBottom: BrightTheme.spacing.xs,
+  },
+  subtitle: {
+    fontSize: 14,
+    color: BrightTheme.colors.textSecondary,
+  },
+  filterContainer: {
+    margin: BrightTheme.spacing.md,
+    padding: BrightTheme.spacing.lg,
+    backgroundColor: BrightTheme.colors.surface,
+    borderRadius: BrightTheme.borderRadius.lg,
+  },
+  filterTitle: {
+    fontWeight: "600",
+    fontSize: 16,
+    marginBottom: BrightTheme.spacing.md,
+    color: BrightTheme.colors.textPrimary,
   },
   buttonGroup: {
     flexDirection: "row",
     flexWrap: "wrap",
-    gap: 8,
-    marginBottom: 12,
+    gap: BrightTheme.spacing.sm,
   },
-  subtitle: {
+  filterButton: {
+    paddingVertical: BrightTheme.spacing.sm,
+    paddingHorizontal: BrightTheme.spacing.md,
+    borderRadius: BrightTheme.borderRadius.round,
+    backgroundColor: BrightTheme.colors.background,
+    borderWidth: 1,
+    borderColor: BrightTheme.colors.border,
+  },
+  filterButtonActive: {
+    backgroundColor: BrightTheme.colors.primary,
+    borderColor: BrightTheme.colors.primary,
+  },
+  filterButtonText: {
+    fontSize: 14,
+    fontWeight: "500",
+    color: BrightTheme.colors.textSecondary,
+  },
+  filterButtonTextActive: {
+    color: BrightTheme.colors.textOnPrimary,
+    fontWeight: "600",
+  },
+  inputContainer: {
+    margin: BrightTheme.spacing.md,
+    padding: BrightTheme.spacing.lg,
+    backgroundColor: BrightTheme.colors.surface,
+    borderRadius: BrightTheme.borderRadius.lg,
+  },
+  inputLabel: {
     fontSize: 16,
-    marginTop: 24,
-    marginBottom: 8,
-    fontWeight: "bold",
+    fontWeight: "600",
+    marginBottom: BrightTheme.spacing.md,
+    color: BrightTheme.colors.textPrimary,
   },
   textInput: {
-    borderColor: "#ccc",
+    borderColor: BrightTheme.colors.border,
     borderWidth: 1,
-    borderRadius: 8,
-    padding: 12,
+    borderRadius: BrightTheme.borderRadius.md,
+    padding: BrightTheme.spacing.md,
     height: 200,
-    marginBottom: 8,
+    marginBottom: BrightTheme.spacing.sm,
     textAlignVertical: "top",
+    fontSize: 16,
+    color: BrightTheme.colors.textPrimary,
+    backgroundColor: BrightTheme.colors.background,
   },
   counter: {
     textAlign: "right",
-    marginBottom: 16,
-    color: "#888",
+    marginBottom: BrightTheme.spacing.md,
+    color: BrightTheme.colors.textLight,
     fontSize: 12,
   },
-  entryContainer: {
-    backgroundColor: "#f9f9f9",
-    padding: 12,
-    borderRadius: 6,
-    marginBottom: 8,
+  saveButton: {
+    backgroundColor: BrightTheme.colors.primary,
+    padding: BrightTheme.spacing.md,
+    borderRadius: BrightTheme.borderRadius.round,
+    alignItems: "center",
   },
-  entryText: {
+  saveButtonDisabled: {
+    opacity: 0.5,
+  },
+  saveButtonText: {
+    color: BrightTheme.colors.textOnPrimary,
+    fontSize: 16,
+    fontWeight: "600",
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: "600",
+    marginHorizontal: BrightTheme.spacing.md,
+    marginTop: BrightTheme.spacing.lg,
+    marginBottom: BrightTheme.spacing.md,
+    color: BrightTheme.colors.textPrimary,
+  },
+  emptyState: {
+    alignItems: "center",
+    padding: BrightTheme.spacing.xl,
+  },
+  emptyStateIcon: {
+    fontSize: 48,
+    marginBottom: BrightTheme.spacing.md,
+  },
+  noEntries: {
+    fontSize: 16,
+    color: BrightTheme.colors.textSecondary,
+    textAlign: "center",
+  },
+  entryContainer: {
+    backgroundColor: BrightTheme.colors.surface,
+    marginHorizontal: BrightTheme.spacing.md,
+    marginBottom: BrightTheme.spacing.md,
+    padding: BrightTheme.spacing.md,
+    borderRadius: BrightTheme.borderRadius.md,
+    borderWidth: 1,
+    borderColor: BrightTheme.colors.border,
+  },
+  entryContainerActive: {
+    borderColor: BrightTheme.colors.primary,
+    backgroundColor: BrightTheme.colors.background,
+  },
+  entryHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  entryDate: {
     fontSize: 14,
-    color: "#333",
-    fontWeight: "bold",
+    color: BrightTheme.colors.textSecondary,
+    fontWeight: "500",
+  },
+  expandIcon: {
+    fontSize: 12,
+    color: BrightTheme.colors.textSecondary,
   },
   entryDetail: {
     fontSize: 14,
-    color: "#555",
-    marginTop: 4,
-  },
-  noEntries: {
-    fontStyle: "italic",
-    color: "#999",
+    color: BrightTheme.colors.textPrimary,
+    marginTop: BrightTheme.spacing.md,
+    paddingTop: BrightTheme.spacing.md,
+    borderTopWidth: 1,
+    borderTopColor: BrightTheme.colors.divider,
+    lineHeight: 22,
   },
 });
