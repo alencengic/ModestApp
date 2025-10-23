@@ -5,6 +5,11 @@ import {
   TextInput,
   TouchableOpacity,
   ScrollView,
+  Modal,
+  Keyboard,
+  Pressable,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 import { getDistinctMeals } from "@/storage/database";
 import { foodIntakeFormStyles } from "./FoodIntakeForm.styles";
@@ -84,6 +89,9 @@ const FoodIntakeFormComponent = forwardRef<FoodIntakeFormRef, FoodIntakeFormProp
   });
 
   const [focusedInput, setFocusedInput] = useState<MealType | null>(null);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [activeModalMeal, setActiveModalMeal] = useState<MealType | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const [userFoods, setUserFoods] = useState<string[]>([]);
 
@@ -144,6 +152,19 @@ const FoodIntakeFormComponent = forwardRef<FoodIntakeFormRef, FoodIntakeFormProp
       breakfastInputRef.current?.focus();
     },
   }));
+
+  const openModalPicker = (type: MealType) => {
+    Keyboard.dismiss();
+    setActiveModalMeal(type);
+    setModalVisible(true);
+    setSearchQuery("");
+  };
+
+  const closeModalPicker = () => {
+    setModalVisible(false);
+    setActiveModalMeal(null);
+    setSearchQuery("");
+  };
 
   const handleAddItem = (type: MealType, item: string) => {
     const trimmedItem = item.trim();
@@ -259,97 +280,32 @@ const FoodIntakeFormComponent = forwardRef<FoodIntakeFormRef, FoodIntakeFormProp
             </View>
           )}
 
-          <TextInput
-            ref={inputRefs[type]}
-            style={[
-              foodIntakeFormStyles.inputField,
-              isFocused && foodIntakeFormStyles.inputFieldFocused,
-            ]}
-            value={currentInput[type]}
-            placeholder={config.placeholder}
-            placeholderTextColor="#999"
-            onFocus={() => {
-              setFocusedInput(type);
-              scrollToInput(type);
-              if (currentInput[type].trim() !== "") {
-                setMenuVisible((prev) => ({ ...prev, [type]: true }));
-              }
-            }}
-            onBlur={() => setFocusedInput(null)}
-            onChangeText={(text) => {
-              setCurrentInput((prev) => ({ ...prev, [type]: text }));
-              setMenuVisible((prev) => ({ ...prev, [type]: text.trim() !== "" }));
-            }}
-            onSubmitEditing={() => {
-              if (canAdd) {
-                handleAddItem(type, currentInput[type]);
-              }
-            }}
-            returnKeyType="done"
-            blurOnSubmit={false}
-          />
-
-          {/* Add button */}
-          {canAdd && (
-            <TouchableOpacity
-              style={[
-                foodIntakeFormStyles.addButton,
-                !canAdd && foodIntakeFormStyles.addButtonDisabled,
-              ]}
-              onPress={() => handleAddItem(type, currentInput[type])}
-              disabled={!canAdd}
-            >
-              <Text style={foodIntakeFormStyles.addButtonText}>
-                + Add Item
-              </Text>
-            </TouchableOpacity>
-          )}
-
-          {menuVisible[type] && currentInput[type].trim() !== "" && (
-            <View style={foodIntakeFormStyles.suggestionsContainer}>
-              <ScrollView nestedScrollEnabled>
-                {filteredItems.length > 0 ? (
-                  filteredItems.slice(0, 5).map((item, index) => (
-                    <TouchableOpacity
-                      key={item}
-                      style={[
-                        foodIntakeFormStyles.suggestionItem,
-                        index === Math.min(filteredItems.length, 5) - 1 &&
-                          foodIntakeFormStyles.suggestionItemLast,
-                      ]}
-                      onPress={() => {
-                        handleAddItem(type, item);
-                      }}
-                    >
-                      <Text style={foodIntakeFormStyles.suggestionText}>
-                        {item}
-                      </Text>
-                    </TouchableOpacity>
-                  ))
-                ) : (
-                  <View style={foodIntakeFormStyles.noSuggestions}>
-                    <Text style={foodIntakeFormStyles.noSuggestionsText}>
-                      No previous entries found
-                    </Text>
-                  </View>
-                )}
-              </ScrollView>
-              <TouchableOpacity
-                style={foodIntakeFormStyles.closeButton}
-                onPress={() =>
-                  setMenuVisible((prev) => ({ ...prev, [type]: false }))
-                }
-              >
-                <Text style={foodIntakeFormStyles.closeButtonText}>
-                  Close Suggestions
-                </Text>
-              </TouchableOpacity>
-            </View>
-          )}
+          {/* Picker button to open modal */}
+          <TouchableOpacity
+            style={foodIntakeFormStyles.addButton}
+            onPress={() => openModalPicker(type)}
+          >
+            <Text style={foodIntakeFormStyles.addButtonText}>
+              + Add Items
+            </Text>
+          </TouchableOpacity>
         </View>
       </View>
     );
   };
+
+  const modalFilteredItems = activeModalMeal
+    ? allFoods.filter((item) => {
+        const matchesSearch = item.toLowerCase().includes(searchQuery.toLowerCase());
+        const notAlreadyAdded = !mealItems[activeModalMeal].includes(item);
+        return matchesSearch && notAlreadyAdded;
+      })
+    : [];
+
+  const hasExactMatch = modalFilteredItems.some(
+    (item) => item.toLowerCase() === searchQuery.toLowerCase()
+  );
+  const canAddAsNew = searchQuery.trim() && !hasExactMatch;
 
   return (
     <View style={foodIntakeFormStyles.container}>
@@ -370,6 +326,103 @@ const FoodIntakeFormComponent = forwardRef<FoodIntakeFormRef, FoodIntakeFormProp
           </Text>
         </View>
       )}
+
+      {/* Food Picker Modal */}
+      <Modal
+        visible={modalVisible}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={closeModalPicker}
+      >
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          style={{ flex: 1 }}
+        >
+          <Pressable
+            style={foodIntakeFormStyles.modalOverlay}
+            onPress={closeModalPicker}
+          >
+            <Pressable
+              style={foodIntakeFormStyles.modalContainer}
+              onPress={(e) => e.stopPropagation()}
+            >
+              <View style={foodIntakeFormStyles.modalHeader}>
+                <Text style={foodIntakeFormStyles.modalTitle}>
+                  Select {activeModalMeal && MEAL_CONFIG[activeModalMeal].label}
+                </Text>
+                <TouchableOpacity
+                  style={foodIntakeFormStyles.modalCloseButton}
+                  onPress={closeModalPicker}
+                >
+                  <Text style={foodIntakeFormStyles.modalCloseText}>✕</Text>
+                </TouchableOpacity>
+              </View>
+
+              {/* Search Input */}
+              <View style={foodIntakeFormStyles.searchContainer}>
+                <TextInput
+                  style={foodIntakeFormStyles.searchInput}
+                  value={searchQuery}
+                  onChangeText={setSearchQuery}
+                  placeholder="Search or add new item..."
+                  placeholderTextColor="#999"
+                  autoFocus
+                />
+              </View>
+
+              <ScrollView
+                style={foodIntakeFormStyles.modalScrollView}
+                keyboardShouldPersistTaps="handled"
+              >
+                {/* Add as new item button */}
+                {canAddAsNew && (
+                  <TouchableOpacity
+                    style={foodIntakeFormStyles.addNewItemButton}
+                    onPress={() => {
+                      Keyboard.dismiss();
+                      if (activeModalMeal) {
+                        handleAddItem(activeModalMeal, searchQuery.trim());
+                      }
+                      closeModalPicker();
+                    }}
+                  >
+                    <Text style={foodIntakeFormStyles.addNewItemIcon}>➕</Text>
+                    <Text style={foodIntakeFormStyles.addNewItemText}>
+                      Add "{searchQuery.trim()}" as new item
+                    </Text>
+                  </TouchableOpacity>
+                )}
+
+                {/* Filtered existing items */}
+                {modalFilteredItems.map((item) => (
+                  <TouchableOpacity
+                    key={item}
+                    style={foodIntakeFormStyles.modalItem}
+                    onPress={() => {
+                      Keyboard.dismiss();
+                      if (activeModalMeal) {
+                        handleAddItem(activeModalMeal, item);
+                      }
+                      closeModalPicker();
+                    }}
+                  >
+                    <Text style={foodIntakeFormStyles.modalItemText}>{item}</Text>
+                  </TouchableOpacity>
+                ))}
+
+                {/* No results message */}
+                {!canAddAsNew && modalFilteredItems.length === 0 && searchQuery.trim() && (
+                  <View style={foodIntakeFormStyles.noResults}>
+                    <Text style={foodIntakeFormStyles.noResultsText}>
+                      No items found
+                    </Text>
+                  </View>
+                )}
+              </ScrollView>
+            </Pressable>
+          </Pressable>
+        </KeyboardAvoidingView>
+      </Modal>
     </View>
   );
 });

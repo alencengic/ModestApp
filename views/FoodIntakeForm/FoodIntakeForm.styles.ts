@@ -173,4 +173,106 @@ export const foodIntakeFormStyles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "600",
   },
+  inputRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  pickerButton: {
+    width: 48,
+    height: 48,
+    backgroundColor: "#007AFF",
+    borderRadius: 8,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  pickerButtonText: {
+    fontSize: 24,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: "flex-end",
+  },
+  modalContainer: {
+    backgroundColor: "#fff",
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    maxHeight: "70%",
+    paddingBottom: 20,
+  },
+  modalHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: "#e0e0e0",
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#333",
+  },
+  modalCloseButton: {
+    padding: 5,
+  },
+  modalCloseText: {
+    fontSize: 24,
+    color: "#666",
+  },
+  modalScrollView: {
+    paddingHorizontal: 20,
+  },
+  modalItem: {
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: "#f0f0f0",
+  },
+  modalItemText: {
+    fontSize: 16,
+    color: "#333",
+  },
+  searchContainer: {
+    paddingHorizontal: 20,
+    paddingTop: 15,
+    paddingBottom: 10,
+  },
+  searchInput: {
+    height: 48,
+    borderColor: "#ddd",
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingHorizontal: 15,
+    fontSize: 16,
+    backgroundColor: "#fff",
+    color: "#333",
+  },
+  addNewItemButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 15,
+    backgroundColor: "#e3f2fd",
+    borderBottomWidth: 1,
+    borderBottomColor: "#007AFF",
+  },
+  addNewItemIcon: {
+    fontSize: 18,
+    marginRight: 10,
+  },
+  addNewItemText: {
+    fontSize: 16,
+    color: "#007AFF",
+    fontWeight: "600",
+    flex: 1,
+  },
+  noResults: {
+    padding: 20,
+    alignItems: "center",
+  },
+  noResultsText: {
+    fontSize: 14,
+    color: "#999",
+    fontStyle: "italic",
+  },
 });

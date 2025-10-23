@@ -132,7 +132,7 @@ export default function HomeScreen() {
             onPress={() => router.push("/daily/daily")}
           >
             <Text style={styles.startButtonText}>
-              {hasExistingData ? "Continue Today's Entry" : "Start Today's Entry"}
+              {hasExistingData ? "Edit Today's Entry" : "Start Today's Entry"}
             </Text>
           </TouchableOpacity>
 

@@ -12,6 +12,7 @@ import {
   Pressable,
   KeyboardAvoidingView,
   Platform,
+  Keyboard,
 } from "react-native";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -350,6 +351,7 @@ const MoodAnalyticsScreen: React.FC = () => {
                 <FlatList
                   data={filteredFoods}
                   keyExtractor={(item) => item}
+                  keyboardShouldPersistTaps="handled"
                   renderItem={({ item }) => (
                     <TouchableOpacity
                       style={[
@@ -358,6 +360,7 @@ const MoodAnalyticsScreen: React.FC = () => {
                           externalStyles.foodItemSelected,
                       ]}
                       onPress={() => {
+                        Keyboard.dismiss();
                         setSelectedFoodName(item);
                         setIsModalVisible(false);
                         setSearchQuery("");
