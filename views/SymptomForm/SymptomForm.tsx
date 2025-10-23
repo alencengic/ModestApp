@@ -39,7 +39,6 @@ export default function SymptomForm({
   const [pain, setPain] = useState(false);
   const [mealTag, setMealTag] = useState<MealType | undefined>(defaultMealType);
 
-  // Notify parent of changes
   React.useEffect(() => {
     if (onChange) {
       onChange({
@@ -74,7 +73,6 @@ export default function SymptomForm({
         How do you feel after your meal?
       </Text>
 
-      {/* Bloating */}
       <View style={symptomFormStyles.section}>
         <Text style={symptomFormStyles.label}>Bloating</Text>
         <View style={symptomFormStyles.buttonRow}>
@@ -101,7 +99,6 @@ export default function SymptomForm({
         </View>
       </View>
 
-      {/* Energy */}
       <View style={symptomFormStyles.section}>
         <Text style={symptomFormStyles.label}>Energy Level (1-5)</Text>
         <View style={symptomFormStyles.buttonRow}>
@@ -127,7 +124,6 @@ export default function SymptomForm({
         </View>
       </View>
 
-      {/* Stool */}
       <View style={symptomFormStyles.section}>
         <Text style={symptomFormStyles.label}>Bristol Stool Scale (1-7)</Text>
         <View style={symptomFormStyles.buttonRow}>

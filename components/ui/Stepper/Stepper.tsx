@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from "react-native";
+import { useRouter } from "expo-router";
 import { BrightTheme } from "@/constants/Theme";
 
 export interface StepConfig {
@@ -20,6 +21,7 @@ export const Stepper: React.FC<StepperProps> = ({
   onStepChange,
   allowSkipAfterStep = -1, // Default: no skipping allowed
 }) => {
+  const router = useRouter();
   const [currentStep, setCurrentStep] = useState(0);
   const [isCompleting, setIsCompleting] = useState(false);
 
@@ -35,6 +37,9 @@ export const Stepper: React.FC<StepperProps> = ({
 
         setCurrentStep(0);
         onStepChange?.(0);
+
+        // Navigate to home screen after completion
+        router.push("/(tabs)");
       } catch (error) {
         console.error("Error completing stepper:", error);
       } finally {
@@ -62,6 +67,9 @@ export const Stepper: React.FC<StepperProps> = ({
       await onComplete();
       setCurrentStep(0);
       onStepChange?.(0);
+
+      // Navigate to home screen after completion
+      router.push("/(tabs)");
     } catch (error) {
       console.error("Error completing stepper:", error);
     } finally {
@@ -79,34 +87,41 @@ export const Stepper: React.FC<StepperProps> = ({
         style={styles.progressScroll}
       >
         <View style={styles.progressContainer}>
-          {steps.map((_, index) => (
-            <View key={index} style={styles.stepIndicatorWrapper}>
-              <View
-                style={[
-                  styles.stepIndicator,
-                  index <= currentStep && styles.stepIndicatorActive,
-                  index === currentStep && styles.stepIndicatorCurrent,
-                ]}
-              >
-                <Text
-                  style={[
-                    styles.stepNumber,
-                    index <= currentStep && styles.stepNumberActive,
-                  ]}
-                >
-                  {index + 1}
-                </Text>
-              </View>
-              {index < steps.length - 1 && (
+          {steps.map((_, index) => {
+            // Make icons smaller for steps 4 and later (index >= 3)
+            const isSmallStep = index >= 3;
+            return (
+              <View key={index} style={styles.stepIndicatorWrapper}>
                 <View
                   style={[
-                    styles.stepConnector,
-                    index < currentStep && styles.stepConnectorActive,
+                    styles.stepIndicator,
+                    isSmallStep && styles.stepIndicatorSmall,
+                    index <= currentStep && styles.stepIndicatorActive,
+                    index === currentStep && styles.stepIndicatorCurrent,
                   ]}
-                />
-              )}
-            </View>
-          ))}
+                >
+                  <Text
+                    style={[
+                      styles.stepNumber,
+                      isSmallStep && styles.stepNumberSmall,
+                      index <= currentStep && styles.stepNumberActive,
+                    ]}
+                  >
+                    {index + 1}
+                  </Text>
+                </View>
+                {index < steps.length - 1 && (
+                  <View
+                    style={[
+                      styles.stepConnector,
+                      isSmallStep && styles.stepConnectorSmall,
+                      index < currentStep && styles.stepConnectorActive,
+                    ]}
+                  />
+                )}
+              </View>
+            );
+          })}
         </View>
       </ScrollView>
 
@@ -210,6 +225,12 @@ const styles = StyleSheet.create({
     borderWidth: 3,
     borderColor: BrightTheme.colors.border,
   },
+  stepIndicatorSmall: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    borderWidth: 2,
+  },
   stepIndicatorActive: {
     backgroundColor: BrightTheme.colors.primary,
     borderColor: BrightTheme.colors.primary,
@@ -224,6 +245,9 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: BrightTheme.colors.textLight,
   },
+  stepNumberSmall: {
+    fontSize: 14,
+  },
   stepNumberActive: {
     color: BrightTheme.colors.textOnPrimary,
   },
@@ -231,6 +255,10 @@ const styles = StyleSheet.create({
     width: 40,
     height: 3,
     backgroundColor: BrightTheme.colors.border,
+  },
+  stepConnectorSmall: {
+    width: 30,
+    height: 2,
   },
   stepConnectorActive: {
     backgroundColor: BrightTheme.colors.primary,

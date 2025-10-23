@@ -74,6 +74,17 @@ export const getFoodIntakeById = async (
   return foodIntake as FoodIntake | null;
 };
 
+export const getFoodIntakeByDate = async (
+  date: string
+): Promise<FoodIntake | null> => {
+  const db = await openDatabase();
+  const foodIntake = await db.getFirstAsync(
+    "SELECT * FROM food_intakes WHERE date = ?",
+    date
+  );
+  return foodIntake as FoodIntake | null;
+};
+
 export const getFoodIntakeChartData = async (
   range: "day" | "week" | "month" | "custom",
   customDate?: Date

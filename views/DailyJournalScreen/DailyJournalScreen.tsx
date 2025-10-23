@@ -7,6 +7,8 @@ import {
   Alert,
   ScrollView,
   TouchableOpacity,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -51,8 +53,9 @@ const DailyJournalScreen: React.FC = () => {
 
       switch (range) {
         case "day":
-          fromDate = readDate;
-          toDate = readDate;
+          // Ensure we get the full day in local timezone
+          fromDate = DateTime.fromJSDate(readDate).startOf("day").toJSDate();
+          toDate = DateTime.fromJSDate(readDate).endOf("day").toJSDate();
           break;
         case "week":
           fromDate = DateTime.fromJSDate(readDate)
@@ -67,8 +70,8 @@ const DailyJournalScreen: React.FC = () => {
           toDate = DateTime.fromJSDate(readDate).endOf("month").toJSDate();
           break;
         default:
-          fromDate = readDate;
-          toDate = readDate;
+          fromDate = DateTime.fromJSDate(readDate).startOf("day").toJSDate();
+          toDate = DateTime.fromJSDate(readDate).endOf("day").toJSDate();
       }
 
       return await getJournalEntriesByRange(fromDate, toDate);
@@ -84,14 +87,19 @@ const DailyJournalScreen: React.FC = () => {
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.headerEmoji}>📔</Text>
-        <Text style={styles.title}>Daily Journal</Text>
-        <Text style={styles.subtitle}>Express your thoughts and feelings</Text>
-      </View>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={{ flex: 1 }}
+      keyboardVerticalOffset={Platform.OS === "ios" ? 90 : 0}
+    >
+      <ScrollView contentContainerStyle={styles.container}>
+        <View style={styles.header}>
+          <Text style={styles.headerEmoji}>📔</Text>
+          <Text style={styles.title}>Daily Journal</Text>
+          <Text style={styles.subtitle}>Express your thoughts and feelings</Text>
+        </View>
 
-      <BannerAd size="small" position="top" />
+        <BannerAd size="small" position="top" />
 
       {/* Tab Switcher */}
       <View style={styles.tabContainer}>
@@ -241,8 +249,9 @@ const DailyJournalScreen: React.FC = () => {
         </>
       )}
 
-      <BannerAd size="medium" position="bottom" />
-    </ScrollView>
+        <BannerAd size="medium" position="bottom" />
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
 

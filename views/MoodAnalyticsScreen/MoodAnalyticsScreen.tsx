@@ -10,6 +10,8 @@ import {
   TextInput,
   FlatList,
   Pressable,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -316,67 +318,72 @@ const MoodAnalyticsScreen: React.FC = () => {
           transparent={true}
           onRequestClose={() => setIsModalVisible(false)}
         >
-          <View style={externalStyles.modalOverlay}>
-            <View style={externalStyles.modalContainer}>
-              <View style={externalStyles.modalHeader}>
-                <Text style={externalStyles.modalTitle}>Select Food</Text>
-                <Pressable
-                  style={externalStyles.modalCloseButton}
-                  onPress={() => {
-                    setIsModalVisible(false);
-                    setSearchQuery("");
-                  }}
-                >
-                  <Text style={externalStyles.modalCloseButtonText}>✕</Text>
-                </Pressable>
-              </View>
-
-              <TextInput
-                style={externalStyles.searchInput}
-                placeholder="Search foods..."
-                value={searchQuery}
-                onChangeText={setSearchQuery}
-                autoFocus
-                placeholderTextColor="#999"
-              />
-
-              <FlatList
-                data={filteredFoods}
-                keyExtractor={(item) => item}
-                renderItem={({ item }) => (
-                  <TouchableOpacity
-                    style={[
-                      externalStyles.foodItem,
-                      selectedFoodName === item &&
-                        externalStyles.foodItemSelected,
-                    ]}
+          <KeyboardAvoidingView
+            behavior={Platform.OS === "ios" ? "padding" : "height"}
+            style={{ flex: 1 }}
+          >
+            <View style={externalStyles.modalOverlay}>
+              <View style={externalStyles.modalContainer}>
+                <View style={externalStyles.modalHeader}>
+                  <Text style={externalStyles.modalTitle}>Select Food</Text>
+                  <Pressable
+                    style={externalStyles.modalCloseButton}
                     onPress={() => {
-                      setSelectedFoodName(item);
                       setIsModalVisible(false);
                       setSearchQuery("");
                     }}
                   >
-                    <Text
+                    <Text style={externalStyles.modalCloseButtonText}>✕</Text>
+                  </Pressable>
+                </View>
+
+                <TextInput
+                  style={externalStyles.searchInput}
+                  placeholder="Search foods..."
+                  value={searchQuery}
+                  onChangeText={setSearchQuery}
+                  autoFocus
+                  placeholderTextColor="#999"
+                />
+
+                <FlatList
+                  data={filteredFoods}
+                  keyExtractor={(item) => item}
+                  renderItem={({ item }) => (
+                    <TouchableOpacity
                       style={[
-                        externalStyles.foodItemText,
+                        externalStyles.foodItem,
                         selectedFoodName === item &&
-                          externalStyles.foodItemTextSelected,
+                          externalStyles.foodItemSelected,
                       ]}
+                      onPress={() => {
+                        setSelectedFoodName(item);
+                        setIsModalVisible(false);
+                        setSearchQuery("");
+                      }}
                     >
-                      {item}
-                    </Text>
-                  </TouchableOpacity>
-                )}
-                ListEmptyComponent={
-                  <View style={externalStyles.centered}>
-                    <Text style={externalStyles.centeredText}>
-                      No foods found
-                    </Text>
-                  </View>
-                }
-              />
+                      <Text
+                        style={[
+                          externalStyles.foodItemText,
+                          selectedFoodName === item &&
+                            externalStyles.foodItemTextSelected,
+                        ]}
+                      >
+                        {item}
+                      </Text>
+                    </TouchableOpacity>
+                  )}
+                  ListEmptyComponent={
+                    <View style={externalStyles.centered}>
+                      <Text style={externalStyles.centeredText}>
+                        No foods found
+                      </Text>
+                    </View>
+                  }
+                />
+              </View>
             </View>
-          </View>
+          </KeyboardAvoidingView>
         </Modal>
 
         <View style={externalStyles.chartWrapper}>

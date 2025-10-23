@@ -7,7 +7,9 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { Card } from "react-native-paper";
-import { router, Href } from "expo-router";
+import { router, Href, useFocusEffect } from "expo-router";
+import { DateTime } from "luxon";
+import { useState, useCallback } from "react";
 
 import { BrightTheme } from "@/constants/Theme";
 import { BannerAd } from "@/components/ads";
@@ -16,6 +18,9 @@ import {
   getScheduledNotifications,
 } from "@/services/notificationService";
 import { Alert } from "react-native";
+import { getMoodByDate } from "@/storage/mood_entries";
+import { getProductivityByDate } from "@/storage/productivity_entries";
+import { getFoodIntakeByDate } from "@/storage/food_intakes";
 
 const quickAccessItems: {
   title: string;
@@ -62,6 +67,29 @@ const quickAccessItems: {
 ];
 
 export default function HomeScreen() {
+  const [hasExistingData, setHasExistingData] = useState(false);
+
+  // Re-check data whenever the screen comes into focus
+  useFocusEffect(
+    useCallback(() => {
+      const checkExistingData = async () => {
+        const today = DateTime.now().toISODate() as string;
+
+        // Check if there's any data for today
+        const [mood, productivity, foodIntake] = await Promise.all([
+          getMoodByDate(today),
+          getProductivityByDate(today),
+          getFoodIntakeByDate(today),
+        ]);
+
+        // If any data exists for today, show "Continue" text
+        setHasExistingData(!!(mood || productivity || foodIntake));
+      };
+
+      checkExistingData();
+    }, [])
+  );
+
   const handleTestNotification = async () => {
     await sendTestNotification();
     Alert.alert(
@@ -102,7 +130,9 @@ export default function HomeScreen() {
             style={styles.startButton}
             onPress={() => router.push("/daily/daily")}
           >
-            <Text style={styles.startButtonText}>Start Today's Entry</Text>
+            <Text style={styles.startButtonText}>
+              {hasExistingData ? "Continue Today's Entry" : "Start Today's Entry"}
+            </Text>
           </TouchableOpacity>
 
           <View style={styles.testButtonsContainer}>

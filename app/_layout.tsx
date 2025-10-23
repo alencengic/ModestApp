@@ -39,6 +39,17 @@ export default function RootLayout() {
     checkOnboarding();
   }, []);
 
+  // Re-check onboarding status when segments change (e.g., after completing onboarding)
+  useEffect(() => {
+    const recheckOnboarding = async () => {
+      const seen = await AsyncStorage.getItem("hasSeenOnboarding");
+      if (seen === "true" && !hasSeenOnboarding) {
+        setHasSeenOnboarding(true);
+      }
+    };
+    recheckOnboarding();
+  }, [segments]);
+
   useEffect(() => {
     if (loaded && hasSeenOnboarding !== null) {
       SplashScreen.hideAsync();

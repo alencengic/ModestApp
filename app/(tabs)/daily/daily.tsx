@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from "react";
-import { SafeAreaView, Alert, ScrollView, View } from "react-native";
+import { SafeAreaView, Alert, ScrollView, View, KeyboardAvoidingView, Platform } from "react-native";
 import { DateTime } from "luxon";
 
 import { dailyEnterScreenStyles } from "./DailyEnterScreen.styles";
@@ -249,21 +249,28 @@ export default function DailyEnterScreen() {
     {
       title: "Food Intake",
       component: (
-        <ScrollView
-          ref={foodScrollViewRef}
-          key={`food-${resetKey}`}
-          showsVerticalScrollIndicator={false}
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          style={{ flex: 1 }}
+          keyboardVerticalOffset={Platform.OS === "ios" ? 100 : 0}
         >
-          <FoodIntakeForm
-            key={`food-form-${resetKey}`}
-            autoSave={false}
-            onChange={setFoodMeals}
-            onFeelingChange={setMealFeelings}
-            autoFocus={true}
-            scrollViewRef={foodScrollViewRef}
-          />
-          <BannerAd size="small" position="inline" />
-        </ScrollView>
+          <ScrollView
+            ref={foodScrollViewRef}
+            key={`food-${resetKey}`}
+            showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
+          >
+            <FoodIntakeForm
+              key={`food-form-${resetKey}`}
+              autoSave={false}
+              onChange={setFoodMeals}
+              onFeelingChange={setMealFeelings}
+              autoFocus={true}
+              scrollViewRef={foodScrollViewRef}
+            />
+            <BannerAd size="small" position="inline" />
+          </ScrollView>
+        </KeyboardAvoidingView>
       ),
     },
     ...mealSpecificSteps,
