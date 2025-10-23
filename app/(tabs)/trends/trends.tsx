@@ -7,7 +7,6 @@ import {
   Text,
   TouchableOpacity,
 } from "react-native";
-import { CartesianChart, Bar } from "victory-native";
 import { useFont, SkFont } from "@shopify/react-native-skia";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useQuery } from "@tanstack/react-query";
@@ -23,18 +22,18 @@ export interface ChartDataItem {
   [key: string]: any;
 }
 
-// Modern color palette for charts
+// Modern color palette - each food gets a unique color
 const CHART_COLORS = [
-  "#C88B6B",
-  "#E8B4A0",
-  "#F5DCC8",
-  "#D4CBBB",
-  "#A8B896",
-  "#E8C4B0",
-  "#C8B4A0",
-  "#B0A89C",
-  "#F5E6D3",
-  "#A67152",
+  "#5B9BD5", // Blue
+  "#70AD47", // Green
+  "#FFC000", // Orange
+  "#C55A11", // Dark Orange
+  "#9E480E", // Brown
+  "#997300", // Olive
+  "#4472C4", // Dark Blue
+  "#ED7D31", // Light Orange
+  "#A5A5A5", // Gray
+  "#255E91", // Navy
 ];
 
 const TrendsAndAnalyticsScreen: React.FC = () => {
@@ -54,7 +53,12 @@ const TrendsAndAnalyticsScreen: React.FC = () => {
     data: rawDataFromQuery = [],
     isLoading,
     isError,
-  } = useQuery<ChartDataItem[], Error>(queryOptions);
+    refetch,
+  } = useQuery<ChartDataItem[], Error>({
+    ...queryOptions,
+    staleTime: 0, // Always fetch fresh data
+    gcTime: 0, // Don't cache
+  });
 
   const chartData: ChartDataItem[] = useMemo(() => {
     const processedData = (rawDataFromQuery ?? [])
@@ -74,7 +78,7 @@ const TrendsAndAnalyticsScreen: React.FC = () => {
         ...item,
         label: item.label.trim(),
         value: item.value,
-        color: CHART_COLORS[index % CHART_COLORS.length], // Use modern color palette
+        color: CHART_COLORS[index % CHART_COLORS.length],
       }));
     return processedData;
   }, [rawDataFromQuery]);
@@ -264,45 +268,43 @@ const TrendsAndAnalyticsScreen: React.FC = () => {
             </View>
           ) : (
             <>
-              <View style={styles.chartViewContainer}>
-                <CartesianChart
-                  data={chartData}
-                  xKey="label"
-                  yKeys={["value"]}
-                  domainPadding={{ left: 20, right: 20, top: 20, bottom: 10 }}
-                >
-                  {({ points, chartBounds }) => (
-                    <>
-                      {points.value.map((point, index) => {
-                        const currentData = chartData[index];
-                        if (
-                          !point ||
-                          !currentData ||
-                          currentData.value == null ||
-                          currentData.value <= 0 ||
-                          typeof currentData.color !== "string" ||
-                          currentData.color.trim() === "" ||
-                          typeof currentData.label !== "string" ||
-                          currentData.label.trim().toLowerCase() ===
-                            "undefined" ||
-                          currentData.label.trim() === ""
-                        ) {
-                          return null;
-                        }
-                        return (
-                          <Bar
-                            key={`${currentData.label}-${index}`}
-                            chartBounds={chartBounds}
-                            points={[point]}
-                            roundedCorners={{ topLeft: 8, topRight: 8 }}
-                            color={currentData.color}
-                            barWidth={40}
+              {/* Visual Food Cards */}
+              <View style={styles.foodCardsContainer}>
+                {chartData.map((item, index) => {
+                  const percentage = ((item.value / totalItems) * 100).toFixed(1);
+                  return (
+                    <View key={index} style={styles.foodCard}>
+                      <View
+                        style={[
+                          styles.foodCardBar,
+                          {
+                            backgroundColor: item.color,
+                            width: `${percentage}%`,
+                          },
+                        ]}
+                      />
+                      <View style={styles.foodCardContent}>
+                        <View style={styles.foodCardHeader}>
+                          <View
+                            style={[
+                              styles.foodCardDot,
+                              { backgroundColor: item.color },
+                            ]}
                           />
-                        );
-                      })}
-                    </>
-                  )}
-                </CartesianChart>
+                          <Text style={styles.foodCardLabel} numberOfLines={1}>
+                            {item.label}
+                          </Text>
+                        </View>
+                        <View style={styles.foodCardStats}>
+                          <Text style={styles.foodCardValue}>{item.value}</Text>
+                          <Text style={styles.foodCardPercentage}>
+                            {percentage}%
+                          </Text>
+                        </View>
+                      </View>
+                    </View>
+                  );
+                })}
               </View>
 
               {/* Stats */}
@@ -330,22 +332,6 @@ const TrendsAndAnalyticsScreen: React.FC = () => {
                 </View>
               )}
 
-              {/* Legend */}
-              <View style={styles.legendContainer}>
-                {legendData.map((item, index) => (
-                  <View key={index} style={styles.legendItem}>
-                    <View
-                      style={[
-                        styles.legendSwatch,
-                        { backgroundColor: item.symbol.fill },
-                      ]}
-                    />
-                    <Text style={styles.legendText}>
-                      {item.name} ({item.value})
-                    </Text>
-                  </View>
-                ))}
-              </View>
             </>
           )}
         </View>

@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import {
   SafeAreaView,
   ScrollView,
@@ -34,6 +34,7 @@ const MoodAnalyticsScreen: React.FC = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [isInfoModalVisible, setIsInfoModalVisible] = useState(false);
+  const [selectedFoodName, setSelectedFoodName] = useState<string | null>(null);
 
   const useQueryFoodCorrelation = () => {
     return {
@@ -52,9 +53,11 @@ const MoodAnalyticsScreen: React.FC = () => {
     isLoading,
     isError,
     error,
-  } = useQuery<(FoodMoodCorrelation | FoodProductivityCorrelation)[], Error>(
-    correlationQueryOptions
-  );
+    isFetching,
+  } = useQuery<(FoodMoodCorrelation | FoodProductivityCorrelation)[], Error>({
+    ...correlationQueryOptions,
+    placeholderData: (previousData) => previousData,
+  });
 
   const getScore = (
     item: FoodMoodCorrelation | FoodProductivityCorrelation
@@ -95,7 +98,10 @@ const MoodAnalyticsScreen: React.FC = () => {
     return Array.from(foodNames).sort();
   }, [rawData]);
 
-  const [selectedFoodName, setSelectedFoodName] = useState<string | null>(null);
+  // Reset selected food when correlation type changes
+  useEffect(() => {
+    setSelectedFoodName(null);
+  }, [correlationType]);
 
   const selectedFoodRawDetails = useMemo(() => {
     if (!selectedFoodName) return undefined;
@@ -160,7 +166,8 @@ const MoodAnalyticsScreen: React.FC = () => {
     );
   };
 
-  if (isLoading) {
+  // Only show loading screen if there's no data at all (initial load)
+  if (isLoading && rawData.length === 0) {
     return (
       <SafeAreaView style={externalStyles.container}>
         <View style={externalStyles.centered}>

@@ -66,6 +66,8 @@ const WeatherMoodScreen: React.FC = () => {
       const data = await getWeatherMoodCorrelation();
       return data as MoodWeatherData[];
     },
+    staleTime: 0, // Always fetch fresh data
+    gcTime: 0, // Don't cache
   });
 
   const stats = useMemo(() => {

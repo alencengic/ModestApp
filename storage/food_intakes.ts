@@ -102,9 +102,12 @@ export const getFoodIntakeChartData = async (
       }
     }
 
+    // Get end of today to include all of today's data
+    const toDate = DateTime.now().endOf("day");
+
     const foodIntakes = (await db.getAllAsync(
-      "SELECT * FROM food_intakes WHERE date >= ?",
-      fromDate.toISODate()
+      "SELECT * FROM food_intakes WHERE date >= ? AND date <= ?",
+      [fromDate.toISODate(), toDate.toISODate()]
     )) as FoodIntake[];
 
     if (foodIntakes.length === 0) return [];
