@@ -1,3 +1,5 @@
+import { scale, scaleFontSize, verticalScale } from "@/utils/responsive";
+
 export const BrightTheme = {
   colors: {
     primary: "#C88B6B",
@@ -69,71 +71,71 @@ export const BrightTheme = {
   },
 
   spacing: {
-    xs: 4,
-    sm: 8,
-    md: 16,
-    lg: 24,
-    xl: 32,
-    xxl: 48,
+    xs: scale(4),
+    sm: scale(8),
+    md: scale(16),
+    lg: scale(24),
+    xl: scale(32),
+    xxl: scale(48),
   },
 
   borderRadius: {
-    sm: 8,
-    md: 12,
-    lg: 16,
-    xl: 24,
+    sm: scale(8),
+    md: scale(12),
+    lg: scale(16),
+    xl: scale(24),
     round: 999,
   },
 
   shadows: {
     sm: {
       shadowColor: "#C88B6B",
-      shadowOffset: { width: 0, height: 2 },
+      shadowOffset: { width: 0, height: scale(2) },
       shadowOpacity: 0.08,
-      shadowRadius: 4,
+      shadowRadius: scale(4),
       elevation: 2,
     },
     md: {
       shadowColor: "#C88B6B",
-      shadowOffset: { width: 0, height: 4 },
+      shadowOffset: { width: 0, height: scale(4) },
       shadowOpacity: 0.1,
-      shadowRadius: 8,
+      shadowRadius: scale(8),
       elevation: 4,
     },
     lg: {
       shadowColor: "#C88B6B",
-      shadowOffset: { width: 0, height: 6 },
+      shadowOffset: { width: 0, height: scale(6) },
       shadowOpacity: 0.12,
-      shadowRadius: 12,
+      shadowRadius: scale(12),
       elevation: 6,
     },
   },
 
   typography: {
     h1: {
-      fontSize: 32,
+      fontSize: scaleFontSize(32),
       fontWeight: "700" as const,
       letterSpacing: -0.5,
     },
     h2: {
-      fontSize: 24,
+      fontSize: scaleFontSize(24),
       fontWeight: "700" as const,
       letterSpacing: -0.3,
     },
     h3: {
-      fontSize: 20,
+      fontSize: scaleFontSize(20),
       fontWeight: "600" as const,
       letterSpacing: -0.2,
     },
     body: {
-      fontSize: 16,
+      fontSize: scaleFontSize(16),
       fontWeight: "400" as const,
-      lineHeight: 24,
+      lineHeight: scaleFontSize(24),
     },
     caption: {
-      fontSize: 14,
+      fontSize: scaleFontSize(14),
       fontWeight: "400" as const,
-      lineHeight: 20,
+      lineHeight: scaleFontSize(20),
     },
   },
 };

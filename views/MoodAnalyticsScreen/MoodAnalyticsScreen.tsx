@@ -23,6 +23,7 @@ import {
 import { styles as externalStyles } from "./MoodAnalyticsScreen.styles";
 import { BrightTheme } from "@/constants/Theme";
 import { BannerAd, VideoAd } from "@/components/ads";
+import { scaleFontSize } from "@/utils/responsive";
 
 type CorrelationType = "mood" | "productivity";
 
@@ -206,7 +207,7 @@ const MoodAnalyticsScreen: React.FC = () => {
         >
           <View style={externalStyles.headerTopRow}>
             <View style={{ width: 40 }} />
-            <Text style={{ fontSize: 48, marginBottom: BrightTheme.spacing.sm }}>
+            <Text style={{ fontSize: scaleFontSize(48), marginBottom: BrightTheme.spacing.sm }}>
               😊
             </Text>
             <TouchableOpacity
@@ -218,7 +219,7 @@ const MoodAnalyticsScreen: React.FC = () => {
           </View>
           <Text
             style={{
-              fontSize: 24,
+              fontSize: scaleFontSize(24),
               fontWeight: "600",
               color: BrightTheme.colors.textPrimary,
               marginBottom: BrightTheme.spacing.xs,
@@ -227,7 +228,7 @@ const MoodAnalyticsScreen: React.FC = () => {
             Mood Analytics
           </Text>
           <Text
-            style={{ fontSize: 14, color: BrightTheme.colors.textSecondary }}
+            style={{ fontSize: scaleFontSize(14), color: BrightTheme.colors.textSecondary }}
           >
             Discover food-mood patterns
           </Text>

@@ -21,6 +21,7 @@ import { Alert } from "react-native";
 import { getMoodByDate } from "@/storage/mood_entries";
 import { getProductivityByDate } from "@/storage/productivity_entries";
 import { getFoodIntakeByDate } from "@/storage/food_intakes";
+import { scaleFontSize, scale } from "@/utils/responsive";
 
 const quickAccessItems: {
   title: string;
@@ -191,25 +192,25 @@ const styles = StyleSheet.create({
     backgroundColor: "#F5E6D3",
   },
   headerTitle: {
-    fontSize: 28,
+    fontSize: scaleFontSize(28),
     fontWeight: "400",
     color: "#2C2C2C",
     textAlign: "center",
   },
   startButton: {
     backgroundColor: "#5e2607ff",
-    paddingHorizontal: 32,
-    paddingVertical: 12,
-    borderRadius: 24,
+    paddingHorizontal: scale(32),
+    paddingVertical: scale(12),
+    borderRadius: scale(24),
     marginTop: BrightTheme.spacing.lg,
   },
   startButtonText: {
     color: "#FFFFFF",
-    fontSize: 16,
+    fontSize: scaleFontSize(16),
     fontWeight: "500",
   },
   sectionTitle: {
-    fontSize: 18,
+    fontSize: scaleFontSize(18),
     fontWeight: "700",
     color: "#2C2C2C",
     marginHorizontal: BrightTheme.spacing.md,
@@ -234,11 +235,11 @@ const styles = StyleSheet.create({
     paddingVertical: BrightTheme.spacing.xl,
   },
   emoji: {
-    fontSize: 40,
+    fontSize: scaleFontSize(40),
     marginBottom: BrightTheme.spacing.sm,
   },
   cardText: {
-    fontSize: 14,
+    fontSize: scaleFontSize(14),
     fontWeight: "600",
     color: "#2C2C2C",
     textAlign: "center",
@@ -250,15 +251,15 @@ const styles = StyleSheet.create({
   },
   testButton: {
     backgroundColor: BrightTheme.colors.background,
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 16,
+    paddingHorizontal: scale(16),
+    paddingVertical: scale(8),
+    borderRadius: scale(16),
     borderWidth: 1,
     borderColor: BrightTheme.colors.border,
   },
   testButtonText: {
     color: BrightTheme.colors.textPrimary,
-    fontSize: 13,
+    fontSize: scaleFontSize(13),
     fontWeight: "500",
   },
 });

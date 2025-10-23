@@ -1,5 +1,6 @@
 import { StyleSheet, Platform } from "react-native";
 import { BrightTheme } from "@/constants/Theme";
+import { scaleFontSize, scale } from "@/utils/responsive";
 
 export const styles = StyleSheet.create({
   container: {
@@ -17,38 +18,38 @@ export const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    minHeight: 100,
-    padding: 20,
+    minHeight: scale(100),
+    padding: scale(20),
   },
   centeredText: {
-    fontSize: 16,
+    fontSize: scaleFontSize(16),
     color: "#666",
     textAlign: "center",
   },
   errorText: {
-    fontSize: 16,
+    fontSize: scaleFontSize(16),
     color: "#e74c3c",
     textAlign: "center",
   },
   chartSectionTitle: {
-    fontSize: 19,
+    fontSize: scaleFontSize(19),
     fontWeight: "600",
-    marginBottom: 15,
+    marginBottom: scale(15),
     color: "#34495e",
   },
   pickerContainer: {
-    marginHorizontal: 10,
-    marginBottom: 20,
+    marginHorizontal: scale(10),
+    marginBottom: scale(20),
     borderColor: "#e0e0e0",
     borderWidth: 1,
-    borderRadius: 8,
+    borderRadius: scale(8),
   },
   picker: {
     width: "100%",
-    height: Platform.OS === "android" ? 50 : undefined,
+    height: Platform.OS === "android" ? scale(50) : undefined,
   },
   foodListItem: {
-    paddingVertical: 12,
+    paddingVertical: scale(12),
     borderBottomWidth: 1,
     borderBottomColor: "#f0f0f0",
   },
@@ -56,37 +57,37 @@ export const styles = StyleSheet.create({
     borderBottomWidth: 0,
   },
   foodListItemName: {
-    fontSize: 17,
+    fontSize: scaleFontSize(17),
     fontWeight: "600",
     color: "#2c3e50",
-    marginBottom: 8,
+    marginBottom: scale(8),
   },
   detailRow: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 6,
-    paddingVertical: 2,
+    marginBottom: scale(6),
+    paddingVertical: scale(2),
   },
   detailLabel: {
-    fontSize: 14,
+    fontSize: scaleFontSize(14),
     color: "#7f8c8d",
   },
   detailValue: {
-    fontSize: 14,
+    fontSize: scaleFontSize(14),
     color: "#34495e",
     fontWeight: "500",
   },
   moodIndicatorRow: {
     flexDirection: "row",
     alignItems: "center",
-    marginTop: 8,
+    marginTop: scale(8),
   },
   moodIndicatorSwatch: {
-    width: 18,
-    height: 18,
-    marginLeft: 10,
-    borderRadius: 9,
+    width: scale(18),
+    height: scale(18),
+    marginLeft: scale(10),
+    borderRadius: scale(9),
     borderWidth: 1,
     borderColor: "#e0e0e0",
   },

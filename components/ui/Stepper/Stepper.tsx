@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from "react-native";
 import { useRouter } from "expo-router";
 import { BrightTheme } from "@/constants/Theme";
+import { scaleFontSize, scale } from "@/utils/responsive";
 
 export interface StepConfig {
   title: string;
@@ -192,7 +193,7 @@ const styles = StyleSheet.create({
     backgroundColor: BrightTheme.colors.background,
   },
   progressScroll: {
-    maxHeight: 60,
+    maxHeight: scale(60),
     marginBottom: BrightTheme.spacing.sm,
   },
   progressScrollContent: {
@@ -205,7 +206,7 @@ const styles = StyleSheet.create({
     paddingTop: BrightTheme.spacing.sm,
   },
   stepCounter: {
-    fontSize: 14,
+    fontSize: scaleFontSize(14),
     fontWeight: "600",
     color: BrightTheme.colors.textSecondary,
     textAlign: "center",
@@ -216,55 +217,55 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   stepIndicator: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+    width: scale(44),
+    height: scale(44),
+    borderRadius: scale(22),
     backgroundColor: BrightTheme.colors.surfaceLight,
     justifyContent: "center",
     alignItems: "center",
-    borderWidth: 3,
+    borderWidth: scale(3),
     borderColor: BrightTheme.colors.border,
   },
   stepIndicatorSmall: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    borderWidth: 2,
+    width: scale(32),
+    height: scale(32),
+    borderRadius: scale(16),
+    borderWidth: scale(2),
   },
   stepIndicatorActive: {
     backgroundColor: BrightTheme.colors.primary,
     borderColor: BrightTheme.colors.primary,
   },
   stepIndicatorCurrent: {
-    borderWidth: 4,
+    borderWidth: scale(4),
     borderColor: BrightTheme.colors.primaryDark,
     ...BrightTheme.shadows.md,
   },
   stepNumber: {
-    fontSize: 18,
+    fontSize: scaleFontSize(18),
     fontWeight: "bold",
     color: BrightTheme.colors.textLight,
   },
   stepNumberSmall: {
-    fontSize: 14,
+    fontSize: scaleFontSize(14),
   },
   stepNumberActive: {
     color: BrightTheme.colors.textOnPrimary,
   },
   stepConnector: {
-    width: 40,
-    height: 3,
+    width: scale(40),
+    height: scale(3),
     backgroundColor: BrightTheme.colors.border,
   },
   stepConnectorSmall: {
-    width: 30,
-    height: 2,
+    width: scale(30),
+    height: scale(2),
   },
   stepConnectorActive: {
     backgroundColor: BrightTheme.colors.primary,
   },
   stepTitle: {
-    fontSize: 24,
+    fontSize: scaleFontSize(24),
     fontWeight: "600",
     textAlign: "center",
     marginBottom: BrightTheme.spacing.lg,
@@ -304,7 +305,7 @@ const styles = StyleSheet.create({
     opacity: 0.4,
   },
   buttonText: {
-    fontSize: 14,
+    fontSize: scaleFontSize(14),
     fontWeight: "600",
     color: BrightTheme.colors.textPrimary,
   },
@@ -312,12 +313,12 @@ const styles = StyleSheet.create({
     color: BrightTheme.colors.textLight,
   },
   nextButtonText: {
-    fontSize: 14,
+    fontSize: scaleFontSize(14),
     fontWeight: "600",
     color: BrightTheme.colors.textOnPrimary,
   },
   skipButtonText: {
-    fontSize: 14,
+    fontSize: scaleFontSize(14),
     fontWeight: "600",
     color: BrightTheme.colors.textPrimary,
   },
