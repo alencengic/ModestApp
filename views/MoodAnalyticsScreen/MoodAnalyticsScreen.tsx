@@ -5,9 +5,13 @@ import {
   View,
   ActivityIndicator,
   Text,
+  TouchableOpacity,
+  Modal,
+  TextInput,
+  FlatList,
+  Pressable,
 } from "react-native";
 import { useQuery } from "@tanstack/react-query";
-import { Picker } from "@react-native-picker/picker";
 import {
   getFoodMoodCorrelationData,
   getFoodProductivityCorrelationData,
@@ -18,8 +22,6 @@ import { styles as externalStyles } from "./MoodAnalyticsScreen.styles";
 import { BrightTheme } from "@/constants/Theme";
 import { BannerAd, VideoAd } from "@/components/ads";
 
-const PICKER_PLACEHOLDER_VALUE = "##PICKER_PLACEHOLDER##";
-
 type CorrelationType = "mood" | "productivity";
 
 const MoodAnalyticsScreen: React.FC = () => {
@@ -29,6 +31,9 @@ const MoodAnalyticsScreen: React.FC = () => {
 
   const [correlationType, setCorrelationType] =
     useState<CorrelationType>("mood");
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isInfoModalVisible, setIsInfoModalVisible] = useState(false);
 
   const useQueryFoodCorrelation = () => {
     return {
@@ -50,7 +55,7 @@ const MoodAnalyticsScreen: React.FC = () => {
   } = useQuery<(FoodMoodCorrelation | FoodProductivityCorrelation)[], Error>(
     correlationQueryOptions
   );
-  console.log(rawData);
+
   const getScore = (
     item: FoodMoodCorrelation | FoodProductivityCorrelation
   ) => {
@@ -96,6 +101,13 @@ const MoodAnalyticsScreen: React.FC = () => {
     if (!selectedFoodName) return undefined;
     return (rawData || []).find((item) => item.foodName === selectedFoodName);
   }, [rawData, selectedFoodName]);
+
+  const filteredFoods = useMemo(() => {
+    if (!searchQuery.trim()) return allFoodNamesForPicker;
+    return allFoodNamesForPicker.filter((food) =>
+      food.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [allFoodNamesForPicker, searchQuery]);
 
   const FoodListItemDetail: React.FC<{
     item: FoodMoodCorrelation | FoodProductivityCorrelation;
@@ -183,9 +195,18 @@ const MoodAnalyticsScreen: React.FC = () => {
             backgroundColor: BrightTheme.colors.background,
           }}
         >
-          <Text style={{ fontSize: 48, marginBottom: BrightTheme.spacing.sm }}>
-            😊
-          </Text>
+          <View style={externalStyles.headerTopRow}>
+            <View style={{ width: 40 }} />
+            <Text style={{ fontSize: 48, marginBottom: BrightTheme.spacing.sm }}>
+              😊
+            </Text>
+            <TouchableOpacity
+              style={externalStyles.infoButton}
+              onPress={() => setIsInfoModalVisible(true)}
+            >
+              <Text style={externalStyles.infoButtonText}>ⓘ</Text>
+            </TouchableOpacity>
+          </View>
           <Text
             style={{
               fontSize: 24,
@@ -207,19 +228,42 @@ const MoodAnalyticsScreen: React.FC = () => {
 
         <View style={externalStyles.chartWrapper}>
           <Text style={externalStyles.chartSectionTitle}>Correlation Type</Text>
-          <View style={externalStyles.pickerContainer}>
-            <Picker
-              selectedValue={correlationType}
-              onValueChange={(value) =>
-                setCorrelationType(value as CorrelationType)
-              }
-              style={externalStyles.picker}
-              mode="dropdown"
-              prompt="Select correlation type"
+          <View style={externalStyles.toggleContainer}>
+            <TouchableOpacity
+              style={[
+                externalStyles.toggleButton,
+                correlationType === "mood" && externalStyles.toggleButtonActive,
+              ]}
+              onPress={() => setCorrelationType("mood")}
             >
-              <Picker.Item label="Mood" value="mood" />
-              <Picker.Item label="Productivity" value="productivity" />
-            </Picker>
+              <Text
+                style={[
+                  externalStyles.toggleButtonText,
+                  correlationType === "mood" &&
+                    externalStyles.toggleButtonTextActive,
+                ]}
+              >
+                Mood
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[
+                externalStyles.toggleButton,
+                correlationType === "productivity" &&
+                  externalStyles.toggleButtonActive,
+              ]}
+              onPress={() => setCorrelationType("productivity")}
+            >
+              <Text
+                style={[
+                  externalStyles.toggleButtonText,
+                  correlationType === "productivity" &&
+                    externalStyles.toggleButtonTextActive,
+                ]}
+              >
+                Productivity
+              </Text>
+            </TouchableOpacity>
           </View>
         </View>
 
@@ -227,33 +271,24 @@ const MoodAnalyticsScreen: React.FC = () => {
           <Text style={externalStyles.chartSectionTitle}>
             Explore Specific Food
           </Text>
-          <View style={externalStyles.pickerContainer}>
-            <Picker
-              selectedValue={
-                selectedFoodName === null
-                  ? PICKER_PLACEHOLDER_VALUE
-                  : selectedFoodName
-              }
-              onValueChange={(itemValue) => {
-                if (itemValue === PICKER_PLACEHOLDER_VALUE) {
-                  setSelectedFoodName(null);
-                } else {
-                  setSelectedFoodName(itemValue as string);
-                }
-              }}
-              style={externalStyles.picker}
-              mode="dropdown"
-              prompt="Select a food"
+          <TouchableOpacity
+            style={externalStyles.foodSelectorButton}
+            onPress={() => setIsModalVisible(true)}
+          >
+            <Text style={externalStyles.foodSelectorButtonText}>
+              {selectedFoodName || "Select a food..."}
+            </Text>
+            <Text style={externalStyles.foodSelectorButtonIcon}>▼</Text>
+          </TouchableOpacity>
+
+          {selectedFoodName && (
+            <TouchableOpacity
+              style={externalStyles.clearButton}
+              onPress={() => setSelectedFoodName(null)}
             >
-              <Picker.Item
-                label="-- All Foods --"
-                value={PICKER_PLACEHOLDER_VALUE}
-              />
-              {allFoodNamesForPicker.map((name) => (
-                <Picker.Item key={name} label={name} value={name} />
-              ))}
-            </Picker>
-          </View>
+              <Text style={externalStyles.clearButtonText}>Clear Selection</Text>
+            </TouchableOpacity>
+          )}
 
           {selectedFoodRawDetails && (
             <FoodListItemDetail
@@ -267,6 +302,75 @@ const MoodAnalyticsScreen: React.FC = () => {
             </Text>
           )}
         </View>
+
+        <Modal
+          visible={isModalVisible}
+          animationType="slide"
+          transparent={true}
+          onRequestClose={() => setIsModalVisible(false)}
+        >
+          <View style={externalStyles.modalOverlay}>
+            <View style={externalStyles.modalContainer}>
+              <View style={externalStyles.modalHeader}>
+                <Text style={externalStyles.modalTitle}>Select Food</Text>
+                <Pressable
+                  style={externalStyles.modalCloseButton}
+                  onPress={() => {
+                    setIsModalVisible(false);
+                    setSearchQuery("");
+                  }}
+                >
+                  <Text style={externalStyles.modalCloseButtonText}>✕</Text>
+                </Pressable>
+              </View>
+
+              <TextInput
+                style={externalStyles.searchInput}
+                placeholder="Search foods..."
+                value={searchQuery}
+                onChangeText={setSearchQuery}
+                autoFocus
+                placeholderTextColor="#999"
+              />
+
+              <FlatList
+                data={filteredFoods}
+                keyExtractor={(item) => item}
+                renderItem={({ item }) => (
+                  <TouchableOpacity
+                    style={[
+                      externalStyles.foodItem,
+                      selectedFoodName === item &&
+                        externalStyles.foodItemSelected,
+                    ]}
+                    onPress={() => {
+                      setSelectedFoodName(item);
+                      setIsModalVisible(false);
+                      setSearchQuery("");
+                    }}
+                  >
+                    <Text
+                      style={[
+                        externalStyles.foodItemText,
+                        selectedFoodName === item &&
+                          externalStyles.foodItemTextSelected,
+                      ]}
+                    >
+                      {item}
+                    </Text>
+                  </TouchableOpacity>
+                )}
+                ListEmptyComponent={
+                  <View style={externalStyles.centered}>
+                    <Text style={externalStyles.centeredText}>
+                      No foods found
+                    </Text>
+                  </View>
+                }
+              />
+            </View>
+          </View>
+        </Modal>
 
         <View style={externalStyles.chartWrapper}>
           <Text style={externalStyles.chartSectionTitle}>
@@ -312,6 +416,80 @@ const MoodAnalyticsScreen: React.FC = () => {
 
         <BannerAd size="medium" position="bottom" />
       </ScrollView>
+
+      <Modal
+        visible={isInfoModalVisible}
+        animationType="fade"
+        transparent={true}
+        onRequestClose={() => setIsInfoModalVisible(false)}
+      >
+        <View style={externalStyles.infoModalOverlay}>
+          <View style={externalStyles.infoModalContainer}>
+            <View style={externalStyles.modalHeader}>
+              <Text style={externalStyles.modalTitle}>Score Explanation</Text>
+              <Pressable
+                style={externalStyles.modalCloseButton}
+                onPress={() => setIsInfoModalVisible(false)}
+              >
+                <Text style={externalStyles.modalCloseButtonText}>✕</Text>
+              </Pressable>
+            </View>
+
+            <ScrollView style={externalStyles.infoModalContent}>
+              <Text style={externalStyles.infoText}>
+                The scores represent the correlation between foods and your mood/productivity levels.
+              </Text>
+
+              <View style={externalStyles.colorExplanation}>
+                <View style={externalStyles.colorRow}>
+                  <View
+                    style={[
+                      externalStyles.colorDot,
+                      { backgroundColor: POSITIVE_COLOR },
+                    ]}
+                  />
+                  <Text style={externalStyles.colorLabel}>
+                    <Text style={{ fontWeight: "bold" }}>Positive ({">"} 0.2):</Text> Foods associated with better mood/productivity
+                  </Text>
+                </View>
+
+                <View style={externalStyles.colorRow}>
+                  <View
+                    style={[
+                      externalStyles.colorDot,
+                      { backgroundColor: NEUTRAL_COLOR },
+                    ]}
+                  />
+                  <Text style={externalStyles.colorLabel}>
+                    <Text style={{ fontWeight: "bold" }}>Neutral (-0.2 to 0.2):</Text> No significant correlation
+                  </Text>
+                </View>
+
+                <View style={externalStyles.colorRow}>
+                  <View
+                    style={[
+                      externalStyles.colorDot,
+                      { backgroundColor: NEGATIVE_COLOR },
+                    ]}
+                  />
+                  <Text style={externalStyles.colorLabel}>
+                    <Text style={{ fontWeight: "bold" }}>Negative ({"<"} -0.2):</Text> Foods associated with worse mood/productivity
+                  </Text>
+                </View>
+              </View>
+
+              <Text style={externalStyles.infoText}>
+                <Text style={{ fontWeight: "bold" }}>How it works:{"\n"}</Text>
+                The app analyzes your food entries and mood/productivity ratings to calculate average scores. Higher scores indicate a positive correlation, while lower scores suggest a negative impact.
+              </Text>
+
+              <Text style={externalStyles.infoNote}>
+                Note: These correlations are based on your personal data. More entries lead to more accurate insights.
+              </Text>
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 };

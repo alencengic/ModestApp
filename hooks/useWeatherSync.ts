@@ -6,10 +6,8 @@ export const useWeatherSync = () => {
   const appState = useRef(AppState.currentState);
 
   useEffect(() => {
-    // Sync weather data when app loads
     syncWeatherData();
 
-    // Set up app state listener to sync when app comes to foreground
     const subscription = AppState.addEventListener(
       "change",
       (nextAppState: AppStateStatus) => {
@@ -17,7 +15,6 @@ export const useWeatherSync = () => {
           appState.current.match(/inactive|background/) &&
           nextAppState === "active"
         ) {
-          // App has come to the foreground, sync weather
           syncWeatherData();
         }
 
@@ -25,12 +22,11 @@ export const useWeatherSync = () => {
       }
     );
 
-    // Set up interval to sync every 6 hours while app is active
     const interval = setInterval(() => {
       if (AppState.currentState === "active") {
         syncWeatherData();
       }
-    }, 6 * 60 * 60 * 1000); // 6 hours in milliseconds
+    }, 6 * 60 * 60 * 1000);
 
     return () => {
       subscription.remove();

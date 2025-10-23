@@ -42,26 +42,32 @@ const MEAL_CONFIG = {
 
 export default function DailyEnterScreen() {
   const [moodValue, setMoodValue] = useState<string | null>(null);
-  const [productivityValue, setProductivityValue] = useState<number | null>(null);
+  const [productivityValue, setProductivityValue] = useState<number | null>(
+    null
+  );
   const [foodMeals, setFoodMeals] = useState<Record<MealType, string>>({
     breakfast: "",
     lunch: "",
     dinner: "",
     snacks: "",
   });
-  const [mealFeelings, setMealFeelings] = useState<Record<MealType, MealFeeling["feeling"]>>({
+  const [mealFeelings, setMealFeelings] = useState<
+    Record<MealType, MealFeeling["feeling"]>
+  >({
     breakfast: null,
     lunch: null,
     dinner: null,
     snacks: null,
   });
-  const [mealSymptoms, setMealSymptoms] = useState<Record<MealType, MealSymptomData | null>>({
+  const [mealSymptoms, setMealSymptoms] = useState<
+    Record<MealType, MealSymptomData | null>
+  >({
     breakfast: null,
     lunch: null,
     dinner: null,
     snacks: null,
   });
-  const [resetKey, setResetKey] = useState(0); // Used to force component remount
+  const [resetKey, setResetKey] = useState(0);
 
   const { mutateAsync: saveFoodIntake } = useMutationInsertFoodIntake();
   const createSymptom = useCreateSymptom();
@@ -70,23 +76,25 @@ export default function DailyEnterScreen() {
     try {
       const currentDate = DateTime.now().toISODate() as string;
 
-      // Save mood
       if (moodValue) {
         await insertOrUpdateMood(moodValue, currentDate);
       }
 
-      // Save productivity
       if (productivityValue) {
-        await insertOrUpdateProductivity(productivityValue, DateTime.now().toISO());
+        await insertOrUpdateProductivity(
+          productivityValue,
+          DateTime.now().toISO()
+        );
       }
 
-      // Save food intake
-      if (Object.values(foodMeals).some(meal => meal.trim() !== "")) {
-        const dataToSave = { ...foodMeals, date: DateTime.now().toFormat("yyyy-LL-dd") };
+      if (Object.values(foodMeals).some((meal) => meal.trim() !== "")) {
+        const dataToSave = {
+          ...foodMeals,
+          date: DateTime.now().toFormat("yyyy-LL-dd"),
+        };
         await saveFoodIntake(dataToSave);
       }
 
-      // Save meal-specific symptoms
       const mealTypes: MealType[] = ["breakfast", "lunch", "dinner", "snacks"];
       for (const mealType of mealTypes) {
         if (mealSymptoms[mealType]) {
@@ -106,14 +114,22 @@ export default function DailyEnterScreen() {
 
       Alert.alert("Success", "All daily entries have been saved!");
 
-      // Reset all forms
       setMoodValue(null);
       setProductivityValue(null);
       setFoodMeals({ breakfast: "", lunch: "", dinner: "", snacks: "" });
-      setMealFeelings({ breakfast: null, lunch: null, dinner: null, snacks: null });
-      setMealSymptoms({ breakfast: null, lunch: null, dinner: null, snacks: null });
+      setMealFeelings({
+        breakfast: null,
+        lunch: null,
+        dinner: null,
+        snacks: null,
+      });
+      setMealSymptoms({
+        breakfast: null,
+        lunch: null,
+        dinner: null,
+        snacks: null,
+      });
 
-      // Force remount of all components
       setResetKey((prev) => prev + 1);
     } catch (error) {
       console.error("Failed to save daily entries:", error);
@@ -122,7 +138,6 @@ export default function DailyEnterScreen() {
     }
   };
 
-  // Dynamically build meal feeling and symptom steps for meals with items
   const mealSpecificSteps = useMemo(() => {
     const steps: StepConfig[] = [];
     const mealTypes: MealType[] = ["breakfast", "lunch", "dinner", "snacks"];
@@ -136,11 +151,13 @@ export default function DailyEnterScreen() {
       if (mealItems.length > 0) {
         const config = MEAL_CONFIG[mealType];
 
-        // Add feeling step
         steps.push({
           title: `${config.icon} ${config.label} Feeling`,
           component: (
-            <ScrollView key={`feeling-${mealType}-${resetKey}`} showsVerticalScrollIndicator={false}>
+            <ScrollView
+              key={`feeling-${mealType}-${resetKey}`}
+              showsVerticalScrollIndicator={false}
+            >
               <MealFeelingForm
                 mealName={config.label}
                 mealItems={mealItems}
@@ -153,11 +170,13 @@ export default function DailyEnterScreen() {
           ),
         });
 
-        // Add symptom step
         steps.push({
           title: `${config.icon} ${config.label} Symptoms`,
           component: (
-            <ScrollView key={`symptom-${mealType}-${resetKey}`} showsVerticalScrollIndicator={false}>
+            <ScrollView
+              key={`symptom-${mealType}-${resetKey}`}
+              showsVerticalScrollIndicator={false}
+            >
               <MealSymptomForm
                 mealName={config.label}
                 mealItems={mealItems}
@@ -179,7 +198,10 @@ export default function DailyEnterScreen() {
     {
       title: "How are you feeling?",
       component: (
-        <ScrollView key={`mood-${resetKey}`} showsVerticalScrollIndicator={false}>
+        <ScrollView
+          key={`mood-${resetKey}`}
+          showsVerticalScrollIndicator={false}
+        >
           <RatingComponent
             title="How are you feeling today?"
             options={moodOptions}
@@ -200,7 +222,10 @@ export default function DailyEnterScreen() {
     {
       title: "Productivity Level",
       component: (
-        <ScrollView key={`productivity-${resetKey}`} showsVerticalScrollIndicator={false}>
+        <ScrollView
+          key={`productivity-${resetKey}`}
+          showsVerticalScrollIndicator={false}
+        >
           <RatingComponent
             title="How productive were you today?"
             options={productivityOptions}
@@ -213,7 +238,9 @@ export default function DailyEnterScreen() {
             buttonStyle={productivityRatingStyles.productivityButton}
             selectedButtonStyle={productivityRatingStyles.selectedProductivity}
             displayTextStyle={productivityRatingStyles.productivityText}
-            selectedTextStyle={productivityRatingStyles.selectedProductivityText}
+            selectedTextStyle={
+              productivityRatingStyles.selectedProductivityText
+            }
           />
         </ScrollView>
       ),
@@ -221,7 +248,10 @@ export default function DailyEnterScreen() {
     {
       title: "Food Intake",
       component: (
-        <ScrollView key={`food-${resetKey}`} showsVerticalScrollIndicator={false}>
+        <ScrollView
+          key={`food-${resetKey}`}
+          showsVerticalScrollIndicator={false}
+        >
           <FoodIntakeForm
             key={`food-form-${resetKey}`}
             autoSave={false}

@@ -68,7 +68,6 @@ const WeatherMoodScreen: React.FC = () => {
     },
   });
 
-  // Calculate statistics
   const stats = useMemo(() => {
     if (!correlationData || correlationData.length === 0) {
       return null;
@@ -92,13 +91,11 @@ const WeatherMoodScreen: React.FC = () => {
       moodCounts[entry.mood].conditions.push(entry.condition);
     });
 
-    // Calculate averages
     Object.keys(moodCounts).forEach((mood) => {
       moodCounts[mood].avgTemp =
         moodCounts[mood].avgTemp / moodCounts[mood].count;
     });
 
-    // Find most common weather condition for each mood
     const moodWeatherPatterns = Object.entries(moodCounts).map(
       ([mood, data]) => {
         const conditionCounts: Record<string, number> = {};

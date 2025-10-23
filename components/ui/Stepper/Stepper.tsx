@@ -29,7 +29,7 @@ export const Stepper: React.FC<StepperProps> = ({
       setIsCompleting(true);
       try {
         await onComplete();
-        // Reset to first step after successful save
+
         setCurrentStep(0);
         onStepChange?.(0);
       } catch (error) {
@@ -90,16 +90,27 @@ export const Stepper: React.FC<StepperProps> = ({
       <Text style={styles.stepTitle}>{steps[currentStep].title}</Text>
 
       {/* Step Content */}
-      <View style={styles.contentContainer}>{steps[currentStep].component}</View>
+      <View style={styles.contentContainer}>
+        {steps[currentStep].component}
+      </View>
 
       {/* Navigation Buttons */}
       <View style={styles.navigationContainer}>
         <TouchableOpacity
-          style={[styles.button, styles.backButton, isFirstStep && styles.buttonDisabled]}
+          style={[
+            styles.button,
+            styles.backButton,
+            isFirstStep && styles.buttonDisabled,
+          ]}
           onPress={handleBack}
           disabled={isFirstStep}
         >
-          <Text style={[styles.buttonText, isFirstStep && styles.buttonTextDisabled]}>
+          <Text
+            style={[
+              styles.buttonText,
+              isFirstStep && styles.buttonTextDisabled,
+            ]}
+          >
             Back
           </Text>
         </TouchableOpacity>

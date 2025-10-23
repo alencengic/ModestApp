@@ -116,4 +116,216 @@ export const styles = StyleSheet.create({
     flexWrap: "wrap",
     gap: 8,
   },
+
+  // Toggle buttons styles
+  toggleContainer: {
+    flexDirection: "row",
+    borderRadius: 8,
+    overflow: "hidden",
+    borderWidth: 1,
+    borderColor: "#e0e0e0",
+  },
+  toggleButton: {
+    flex: 1,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    backgroundColor: "#f8f9fa",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  toggleButtonActive: {
+    backgroundColor: BrightTheme.colors.primary,
+  },
+  toggleButtonText: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#666",
+  },
+  toggleButtonTextActive: {
+    color: "#fff",
+  },
+
+  // Food selector button styles
+  foodSelectorButton: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: 15,
+    backgroundColor: "#f8f9fa",
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#e0e0e0",
+    marginBottom: 10,
+  },
+  foodSelectorButtonText: {
+    fontSize: 16,
+    color: "#34495e",
+    flex: 1,
+  },
+  foodSelectorButtonIcon: {
+    fontSize: 12,
+    color: "#7f8c8d",
+    marginLeft: 10,
+  },
+  clearButton: {
+    alignSelf: "flex-end",
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    backgroundColor: "#e74c3c",
+    borderRadius: 6,
+    marginBottom: 10,
+  },
+  clearButtonText: {
+    color: "#fff",
+    fontSize: 14,
+    fontWeight: "600",
+  },
+
+  // Modal styles
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: "flex-end",
+  },
+  modalContainer: {
+    backgroundColor: "#fff",
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    maxHeight: "80%",
+    paddingBottom: Platform.OS === "ios" ? 30 : 20,
+  },
+  modalHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: "#e0e0e0",
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: "600",
+    color: "#2c3e50",
+  },
+  modalCloseButton: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: "#f0f0f0",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  modalCloseButtonText: {
+    fontSize: 20,
+    color: "#666",
+  },
+  searchInput: {
+    margin: 20,
+    marginTop: 15,
+    marginBottom: 10,
+    padding: 12,
+    fontSize: 16,
+    backgroundColor: "#f8f9fa",
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#e0e0e0",
+  },
+  foodItem: {
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: "#f0f0f0",
+  },
+  foodItemSelected: {
+    backgroundColor: "#e3f2fd",
+  },
+  foodItemText: {
+    fontSize: 16,
+    color: "#34495e",
+  },
+  foodItemTextSelected: {
+    fontWeight: "600",
+    color: BrightTheme.colors.primary,
+  },
+
+  // Info button styles
+  headerTopRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    width: "100%",
+    marginBottom: BrightTheme.spacing.sm,
+  },
+  infoButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: "rgba(0, 0, 0, 0.05)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  infoButtonText: {
+    fontSize: 24,
+    color: BrightTheme.colors.primary,
+  },
+
+  // Info modal styles
+  infoModalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.6)",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+  },
+  infoModalContainer: {
+    backgroundColor: "#fff",
+    borderRadius: 16,
+    width: "100%",
+    maxHeight: "80%",
+    maxWidth: 500,
+  },
+  infoModalContent: {
+    padding: 20,
+    maxHeight: 400,
+  },
+  infoText: {
+    fontSize: 15,
+    color: "#34495e",
+    lineHeight: 22,
+    marginBottom: 16,
+  },
+  colorExplanation: {
+    marginVertical: 16,
+    padding: 16,
+    backgroundColor: "#f8f9fa",
+    borderRadius: 12,
+  },
+  colorRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 12,
+  },
+  colorDot: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    marginRight: 12,
+    borderWidth: 1,
+    borderColor: "#e0e0e0",
+  },
+  colorLabel: {
+    fontSize: 14,
+    color: "#34495e",
+    flex: 1,
+    lineHeight: 20,
+  },
+  infoNote: {
+    fontSize: 13,
+    color: "#7f8c8d",
+    fontStyle: "italic",
+    marginTop: 8,
+    padding: 12,
+    backgroundColor: "#e3f2fd",
+    borderRadius: 8,
+    lineHeight: 20,
+  },
 });
