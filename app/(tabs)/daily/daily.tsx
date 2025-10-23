@@ -41,6 +41,7 @@ const MEAL_CONFIG = {
 };
 
 export default function DailyEnterScreen() {
+  const foodScrollViewRef = React.useRef<ScrollView>(null);
   const [moodValue, setMoodValue] = useState<string | null>(null);
   const [productivityValue, setProductivityValue] = useState<number | null>(
     null
@@ -249,6 +250,7 @@ export default function DailyEnterScreen() {
       title: "Food Intake",
       component: (
         <ScrollView
+          ref={foodScrollViewRef}
           key={`food-${resetKey}`}
           showsVerticalScrollIndicator={false}
         >
@@ -257,6 +259,8 @@ export default function DailyEnterScreen() {
             autoSave={false}
             onChange={setFoodMeals}
             onFeelingChange={setMealFeelings}
+            autoFocus={true}
+            scrollViewRef={foodScrollViewRef}
           />
           <BannerAd size="small" position="inline" />
         </ScrollView>
@@ -267,7 +271,11 @@ export default function DailyEnterScreen() {
 
   return (
     <SafeAreaView style={dailyEnterScreenStyles.safeArea}>
-      <Stepper steps={steps} onComplete={handleCompleteAll} />
+      <Stepper
+        steps={steps}
+        onComplete={handleCompleteAll}
+        allowSkipAfterStep={2} // Allow skipping after step 3 (index 2)
+      />
     </SafeAreaView>
   );
 }

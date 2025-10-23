@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from "react-native";
 import { BrightTheme } from "@/constants/Theme";
 
 export interface StepConfig {
@@ -11,18 +11,21 @@ interface StepperProps {
   steps: StepConfig[];
   onComplete: () => void | Promise<void>;
   onStepChange?: (stepIndex: number) => void;
+  allowSkipAfterStep?: number; // Allow skipping after this step index (0-based)
 }
 
 export const Stepper: React.FC<StepperProps> = ({
   steps,
   onComplete,
   onStepChange,
+  allowSkipAfterStep = -1, // Default: no skipping allowed
 }) => {
   const [currentStep, setCurrentStep] = useState(0);
   const [isCompleting, setIsCompleting] = useState(false);
 
   const isFirstStep = currentStep === 0;
   const isLastStep = currentStep === steps.length - 1;
+  const canSkip = allowSkipAfterStep >= 0 && currentStep > allowSkipAfterStep;
 
   const handleNext = async () => {
     if (isLastStep) {
@@ -52,39 +55,65 @@ export const Stepper: React.FC<StepperProps> = ({
     }
   };
 
+  const handleSkip = async () => {
+    // Skip to the last step to complete
+    setIsCompleting(true);
+    try {
+      await onComplete();
+      setCurrentStep(0);
+      onStepChange?.(0);
+    } catch (error) {
+      console.error("Error completing stepper:", error);
+    } finally {
+      setIsCompleting(false);
+    }
+  };
+
   return (
     <View style={styles.container}>
-      {/* Progress Indicator */}
-      <View style={styles.progressContainer}>
-        {steps.map((_, index) => (
-          <View key={index} style={styles.stepIndicatorWrapper}>
-            <View
-              style={[
-                styles.stepIndicator,
-                index <= currentStep && styles.stepIndicatorActive,
-                index === currentStep && styles.stepIndicatorCurrent,
-              ]}
-            >
-              <Text
-                style={[
-                  styles.stepNumber,
-                  index <= currentStep && styles.stepNumberActive,
-                ]}
-              >
-                {index + 1}
-              </Text>
-            </View>
-            {index < steps.length - 1 && (
+      {/* Progress Indicator - Scrollable for many steps */}
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.progressScrollContent}
+        style={styles.progressScroll}
+      >
+        <View style={styles.progressContainer}>
+          {steps.map((_, index) => (
+            <View key={index} style={styles.stepIndicatorWrapper}>
               <View
                 style={[
-                  styles.stepConnector,
-                  index < currentStep && styles.stepConnectorActive,
+                  styles.stepIndicator,
+                  index <= currentStep && styles.stepIndicatorActive,
+                  index === currentStep && styles.stepIndicatorCurrent,
                 ]}
-              />
-            )}
-          </View>
-        ))}
-      </View>
+              >
+                <Text
+                  style={[
+                    styles.stepNumber,
+                    index <= currentStep && styles.stepNumberActive,
+                  ]}
+                >
+                  {index + 1}
+                </Text>
+              </View>
+              {index < steps.length - 1 && (
+                <View
+                  style={[
+                    styles.stepConnector,
+                    index < currentStep && styles.stepConnectorActive,
+                  ]}
+                />
+              )}
+            </View>
+          ))}
+        </View>
+      </ScrollView>
+
+      {/* Step Counter Text */}
+      <Text style={styles.stepCounter}>
+        Step {currentStep + 1} of {steps.length}
+      </Text>
 
       {/* Step Title */}
       <Text style={styles.stepTitle}>{steps[currentStep].title}</Text>
@@ -115,6 +144,18 @@ export const Stepper: React.FC<StepperProps> = ({
           </Text>
         </TouchableOpacity>
 
+        {canSkip && !isLastStep && (
+          <TouchableOpacity
+            style={[styles.button, styles.skipButton]}
+            onPress={handleSkip}
+            disabled={isCompleting}
+          >
+            <Text style={styles.skipButtonText}>
+              {isCompleting ? "Saving..." : "Skip & Save"}
+            </Text>
+          </TouchableOpacity>
+        )}
+
         <TouchableOpacity
           style={[styles.button, styles.nextButton]}
           onPress={handleNext}
@@ -135,12 +176,25 @@ const styles = StyleSheet.create({
     padding: BrightTheme.spacing.lg,
     backgroundColor: BrightTheme.colors.background,
   },
+  progressScroll: {
+    maxHeight: 60,
+    marginBottom: BrightTheme.spacing.sm,
+  },
+  progressScrollContent: {
+    paddingHorizontal: BrightTheme.spacing.md,
+    alignItems: "center",
+  },
   progressContainer: {
     flexDirection: "row",
-    justifyContent: "center",
     alignItems: "center",
-    marginBottom: BrightTheme.spacing.xl,
     paddingTop: BrightTheme.spacing.sm,
+  },
+  stepCounter: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: BrightTheme.colors.textSecondary,
+    textAlign: "center",
+    marginBottom: BrightTheme.spacing.md,
   },
   stepIndicatorWrapper: {
     flexDirection: "row",
@@ -196,12 +250,12 @@ const styles = StyleSheet.create({
   navigationContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
-    gap: BrightTheme.spacing.md,
+    gap: BrightTheme.spacing.sm,
   },
   button: {
     flex: 1,
-    paddingVertical: BrightTheme.spacing.sm,
-    paddingHorizontal: BrightTheme.spacing.md,
+    paddingVertical: BrightTheme.spacing.md,
+    paddingHorizontal: BrightTheme.spacing.sm,
     borderRadius: BrightTheme.borderRadius.round,
     alignItems: "center",
   },
@@ -212,6 +266,11 @@ const styles = StyleSheet.create({
   },
   nextButton: {
     backgroundColor: BrightTheme.colors.primary,
+  },
+  skipButton: {
+    backgroundColor: BrightTheme.colors.secondary || "#FFA500",
+    borderWidth: 1,
+    borderColor: BrightTheme.colors.border,
   },
   buttonDisabled: {
     opacity: 0.4,
@@ -228,5 +287,10 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "600",
     color: BrightTheme.colors.textOnPrimary,
+  },
+  skipButtonText: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: BrightTheme.colors.textPrimary,
   },
 });

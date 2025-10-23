@@ -1,15 +1,18 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import {
   SafeAreaView,
   ScrollView,
   View,
   Text,
   ActivityIndicator,
+  TouchableOpacity,
+  Modal,
 } from "react-native";
 import { useQuery } from "@tanstack/react-query";
 import { getWeatherMoodCorrelation } from "@/storage/weather_data";
 import { styles } from "./WeatherMoodScreen.styles";
 import { BannerAd, VideoAd } from "@/components/ads";
+import { BrightTheme } from "@/constants/Theme";
 
 interface MoodWeatherData {
   mood: string;
@@ -56,6 +59,8 @@ const getWeatherEmoji = (condition: string): string => {
 };
 
 const WeatherMoodScreen: React.FC = () => {
+  const [showInfoModal, setShowInfoModal] = useState(false);
+
   const {
     data: correlationData = [],
     isLoading,
@@ -123,6 +128,37 @@ const WeatherMoodScreen: React.FC = () => {
     return moodWeatherPatterns.sort((a, b) => b.count - a.count);
   }, [correlationData]);
 
+  // Calculate additional insights
+  const insights = useMemo(() => {
+    if (!correlationData || correlationData.length === 0) return null;
+
+    const temps = correlationData.map((d) => d.temperature);
+    const avgTemp = temps.reduce((a, b) => a + b, 0) / temps.length;
+
+    const humidities = correlationData.map((d) => d.humidity);
+    const avgHumidity = humidities.reduce((a, b) => a + b, 0) / humidities.length;
+
+    // Find best weather conditions for mood
+    const positiveConditions: Record<string, number> = {};
+    correlationData.forEach((entry) => {
+      if (["Happy", "Very Happy", "Ecstatic"].includes(entry.mood)) {
+        positiveConditions[entry.condition] =
+          (positiveConditions[entry.condition] || 0) + 1;
+      }
+    });
+
+    const bestCondition = Object.entries(positiveConditions).sort(
+      (a, b) => b[1] - a[1]
+    )[0];
+
+    return {
+      avgTemp: avgTemp.toFixed(1),
+      avgHumidity: avgHumidity.toFixed(0),
+      bestCondition: bestCondition ? bestCondition[0] : "N/A",
+      bestConditionCount: bestCondition ? bestCondition[1] : 0,
+    };
+  }, [correlationData]);
+
   if (isLoading) {
     return (
       <SafeAreaView style={styles.container}>
@@ -175,11 +211,66 @@ const WeatherMoodScreen: React.FC = () => {
         <BannerAd size="small" position="top" />
 
         <View style={styles.header}>
-          <Text style={styles.headerTitle}>Weather & Mood</Text>
-          <Text style={styles.headerSubtitle}>
-            Discover how weather affects your mood
-          </Text>
+          <View style={styles.headerRow}>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.headerTitle}>Weather & Mood</Text>
+              <Text style={styles.headerSubtitle}>
+                Discover how weather affects your mood
+              </Text>
+            </View>
+            <TouchableOpacity
+              style={styles.infoButton}
+              onPress={() => setShowInfoModal(true)}
+            >
+              <Text style={styles.infoButtonText}>ⓘ</Text>
+            </TouchableOpacity>
+          </View>
         </View>
+
+        {/* Info Modal */}
+        <Modal
+          visible={showInfoModal}
+          animationType="slide"
+          transparent={true}
+          onRequestClose={() => setShowInfoModal(false)}
+        >
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalContent}>
+              <Text style={styles.modalTitle}>Weather & Mood Insights</Text>
+
+              <Text style={styles.modalSectionTitle}>What This Shows:</Text>
+              <Text style={styles.modalText}>
+                This screen correlates your logged mood entries with weather data at the time of logging.
+              </Text>
+
+              <Text style={styles.modalSectionTitle}>Mood-Weather Patterns:</Text>
+              <Text style={styles.modalText}>
+                • Shows which moods occur most frequently{"\n"}
+                • Average temperature when feeling each mood{"\n"}
+                • Most common weather conditions for each mood
+              </Text>
+
+              <Text style={styles.modalSectionTitle}>Key Insights:</Text>
+              <Text style={styles.modalText}>
+                • Average weather conditions across all entries{"\n"}
+                • Weather conditions associated with positive moods{"\n"}
+                • Temperature and humidity trends
+              </Text>
+
+              <Text style={styles.modalSectionTitle}>How to Use:</Text>
+              <Text style={styles.modalText}>
+                Track your mood daily to build a comprehensive dataset. Over time, you'll discover patterns that help you understand how weather influences your well-being.
+              </Text>
+
+              <TouchableOpacity
+                style={styles.modalCloseButton}
+                onPress={() => setShowInfoModal(false)}
+              >
+                <Text style={styles.modalCloseButtonText}>Got it!</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
 
         {/* Summary Card */}
         <View style={styles.summaryCard}>
@@ -188,6 +279,40 @@ const WeatherMoodScreen: React.FC = () => {
             Tracking {correlationData.length} mood entries with weather data
           </Text>
         </View>
+
+        {/* Key Insights Card */}
+        {insights && (
+          <View style={styles.insightsCard}>
+            <Text style={styles.cardTitle}>Key Insights</Text>
+            <View style={styles.insightRow}>
+              <View style={styles.insightItem}>
+                <Text style={styles.insightEmoji}>🌡️</Text>
+                <Text style={styles.insightLabel}>Avg Temperature</Text>
+                <Text style={styles.insightValue}>{insights.avgTemp}°C</Text>
+              </View>
+              <View style={styles.insightItem}>
+                <Text style={styles.insightEmoji}>💧</Text>
+                <Text style={styles.insightLabel}>Avg Humidity</Text>
+                <Text style={styles.insightValue}>{insights.avgHumidity}%</Text>
+              </View>
+            </View>
+            {insights.bestCondition !== "N/A" && (
+              <View style={styles.bestWeatherContainer}>
+                <Text style={styles.bestWeatherLabel}>
+                  Your Best Weather for Positive Mood:
+                </Text>
+                <View style={styles.bestWeatherBadge}>
+                  <Text style={styles.bestWeatherText}>
+                    {getWeatherEmoji(insights.bestCondition)} {insights.bestCondition}
+                  </Text>
+                  <Text style={styles.bestWeatherCount}>
+                    ({insights.bestConditionCount} positive mood entries)
+                  </Text>
+                </View>
+              </View>
+            )}
+          </View>
+        )}
 
         {/* Mood-Weather Patterns */}
         <View style={styles.section}>

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState, useMemo, useRef, useImperativeHandle, forwardRef } from "react";
 import {
   View,
   Text,
@@ -29,14 +29,31 @@ interface FoodIntakeFormProps {
   onChange?: (meals: Record<MealType, string>) => void;
   onSave?: () => Promise<void>;
   onFeelingChange?: (feelings: Record<MealType, MealFeeling["feeling"]>) => void;
+  autoFocus?: boolean;
+  scrollViewRef?: React.RefObject<ScrollView>;
 }
 
-export const FoodIntakeForm: React.FC<FoodIntakeFormProps> = ({
+export interface FoodIntakeFormRef {
+  focusFirstInput: () => void;
+}
+
+const FoodIntakeFormComponent = forwardRef<FoodIntakeFormRef, FoodIntakeFormProps>(({
   autoSave = true,
   onChange,
   onSave: onSaveCallback,
   onFeelingChange,
-}) => {
+  autoFocus = false,
+  scrollViewRef,
+}, ref) => {
+  const breakfastInputRef = useRef<TextInput>(null);
+  const lunchInputRef = useRef<TextInput>(null);
+  const dinnerInputRef = useRef<TextInput>(null);
+  const snacksInputRef = useRef<TextInput>(null);
+
+  const breakfastViewRef = useRef<View>(null);
+  const lunchViewRef = useRef<View>(null);
+  const dinnerViewRef = useRef<View>(null);
+  const snacksViewRef = useRef<View>(null);
   const [mealItems, setMealItems] = useState<Record<MealType, string[]>>({
     breakfast: [],
     lunch: [],
@@ -69,6 +86,13 @@ export const FoodIntakeForm: React.FC<FoodIntakeFormProps> = ({
   const [focusedInput, setFocusedInput] = useState<MealType | null>(null);
 
   const [userFoods, setUserFoods] = useState<string[]>([]);
+
+  const [viewPositions, setViewPositions] = useState<Record<MealType, number>>({
+    breakfast: 0,
+    lunch: 0,
+    dinner: 0,
+    snacks: 0,
+  });
 
   const allFoods = useMemo(() => {
     const combined = [...COMMON_FOODS, ...userFoods];
@@ -103,6 +127,24 @@ export const FoodIntakeForm: React.FC<FoodIntakeFormProps> = ({
     loadUserFoods();
   }, []);
 
+  // Auto-focus breakfast input when autoFocus is true
+  useEffect(() => {
+    if (autoFocus && breakfastInputRef.current) {
+      // Small delay to ensure component is fully mounted
+      const timer = setTimeout(() => {
+        breakfastInputRef.current?.focus();
+      }, 300);
+      return () => clearTimeout(timer);
+    }
+  }, [autoFocus]);
+
+  // Expose focus method to parent components
+  useImperativeHandle(ref, () => ({
+    focusFirstInput: () => {
+      breakfastInputRef.current?.focus();
+    },
+  }));
+
   const handleAddItem = (type: MealType, item: string) => {
     const trimmedItem = item.trim();
     if (trimmedItem && !mealItems[type].includes(trimmedItem)) {
@@ -128,6 +170,28 @@ export const FoodIntakeForm: React.FC<FoodIntakeFormProps> = ({
     setMenuVisible((prev) => ({ ...prev, [type]: false }));
   };
 
+  const scrollToInput = (type: MealType) => {
+    if (scrollViewRef?.current) {
+      const yPosition = viewPositions[type];
+
+      // Use a small timeout to ensure keyboard is opening
+      setTimeout(() => {
+        scrollViewRef.current?.scrollTo({
+          y: Math.max(0, yPosition - 100), // Offset to show some space above, min 0
+          animated: true,
+        });
+      }, 100);
+    }
+  };
+
+  const handleLayout = (type: MealType, event: any) => {
+    const { y } = event.nativeEvent.layout;
+    setViewPositions(prev => ({
+      ...prev,
+      [type]: y,
+    }));
+  };
+
   const renderMealInput = (type: MealType) => {
     const config = MEAL_CONFIG[type];
     const filteredItems = allFoods.filter((item) =>
@@ -137,8 +201,26 @@ export const FoodIntakeForm: React.FC<FoodIntakeFormProps> = ({
     const isFocused = focusedInput === type;
     const canAdd = currentInput[type].trim() !== "";
 
+    const inputRefs = {
+      breakfast: breakfastInputRef,
+      lunch: lunchInputRef,
+      dinner: dinnerInputRef,
+      snacks: snacksInputRef,
+    };
+
+    const viewRefs = {
+      breakfast: breakfastViewRef,
+      lunch: lunchViewRef,
+      dinner: dinnerViewRef,
+      snacks: snacksViewRef,
+    };
+
     return (
-      <View style={foodIntakeFormStyles.mealSection}>
+      <View
+        ref={viewRefs[type]}
+        style={foodIntakeFormStyles.mealSection}
+        onLayout={(event) => handleLayout(type, event)}
+      >
         <View
           style={[
             foodIntakeFormStyles.mealCard,
@@ -178,6 +260,7 @@ export const FoodIntakeForm: React.FC<FoodIntakeFormProps> = ({
           )}
 
           <TextInput
+            ref={inputRefs[type]}
             style={[
               foodIntakeFormStyles.inputField,
               isFocused && foodIntakeFormStyles.inputFieldFocused,
@@ -187,6 +270,7 @@ export const FoodIntakeForm: React.FC<FoodIntakeFormProps> = ({
             placeholderTextColor="#999"
             onFocus={() => {
               setFocusedInput(type);
+              scrollToInput(type);
               if (currentInput[type].trim() !== "") {
                 setMenuVisible((prev) => ({ ...prev, [type]: true }));
               }
@@ -288,4 +372,8 @@ export const FoodIntakeForm: React.FC<FoodIntakeFormProps> = ({
       )}
     </View>
   );
-};
+});
+
+FoodIntakeFormComponent.displayName = 'FoodIntakeForm';
+
+export const FoodIntakeForm = FoodIntakeFormComponent as typeof FoodIntakeFormComponent;
