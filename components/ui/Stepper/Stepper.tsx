@@ -283,7 +283,7 @@ const styles = StyleSheet.create({
   },
   button: {
     flex: 1,
-    paddingVertical: BrightTheme.spacing.md,
+    paddingVertical: scale(10),
     paddingHorizontal: BrightTheme.spacing.sm,
     borderRadius: BrightTheme.borderRadius.round,
     alignItems: "center",
@@ -305,7 +305,7 @@ const styles = StyleSheet.create({
     opacity: 0.4,
   },
   buttonText: {
-    fontSize: scaleFontSize(14),
+    fontSize: scaleFontSize(13),
     fontWeight: "600",
     color: BrightTheme.colors.textPrimary,
   },
@@ -313,12 +313,12 @@ const styles = StyleSheet.create({
     color: BrightTheme.colors.textLight,
   },
   nextButtonText: {
-    fontSize: scaleFontSize(14),
+    fontSize: scaleFontSize(13),
     fontWeight: "600",
     color: BrightTheme.colors.textOnPrimary,
   },
   skipButtonText: {
-    fontSize: scaleFontSize(14),
+    fontSize: scaleFontSize(13),
     fontWeight: "600",
     color: BrightTheme.colors.textPrimary,
   },

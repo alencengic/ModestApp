@@ -199,14 +199,14 @@ const styles = StyleSheet.create({
   },
   startButton: {
     backgroundColor: "#5e2607ff",
-    paddingHorizontal: scale(32),
-    paddingVertical: scale(12),
-    borderRadius: scale(24),
+    paddingHorizontal: scale(24),
+    paddingVertical: scale(10),
+    borderRadius: scale(20),
     marginTop: BrightTheme.spacing.lg,
   },
   startButtonText: {
     color: "#FFFFFF",
-    fontSize: scaleFontSize(16),
+    fontSize: scaleFontSize(14),
     fontWeight: "500",
   },
   sectionTitle: {
