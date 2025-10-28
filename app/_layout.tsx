@@ -1,7 +1,7 @@
 import {
   DarkTheme,
   DefaultTheme,
-  ThemeProvider,
+  ThemeProvider as NavigationThemeProvider,
 } from "@react-navigation/native";
 import { useFonts } from "expo-font";
 import { Stack, useRouter, useSegments } from "expo-router";
@@ -15,19 +15,17 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { useWeatherSync } from "@/hooks/useWeatherSync";
 import { requestNotificationPermissions, scheduleDailyNotifications } from "@/services/notificationService";
+import { ThemeProvider, useTheme } from "@/context/ThemeContext";
 
 SplashScreen.preventAutoHideAsync();
 
 const queryClient = new QueryClient();
 
-export default function RootLayout() {
-  const colorScheme = useColorScheme();
+function RootLayoutNav() {
   const router = useRouter();
   const segments = useSegments();
+  const { isDark } = useTheme();
   const [hasSeenOnboarding, setHasSeenOnboarding] = useState<boolean | null>(null);
-  const [loaded] = useFonts({
-    SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
-  });
 
   useWeatherSync();
 
@@ -51,15 +49,13 @@ export default function RootLayout() {
   }, [segments]);
 
   useEffect(() => {
-    if (loaded && hasSeenOnboarding !== null) {
-      SplashScreen.hideAsync();
-
+    if (hasSeenOnboarding !== null) {
       // Redirect to onboarding if not seen
       if (!hasSeenOnboarding && !segments.includes("onboarding")) {
         router.replace("/onboarding");
       }
     }
-  }, [loaded, hasSeenOnboarding, segments]);
+  }, [hasSeenOnboarding, segments]);
 
   useEffect(() => {
     const setupNotifications = async () => {
@@ -72,20 +68,42 @@ export default function RootLayout() {
     setupNotifications();
   }, []);
 
-  if (!loaded || hasSeenOnboarding === null) {
+  if (hasSeenOnboarding === null) {
+    return null;
+  }
+
+  return (
+    <NavigationThemeProvider value={isDark ? DarkTheme : DefaultTheme}>
+      <Stack>
+        <Stack.Screen name="onboarding" options={{ headerShown: false }} />
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen name="journal-entry-detail" options={{ headerShown: false }} />
+        <Stack.Screen name="+not-found" />
+      </Stack>
+      <StatusBar style="auto" />
+    </NavigationThemeProvider>
+  );
+}
+
+export default function RootLayout() {
+  const [loaded] = useFonts({
+    SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
+  });
+
+  useEffect(() => {
+    if (loaded) {
+      SplashScreen.hideAsync();
+    }
+  }, [loaded]);
+
+  if (!loaded) {
     return null;
   }
 
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-        <Stack>
-          <Stack.Screen name="onboarding" options={{ headerShown: false }} />
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen name="journal-entry-detail" options={{ headerShown: false }} />
-          <Stack.Screen name="+not-found" />
-        </Stack>
-        <StatusBar style="auto" />
+      <ThemeProvider>
+        <RootLayoutNav />
       </ThemeProvider>
     </QueryClientProvider>
   );

@@ -69,6 +69,15 @@ export default function TabLayout() {
         }}
       />
       <Drawer.Screen
+        name="settings/settings"
+        options={{
+          title: "Settings",
+          drawerIcon: ({ color }) => (
+            <IconSymbol size={24} name="gearshape.fill" color={color} />
+          ),
+        }}
+      />
+      <Drawer.Screen
         name="daily/daily"
         options={{
           drawerItemStyle: { display: "none" },

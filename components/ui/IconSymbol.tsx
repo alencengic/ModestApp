@@ -14,6 +14,7 @@ const MAPPING = {
   "face.smiling": "sentiment-satisfied-alt",
   "fork.knife": "restaurant",
   "cloud.sun.fill": "wb-sunny",
+  "gearshape.fill": "settings",
 } as const;
 
 export type IconSymbolName = keyof typeof MAPPING;
