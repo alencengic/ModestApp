@@ -10,9 +10,9 @@ import {
 } from "react-native";
 import { useQuery } from "@tanstack/react-query";
 import { getWeatherMoodCorrelation } from "@/storage/weather_data";
-import { styles } from "./WeatherMoodScreen.styles";
+import { createStyles } from "./WeatherMoodScreen.styles";
 import { BannerAd, VideoAd } from "@/components/ads";
-import { BrightTheme } from "@/constants/Theme";
+import { useTheme } from "@/context/ThemeContext";
 
 interface MoodWeatherData {
   mood: string;
@@ -59,6 +59,8 @@ const getWeatherEmoji = (condition: string): string => {
 };
 
 const WeatherMoodScreen: React.FC = () => {
+  const { theme } = useTheme();
+  const styles = createStyles(theme);
   const [showInfoModal, setShowInfoModal] = useState(false);
 
   const {

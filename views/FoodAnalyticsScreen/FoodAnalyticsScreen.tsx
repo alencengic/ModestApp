@@ -7,7 +7,7 @@ import {
   SymptomType,
   FoodSymptomCorrelation,
 } from "../../storage/correlations";
-import { BrightTheme } from "@/constants/Theme";
+import { useTheme } from "@/context/ThemeContext";
 import { BannerAd } from "@/components/ads";
 
 const symptomTypes: SymptomType[] = [
@@ -28,19 +28,8 @@ const symptomLabels: Record<SymptomType, string> = {
   pain: "Pain",
 };
 
-const EmptyListComponent = () => (
-  <View style={styles.emptyContainer}>
-    <Icon source="file-find-outline" size={48} color="#aaa" />
-    <Text style={styles.emptyText}>
-      No correlation data found for this symptom yet.
-    </Text>
-    <Text style={styles.emptySubText}>
-      Keep logging your meals and symptoms to see insights here.
-    </Text>
-  </View>
-);
-
 export default function FoodAnalyticsScreen() {
+  const { theme } = useTheme();
   const POSITIVE_COLOR = "#3CB371";
   const NEUTRAL_COLOR = "#A9A9A9";
   const NEGATIVE_COLOR = "#CD5C5C";
@@ -72,6 +61,264 @@ export default function FoodAnalyticsScreen() {
     if (score < -0.2) return NEGATIVE_COLOR;
     return NEUTRAL_COLOR;
   };
+
+  const styles = StyleSheet.create({
+    container: {
+      paddingBottom: theme.spacing.xl,
+      backgroundColor: theme.colors.background,
+      flexGrow: 1,
+    },
+    header: {
+      padding: theme.spacing.xl,
+      alignItems: "center",
+      backgroundColor: theme.colors.background,
+    },
+    headerEmoji: {
+      fontSize: 48,
+      marginBottom: theme.spacing.sm,
+    },
+    headerTitle: {
+      fontSize: 24,
+      fontWeight: "600",
+      color: theme.colors.textPrimary,
+      marginBottom: theme.spacing.xs,
+    },
+    headerSubtitle: {
+      fontSize: 14,
+      color: theme.colors.textSecondary,
+    },
+    title: {
+      textAlign: "center",
+      marginBottom: 10,
+    },
+    card: {
+      margin: theme.spacing.md,
+      borderRadius: theme.borderRadius.lg,
+      ...theme.shadows.md,
+    },
+    sectionTitle: {
+      fontSize: 16,
+      fontWeight: "600",
+      color: theme.colors.textPrimary,
+      marginBottom: 16,
+    },
+    symptomGrid: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      gap: 10,
+    },
+    symptomButton: {
+      paddingVertical: 10,
+      paddingHorizontal: 16,
+      backgroundColor: "#f8f9fa",
+      borderRadius: 20,
+      borderWidth: 1,
+      borderColor: "#e0e0e0",
+      minWidth: "30%",
+      alignItems: "center",
+    },
+    symptomButtonActive: {
+      backgroundColor: theme.colors.primary,
+      borderColor: theme.colors.primary,
+    },
+    symptomButtonText: {
+      fontSize: 14,
+      fontWeight: "600",
+      color: "#666",
+    },
+    symptomButtonTextActive: {
+      color: "#fff",
+    },
+    foodItem: {
+      paddingVertical: 12,
+      borderBottomWidth: 1,
+      borderBottomColor: "#f0f0f0",
+    },
+    foodItemLast: {
+      borderBottomWidth: 0,
+    },
+    foodItemHeader: {
+      flexDirection: "row",
+      alignItems: "center",
+      marginBottom: 8,
+      gap: 8,
+    },
+    foodItemTitle: {
+      fontSize: 17,
+      fontWeight: "600",
+      color: "#2c3e50",
+    },
+    foodItemDetails: {
+      paddingLeft: 28,
+    },
+    detailRow: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      marginBottom: 6,
+      paddingVertical: 2,
+    },
+    detailLabel: {
+      fontSize: 14,
+      color: "#7f8c8d",
+    },
+    detailValue: {
+      fontSize: 14,
+      color: "#34495e",
+      fontWeight: "500",
+    },
+    colorIndicatorRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      marginTop: 4,
+    },
+    colorIndicatorSwatch: {
+      width: 18,
+      height: 18,
+      marginLeft: 10,
+      borderRadius: 9,
+      borderWidth: 1,
+      borderColor: "#e0e0e0",
+    },
+    emptyContainer: {
+      alignItems: "center",
+      paddingVertical: 32,
+      paddingHorizontal: 16,
+    },
+    emptyText: {
+      marginTop: 16,
+      fontSize: 16,
+      fontWeight: "bold",
+      textAlign: "center",
+      color: "#555",
+    },
+    emptySubText: {
+      marginTop: 8,
+      fontSize: 14,
+      textAlign: "center",
+      color: "#888",
+    },
+    errorText: {
+      textAlign: "center",
+      color: "red",
+      marginVertical: 20,
+    },
+    headerTopRow: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      width: "100%",
+      marginBottom: theme.spacing.sm,
+    },
+    infoButton: {
+      width: 40,
+      height: 40,
+      borderRadius: 20,
+      backgroundColor: "rgba(0, 0, 0, 0.05)",
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    infoButtonText: {
+      fontSize: 24,
+      color: theme.colors.primary,
+    },
+    infoModalOverlay: {
+      flex: 1,
+      backgroundColor: "rgba(0, 0, 0, 0.6)",
+      justifyContent: "center",
+      alignItems: "center",
+      padding: 20,
+    },
+    infoModalContainer: {
+      backgroundColor: "#fff",
+      borderRadius: 16,
+      width: "100%",
+      maxHeight: "80%",
+      maxWidth: 500,
+    },
+    modalHeader: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      padding: 20,
+      borderBottomWidth: 1,
+      borderBottomColor: "#e0e0e0",
+    },
+    modalTitle: {
+      fontSize: 20,
+      fontWeight: "600",
+      color: "#2c3e50",
+    },
+    modalCloseButton: {
+      width: 32,
+      height: 32,
+      borderRadius: 16,
+      backgroundColor: "#f0f0f0",
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    modalCloseButtonText: {
+      fontSize: 20,
+      color: "#666",
+    },
+    infoModalContent: {
+      padding: 20,
+      maxHeight: 400,
+    },
+    infoText: {
+      fontSize: 15,
+      color: "#34495e",
+      lineHeight: 22,
+      marginBottom: 16,
+    },
+    colorExplanation: {
+      marginVertical: 16,
+      padding: 16,
+      backgroundColor: "#f8f9fa",
+      borderRadius: 12,
+    },
+    colorRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      marginBottom: 12,
+    },
+    colorDot: {
+      width: 20,
+      height: 20,
+      borderRadius: 10,
+      marginRight: 12,
+      borderWidth: 1,
+      borderColor: "#e0e0e0",
+    },
+    colorLabel: {
+      fontSize: 14,
+      color: "#34495e",
+      flex: 1,
+      lineHeight: 20,
+    },
+    infoNote: {
+      fontSize: 13,
+      color: "#7f8c8d",
+      fontStyle: "italic",
+      marginTop: 8,
+      padding: 12,
+      backgroundColor: "#e3f2fd",
+      borderRadius: 8,
+      lineHeight: 20,
+    },
+  });
+
+  const EmptyListComponent = () => (
+    <View style={styles.emptyContainer}>
+      <Icon source="file-find-outline" size={48} color="#aaa" />
+      <Text style={styles.emptyText}>
+        No correlation data found for this symptom yet.
+      </Text>
+      <Text style={styles.emptySubText}>
+        Keep logging your meals and symptoms to see insights here.
+      </Text>
+    </View>
+  );
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -264,253 +511,3 @@ export default function FoodAnalyticsScreen() {
     </ScrollView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    paddingBottom: BrightTheme.spacing.xl,
-    backgroundColor: BrightTheme.colors.background,
-    flexGrow: 1,
-  },
-  header: {
-    padding: BrightTheme.spacing.xl,
-    alignItems: "center",
-    backgroundColor: BrightTheme.colors.background,
-  },
-  headerEmoji: {
-    fontSize: 48,
-    marginBottom: BrightTheme.spacing.sm,
-  },
-  headerTitle: {
-    fontSize: 24,
-    fontWeight: "600",
-    color: BrightTheme.colors.textPrimary,
-    marginBottom: BrightTheme.spacing.xs,
-  },
-  headerSubtitle: {
-    fontSize: 14,
-    color: BrightTheme.colors.textSecondary,
-  },
-  title: {
-    textAlign: "center",
-    marginBottom: 10,
-  },
-  card: {
-    margin: BrightTheme.spacing.md,
-    borderRadius: BrightTheme.borderRadius.lg,
-    ...BrightTheme.shadows.md,
-  },
-  sectionTitle: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: BrightTheme.colors.textPrimary,
-    marginBottom: 16,
-  },
-  symptomGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 10,
-  },
-  symptomButton: {
-    paddingVertical: 10,
-    paddingHorizontal: 16,
-    backgroundColor: "#f8f9fa",
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: "#e0e0e0",
-    minWidth: "30%",
-    alignItems: "center",
-  },
-  symptomButtonActive: {
-    backgroundColor: BrightTheme.colors.primary,
-    borderColor: BrightTheme.colors.primary,
-  },
-  symptomButtonText: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: "#666",
-  },
-  symptomButtonTextActive: {
-    color: "#fff",
-  },
-  foodItem: {
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: "#f0f0f0",
-  },
-  foodItemLast: {
-    borderBottomWidth: 0,
-  },
-  foodItemHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 8,
-    gap: 8,
-  },
-  foodItemTitle: {
-    fontSize: 17,
-    fontWeight: "600",
-    color: "#2c3e50",
-  },
-  foodItemDetails: {
-    paddingLeft: 28,
-  },
-  detailRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 6,
-    paddingVertical: 2,
-  },
-  detailLabel: {
-    fontSize: 14,
-    color: "#7f8c8d",
-  },
-  detailValue: {
-    fontSize: 14,
-    color: "#34495e",
-    fontWeight: "500",
-  },
-  colorIndicatorRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginTop: 4,
-  },
-  colorIndicatorSwatch: {
-    width: 18,
-    height: 18,
-    marginLeft: 10,
-    borderRadius: 9,
-    borderWidth: 1,
-    borderColor: "#e0e0e0",
-  },
-  emptyContainer: {
-    alignItems: "center",
-    paddingVertical: 32,
-    paddingHorizontal: 16,
-  },
-  emptyText: {
-    marginTop: 16,
-    fontSize: 16,
-    fontWeight: "bold",
-    textAlign: "center",
-    color: "#555",
-  },
-  emptySubText: {
-    marginTop: 8,
-    fontSize: 14,
-    textAlign: "center",
-    color: "#888",
-  },
-  errorText: {
-    textAlign: "center",
-    color: "red",
-    marginVertical: 20,
-  },
-
-  // Info button styles
-  headerTopRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    width: "100%",
-    marginBottom: BrightTheme.spacing.sm,
-  },
-  infoButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: "rgba(0, 0, 0, 0.05)",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  infoButtonText: {
-    fontSize: 24,
-    color: BrightTheme.colors.primary,
-  },
-
-  // Info modal styles
-  infoModalOverlay: {
-    flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.6)",
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 20,
-  },
-  infoModalContainer: {
-    backgroundColor: "#fff",
-    borderRadius: 16,
-    width: "100%",
-    maxHeight: "80%",
-    maxWidth: 500,
-  },
-  modalHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    padding: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: "#e0e0e0",
-  },
-  modalTitle: {
-    fontSize: 20,
-    fontWeight: "600",
-    color: "#2c3e50",
-  },
-  modalCloseButton: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: "#f0f0f0",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  modalCloseButtonText: {
-    fontSize: 20,
-    color: "#666",
-  },
-  infoModalContent: {
-    padding: 20,
-    maxHeight: 400,
-  },
-  infoText: {
-    fontSize: 15,
-    color: "#34495e",
-    lineHeight: 22,
-    marginBottom: 16,
-  },
-  colorExplanation: {
-    marginVertical: 16,
-    padding: 16,
-    backgroundColor: "#f8f9fa",
-    borderRadius: 12,
-  },
-  colorRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 12,
-  },
-  colorDot: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    marginRight: 12,
-    borderWidth: 1,
-    borderColor: "#e0e0e0",
-  },
-  colorLabel: {
-    fontSize: 14,
-    color: "#34495e",
-    flex: 1,
-    lineHeight: 20,
-  },
-  infoNote: {
-    fontSize: 13,
-    color: "#7f8c8d",
-    fontStyle: "italic",
-    marginTop: 8,
-    padding: 12,
-    backgroundColor: "#e3f2fd",
-    borderRadius: 8,
-    lineHeight: 20,
-  },
-});

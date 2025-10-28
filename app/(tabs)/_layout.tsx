@@ -1,17 +1,30 @@
 import React from "react";
 import { Drawer } from "expo-router/drawer";
 import { IconSymbol } from "@/components/ui/IconSymbol";
-import { Colors } from "@/constants/Colors";
-import { useColorScheme } from "@/hooks/useColorScheme";
+import { useTheme } from "@/context/ThemeContext";
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
+  const { theme } = useTheme();
 
   return (
     <Drawer
       screenOptions={{
-        drawerActiveTintColor: Colors[colorScheme ?? "light"].tint,
+        drawerActiveTintColor: theme.colors.primary,
+        drawerInactiveTintColor: theme.colors.textSecondary,
+        drawerStyle: {
+          backgroundColor: theme.colors.background,
+        },
+        drawerLabelStyle: {
+          color: theme.colors.textPrimary,
+        },
         headerShown: true,
+        headerStyle: {
+          backgroundColor: theme.colors.surface,
+        },
+        headerTintColor: theme.colors.primary,
+        headerTitleStyle: {
+          color: theme.colors.textPrimary,
+        },
       }}
     >
       <Drawer.Screen

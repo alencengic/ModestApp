@@ -1,10 +1,10 @@
 import { StyleSheet } from "react-native";
-import { BrightTheme } from "@/constants/Theme";
+import { Theme } from "@/constants/ColorPalettes";
 
-export const styles = StyleSheet.create({
+export const createStyles = (theme: Theme) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: BrightTheme.colors.background,
+    backgroundColor: theme.colors.background,
   },
   centered: {
     flex: 1,
@@ -13,16 +13,16 @@ export const styles = StyleSheet.create({
     padding: 20,
   },
   filterContainer: {
-    margin: BrightTheme.spacing.md,
-    padding: BrightTheme.spacing.lg,
-    backgroundColor: BrightTheme.colors.surface,
-    borderRadius: BrightTheme.borderRadius.lg,
+    margin: theme.spacing.md,
+    padding: theme.spacing.lg,
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.borderRadius.lg,
   },
   filterTitle: {
     fontWeight: "600",
     fontSize: 16,
-    marginBottom: BrightTheme.spacing.md,
-    color: BrightTheme.colors.textPrimary,
+    marginBottom: theme.spacing.md,
+    color: theme.colors.textPrimary,
   },
   buttonGroup: {
     flexDirection: "row",
@@ -33,46 +33,46 @@ export const styles = StyleSheet.create({
   filterButton: {
     paddingVertical: 10,
     paddingHorizontal: 16,
-    borderRadius: BrightTheme.borderRadius.round,
-    backgroundColor: BrightTheme.colors.background,
+    borderRadius: theme.borderRadius.round,
+    backgroundColor: theme.colors.background,
     borderWidth: 1,
-    borderColor: BrightTheme.colors.border,
+    borderColor: theme.colors.border,
   },
   filterButtonActive: {
-    backgroundColor: BrightTheme.colors.primary,
-    borderColor: BrightTheme.colors.primary,
+    backgroundColor: theme.colors.primary,
+    borderColor: theme.colors.primary,
   },
   filterButtonText: {
     fontSize: 14,
     fontWeight: "500",
-    color: BrightTheme.colors.textSecondary,
+    color: theme.colors.textSecondary,
   },
   filterButtonTextActive: {
-    color: BrightTheme.colors.textOnPrimary,
+    color: theme.colors.textOnPrimary,
     fontWeight: "600",
   },
   chartWrapper: {
-    margin: BrightTheme.spacing.md,
-    padding: BrightTheme.spacing.lg,
-    backgroundColor: BrightTheme.colors.surface,
-    borderRadius: BrightTheme.borderRadius.xl,
+    margin: theme.spacing.md,
+    padding: theme.spacing.lg,
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.borderRadius.xl,
   },
   chartTitle: {
     fontSize: 18,
     fontWeight: "600",
-    marginBottom: BrightTheme.spacing.sm,
-    color: BrightTheme.colors.textPrimary,
+    marginBottom: theme.spacing.sm,
+    color: theme.colors.textPrimary,
   },
   chartSubtitle: {
     fontSize: 14,
-    color: BrightTheme.colors.textSecondary,
-    marginBottom: BrightTheme.spacing.lg,
+    color: theme.colors.textSecondary,
+    marginBottom: theme.spacing.lg,
   },
   foodCardsContainer: {
     marginTop: 10,
   },
   foodCard: {
-    backgroundColor: BrightTheme.colors.background,
+    backgroundColor: theme.colors.background,
     borderRadius: 12,
     marginBottom: 12,
     overflow: "hidden",
@@ -106,7 +106,7 @@ export const styles = StyleSheet.create({
   foodCardLabel: {
     fontSize: 16,
     fontWeight: "600",
-    color: BrightTheme.colors.textPrimary,
+    color: theme.colors.textPrimary,
     flex: 1,
   },
   foodCardStats: {
@@ -117,15 +117,15 @@ export const styles = StyleSheet.create({
   foodCardValue: {
     fontSize: 20,
     fontWeight: "700",
-    color: BrightTheme.colors.primary,
+    color: theme.colors.primary,
   },
   foodCardPercentage: {
     fontSize: 14,
     fontWeight: "600",
-    color: BrightTheme.colors.textSecondary,
+    color: theme.colors.textSecondary,
   },
   errorText: {
-    color: BrightTheme.colors.error,
+    color: theme.colors.error,
     textAlign: "center",
     fontSize: 16,
     fontWeight: "600",
@@ -140,7 +140,7 @@ export const styles = StyleSheet.create({
   },
   emptyStateText: {
     fontSize: 16,
-    color: BrightTheme.colors.textSecondary,
+    color: theme.colors.textSecondary,
     textAlign: "center",
     lineHeight: 24,
   },
@@ -148,12 +148,12 @@ export const styles = StyleSheet.create({
     marginTop: 20,
     paddingTop: 20,
     borderTopWidth: 1,
-    borderTopColor: BrightTheme.colors.border,
+    borderTopColor: theme.colors.border,
   },
   legendTitle: {
     fontSize: 16,
     fontWeight: "600",
-    color: BrightTheme.colors.textPrimary,
+    color: theme.colors.textPrimary,
     marginBottom: 12,
   },
   legendItem: {
@@ -162,7 +162,7 @@ export const styles = StyleSheet.create({
     marginBottom: 10,
     paddingVertical: 8,
     paddingHorizontal: 12,
-    backgroundColor: BrightTheme.colors.background,
+    backgroundColor: theme.colors.background,
     borderRadius: 8,
   },
   legendSwatch: {
@@ -174,7 +174,7 @@ export const styles = StyleSheet.create({
   legendText: {
     flex: 1,
     fontSize: 14,
-    color: BrightTheme.colors.textPrimary,
+    color: theme.colors.textPrimary,
     fontWeight: "500",
   },
   legendValues: {
@@ -185,11 +185,11 @@ export const styles = StyleSheet.create({
   legendValue: {
     fontSize: 15,
     fontWeight: "700",
-    color: BrightTheme.colors.primary,
+    color: theme.colors.primary,
   },
   legendPercentage: {
     fontSize: 13,
-    color: BrightTheme.colors.textSecondary,
+    color: theme.colors.textSecondary,
     fontWeight: "500",
   },
   statsContainer: {
@@ -198,7 +198,7 @@ export const styles = StyleSheet.create({
     marginTop: 16,
     paddingTop: 16,
     borderTopWidth: 1,
-    borderTopColor: BrightTheme.colors.border,
+    borderTopColor: theme.colors.border,
   },
   statItem: {
     alignItems: "center",
@@ -206,12 +206,12 @@ export const styles = StyleSheet.create({
   statValue: {
     fontSize: 24,
     fontWeight: "700",
-    color: BrightTheme.colors.primary,
+    color: theme.colors.primary,
     marginBottom: 4,
   },
   statLabel: {
     fontSize: 12,
-    color: BrightTheme.colors.textSecondary,
+    color: theme.colors.textSecondary,
     fontWeight: "500",
   },
 });

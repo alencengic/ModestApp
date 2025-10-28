@@ -18,11 +18,12 @@ import {
   updateJournalEntry,
   deleteJournalEntry,
 } from "@/storage/journal_entries";
-import { BrightTheme } from "@/constants/Theme";
+import { useTheme } from "@/context/ThemeContext";
 
 const CHARACTER_LIMIT = 1000;
 
 const JournalEntryDetailScreen: React.FC = () => {
+  const { theme } = useTheme();
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const queryClient = useQueryClient();
@@ -103,11 +104,156 @@ const JournalEntryDetailScreen: React.FC = () => {
     );
   };
 
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.colors.background,
+    },
+    scrollContent: {
+      padding: theme.spacing.lg,
+    },
+    centered: {
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "center",
+      padding: theme.spacing.xl,
+    },
+    loadingText: {
+      marginTop: theme.spacing.md,
+      fontSize: 16,
+      color: theme.colors.textSecondary,
+    },
+    errorText: {
+      fontSize: 18,
+      color: theme.colors.error,
+      marginBottom: theme.spacing.lg,
+      textAlign: "center",
+    },
+    header: {
+      marginBottom: theme.spacing.lg,
+    },
+    backButton: {
+      marginBottom: theme.spacing.md,
+    },
+    backButtonText: {
+      fontSize: 16,
+      color: theme.colors.primary,
+      fontWeight: "600",
+    },
+    headerTitle: {
+      fontSize: 28,
+      fontWeight: "700",
+      color: theme.colors.textPrimary,
+    },
+    dateContainer: {
+      flexDirection: "row",
+      alignItems: "center",
+      marginBottom: theme.spacing.lg,
+      padding: theme.spacing.md,
+      backgroundColor: theme.colors.surface,
+      borderRadius: theme.borderRadius.md,
+    },
+    dateLabel: {
+      fontSize: 14,
+      fontWeight: "600",
+      color: theme.colors.textSecondary,
+      marginRight: theme.spacing.sm,
+    },
+    dateText: {
+      fontSize: 14,
+      color: theme.colors.textPrimary,
+      fontWeight: "500",
+    },
+    contentContainer: {
+      marginBottom: theme.spacing.xl,
+      padding: theme.spacing.lg,
+      backgroundColor: theme.colors.surface,
+      borderRadius: theme.borderRadius.lg,
+      minHeight: 200,
+    },
+    contentText: {
+      fontSize: 16,
+      lineHeight: 24,
+      color: theme.colors.textPrimary,
+    },
+    textInput: {
+      borderColor: theme.colors.border,
+      borderWidth: 1,
+      borderRadius: theme.borderRadius.md,
+      padding: theme.spacing.md,
+      minHeight: 200,
+      textAlignVertical: "top",
+      fontSize: 16,
+      color: theme.colors.textPrimary,
+      backgroundColor: theme.colors.background,
+    },
+    counter: {
+      textAlign: "right",
+      marginTop: theme.spacing.sm,
+      color: theme.colors.textLight,
+      fontSize: 12,
+    },
+    actionsContainer: {
+      marginTop: theme.spacing.md,
+    },
+    editActions: {
+      flexDirection: "row",
+      gap: theme.spacing.md,
+    },
+    viewActions: {
+      flexDirection: "row",
+      gap: theme.spacing.md,
+    },
+    button: {
+      flex: 1,
+      padding: theme.spacing.md,
+      borderRadius: theme.borderRadius.round,
+      alignItems: "center",
+    },
+    editButton: {
+      backgroundColor: theme.colors.primary,
+    },
+    editButtonText: {
+      color: theme.colors.textOnPrimary,
+      fontSize: 16,
+      fontWeight: "600",
+    },
+    deleteButton: {
+      backgroundColor: theme.colors.error,
+    },
+    deleteButtonText: {
+      color: "#FFFFFF",
+      fontSize: 16,
+      fontWeight: "600",
+    },
+    saveButton: {
+      backgroundColor: theme.colors.primary,
+    },
+    saveButtonText: {
+      color: theme.colors.textOnPrimary,
+      fontSize: 16,
+      fontWeight: "600",
+    },
+    cancelButton: {
+      backgroundColor: theme.colors.surface,
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+    },
+    cancelButtonText: {
+      color: theme.colors.textSecondary,
+      fontSize: 16,
+      fontWeight: "600",
+    },
+    buttonDisabled: {
+      opacity: 0.5,
+    },
+  });
+
   if (isLoading) {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.centered}>
-          <ActivityIndicator size="large" color={BrightTheme.colors.primary} />
+          <ActivityIndicator size="large" color={theme.colors.primary} />
           <Text style={styles.loadingText}>Loading entry...</Text>
         </View>
       </SafeAreaView>
@@ -155,7 +301,7 @@ const JournalEntryDetailScreen: React.FC = () => {
                 multiline
                 maxLength={CHARACTER_LIMIT}
                 placeholder="Write your thoughts..."
-                placeholderTextColor={BrightTheme.colors.textLight}
+                placeholderTextColor={theme.colors.textLight}
                 value={editedContent}
                 onChangeText={setEditedContent}
                 autoFocus
@@ -223,148 +369,3 @@ const JournalEntryDetailScreen: React.FC = () => {
 };
 
 export default JournalEntryDetailScreen;
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: BrightTheme.colors.background,
-  },
-  scrollContent: {
-    padding: BrightTheme.spacing.lg,
-  },
-  centered: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    padding: BrightTheme.spacing.xl,
-  },
-  loadingText: {
-    marginTop: BrightTheme.spacing.md,
-    fontSize: 16,
-    color: BrightTheme.colors.textSecondary,
-  },
-  errorText: {
-    fontSize: 18,
-    color: BrightTheme.colors.error,
-    marginBottom: BrightTheme.spacing.lg,
-    textAlign: "center",
-  },
-  header: {
-    marginBottom: BrightTheme.spacing.lg,
-  },
-  backButton: {
-    marginBottom: BrightTheme.spacing.md,
-  },
-  backButtonText: {
-    fontSize: 16,
-    color: BrightTheme.colors.primary,
-    fontWeight: "600",
-  },
-  headerTitle: {
-    fontSize: 28,
-    fontWeight: "700",
-    color: BrightTheme.colors.textPrimary,
-  },
-  dateContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: BrightTheme.spacing.lg,
-    padding: BrightTheme.spacing.md,
-    backgroundColor: BrightTheme.colors.surface,
-    borderRadius: BrightTheme.borderRadius.md,
-  },
-  dateLabel: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: BrightTheme.colors.textSecondary,
-    marginRight: BrightTheme.spacing.sm,
-  },
-  dateText: {
-    fontSize: 14,
-    color: BrightTheme.colors.textPrimary,
-    fontWeight: "500",
-  },
-  contentContainer: {
-    marginBottom: BrightTheme.spacing.xl,
-    padding: BrightTheme.spacing.lg,
-    backgroundColor: BrightTheme.colors.surface,
-    borderRadius: BrightTheme.borderRadius.lg,
-    minHeight: 200,
-  },
-  contentText: {
-    fontSize: 16,
-    lineHeight: 24,
-    color: BrightTheme.colors.textPrimary,
-  },
-  textInput: {
-    borderColor: BrightTheme.colors.border,
-    borderWidth: 1,
-    borderRadius: BrightTheme.borderRadius.md,
-    padding: BrightTheme.spacing.md,
-    minHeight: 200,
-    textAlignVertical: "top",
-    fontSize: 16,
-    color: BrightTheme.colors.textPrimary,
-    backgroundColor: BrightTheme.colors.background,
-  },
-  counter: {
-    textAlign: "right",
-    marginTop: BrightTheme.spacing.sm,
-    color: BrightTheme.colors.textLight,
-    fontSize: 12,
-  },
-  actionsContainer: {
-    marginTop: BrightTheme.spacing.md,
-  },
-  editActions: {
-    flexDirection: "row",
-    gap: BrightTheme.spacing.md,
-  },
-  viewActions: {
-    flexDirection: "row",
-    gap: BrightTheme.spacing.md,
-  },
-  button: {
-    flex: 1,
-    padding: BrightTheme.spacing.md,
-    borderRadius: BrightTheme.borderRadius.round,
-    alignItems: "center",
-  },
-  editButton: {
-    backgroundColor: BrightTheme.colors.primary,
-  },
-  editButtonText: {
-    color: BrightTheme.colors.textOnPrimary,
-    fontSize: 16,
-    fontWeight: "600",
-  },
-  deleteButton: {
-    backgroundColor: BrightTheme.colors.error,
-  },
-  deleteButtonText: {
-    color: "#FFFFFF",
-    fontSize: 16,
-    fontWeight: "600",
-  },
-  saveButton: {
-    backgroundColor: BrightTheme.colors.primary,
-  },
-  saveButtonText: {
-    color: BrightTheme.colors.textOnPrimary,
-    fontSize: 16,
-    fontWeight: "600",
-  },
-  cancelButton: {
-    backgroundColor: BrightTheme.colors.surface,
-    borderWidth: 1,
-    borderColor: BrightTheme.colors.border,
-  },
-  cancelButtonText: {
-    color: BrightTheme.colors.textSecondary,
-    fontSize: 16,
-    fontWeight: "600",
-  },
-  buttonDisabled: {
-    opacity: 0.5,
-  },
-});

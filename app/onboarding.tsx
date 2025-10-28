@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import { useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { BrightTheme } from "@/constants/Theme";
+import { useTheme } from "@/context/ThemeContext";
 
 const { width, height } = Dimensions.get("window");
 
@@ -53,6 +53,7 @@ const slides = [
 
 const OnboardingScreen: React.FC = () => {
   const router = useRouter();
+  const { theme } = useTheme();
   const [currentSlide, setCurrentSlide] = useState(0);
 
   const handleNext = () => {
@@ -73,6 +74,96 @@ const OnboardingScreen: React.FC = () => {
 
   const isLastSlide = currentSlide === slides.length - 1;
   const slide = slides[currentSlide];
+
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.colors.background,
+    },
+    skipButton: {
+      position: "absolute",
+      top: 50,
+      right: 20,
+      zIndex: 10,
+      padding: 10,
+    },
+    skipText: {
+      fontSize: 16,
+      color: theme.colors.primary,
+      fontWeight: "600",
+    },
+    content: {
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "center",
+      paddingHorizontal: 30,
+    },
+    slideContainer: {
+      alignItems: "center",
+      justifyContent: "center",
+      marginBottom: 60,
+    },
+    emoji: {
+      fontSize: 100,
+      marginBottom: 30,
+    },
+    title: {
+      fontSize: 28,
+      fontWeight: "700",
+      color: theme.colors.textPrimary,
+      textAlign: "center",
+      marginBottom: 20,
+    },
+    description: {
+      fontSize: 16,
+      color: theme.colors.textSecondary,
+      textAlign: "center",
+      lineHeight: 24,
+      paddingHorizontal: 10,
+    },
+    pagination: {
+      flexDirection: "row",
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    dot: {
+      width: 8,
+      height: 8,
+      borderRadius: 4,
+      backgroundColor: theme.colors.border,
+      marginHorizontal: 5,
+    },
+    activeDot: {
+      width: 24,
+      backgroundColor: theme.colors.primary,
+    },
+    footer: {
+      paddingHorizontal: 30,
+      paddingBottom: 40,
+    },
+    nextButton: {
+      backgroundColor: theme.colors.primary,
+      paddingVertical: 16,
+      borderRadius: theme.borderRadius.round,
+      alignItems: "center",
+    },
+    nextText: {
+      color: theme.colors.textOnPrimary,
+      fontSize: 18,
+      fontWeight: "600",
+    },
+    getStartedButton: {
+      backgroundColor: theme.colors.primary,
+      paddingVertical: 16,
+      borderRadius: theme.borderRadius.round,
+      alignItems: "center",
+    },
+    getStartedText: {
+      color: theme.colors.textOnPrimary,
+      fontSize: 18,
+      fontWeight: "600",
+    },
+  });
 
   return (
     <SafeAreaView style={styles.container}>
@@ -125,93 +216,3 @@ const OnboardingScreen: React.FC = () => {
 };
 
 export default OnboardingScreen;
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: BrightTheme.colors.background,
-  },
-  skipButton: {
-    position: "absolute",
-    top: 50,
-    right: 20,
-    zIndex: 10,
-    padding: 10,
-  },
-  skipText: {
-    fontSize: 16,
-    color: BrightTheme.colors.primary,
-    fontWeight: "600",
-  },
-  content: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    paddingHorizontal: 30,
-  },
-  slideContainer: {
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 60,
-  },
-  emoji: {
-    fontSize: 100,
-    marginBottom: 30,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: "700",
-    color: BrightTheme.colors.textPrimary,
-    textAlign: "center",
-    marginBottom: 20,
-  },
-  description: {
-    fontSize: 16,
-    color: BrightTheme.colors.textSecondary,
-    textAlign: "center",
-    lineHeight: 24,
-    paddingHorizontal: 10,
-  },
-  pagination: {
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  dot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: BrightTheme.colors.border,
-    marginHorizontal: 5,
-  },
-  activeDot: {
-    width: 24,
-    backgroundColor: BrightTheme.colors.primary,
-  },
-  footer: {
-    paddingHorizontal: 30,
-    paddingBottom: 40,
-  },
-  nextButton: {
-    backgroundColor: BrightTheme.colors.primary,
-    paddingVertical: 16,
-    borderRadius: BrightTheme.borderRadius.round,
-    alignItems: "center",
-  },
-  nextText: {
-    color: BrightTheme.colors.textOnPrimary,
-    fontSize: 18,
-    fontWeight: "600",
-  },
-  getStartedButton: {
-    backgroundColor: BrightTheme.colors.primary,
-    paddingVertical: 16,
-    borderRadius: BrightTheme.borderRadius.round,
-    alignItems: "center",
-  },
-  getStartedText: {
-    color: BrightTheme.colors.textOnPrimary,
-    fontSize: 18,
-    fontWeight: "600",
-  },
-});

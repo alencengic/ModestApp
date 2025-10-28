@@ -11,7 +11,7 @@ import { router, Href, useFocusEffect } from "expo-router";
 import { DateTime } from "luxon";
 import { useState, useCallback } from "react";
 
-import { BrightTheme } from "@/constants/Theme";
+import { useTheme } from "@/context/ThemeContext";
 import { BannerAd } from "@/components/ads";
 import {
   sendTestNotification,
@@ -28,47 +28,130 @@ const quickAccessItems: {
   icon: string;
   route: Href;
   emoji: string;
-  color: string;
 }[] = [
   {
     title: "Daily Journal",
     icon: "book-open-page-variant",
     route: "/daily/journal",
     emoji: "📔",
-    color: "#e6b397ff",
   },
   {
     title: "Trends",
     icon: "chart-line",
     route: "/trends/trends",
     emoji: "📊",
-    color: "#e6b397ff",
   },
   {
     title: "Mood Analytics",
     icon: "emoticon-happy-outline",
     route: "/mood/analytics",
     emoji: "😊",
-    color: "#e6b397ff",
   },
   {
     title: "Food Analytics",
     icon: "food-apple-outline",
     route: "/trends/food-analytics",
     emoji: "🍎",
-    color: "#e6b397ff",
   },
   {
     title: "Weather & Mood",
     icon: "weather-sunny",
     route: "/weather/weather-mood",
     emoji: "🌤️",
-    color: "#e6b397ff",
   },
 ];
 
 export default function HomeScreen() {
+  const { theme } = useTheme();
   const [hasExistingData, setHasExistingData] = useState(false);
+
+  const styles = StyleSheet.create({
+    safeArea: {
+      flex: 1,
+      backgroundColor: theme.colors.background,
+    },
+    container: {
+      paddingBottom: theme.spacing.xl,
+    },
+    header: {
+      paddingHorizontal: theme.spacing.xl,
+      paddingTop: theme.spacing.xl,
+      paddingBottom: theme.spacing.lg,
+      alignItems: "center",
+      backgroundColor: theme.colors.background,
+    },
+    headerTitle: {
+      fontSize: scaleFontSize(28),
+      fontWeight: "400",
+      color: theme.colors.textPrimary,
+      textAlign: "center",
+    },
+    startButton: {
+      backgroundColor: theme.colors.primary,
+      paddingHorizontal: scale(24),
+      paddingVertical: scale(10),
+      borderRadius: scale(20),
+      marginTop: theme.spacing.lg,
+    },
+    startButtonText: {
+      color: theme.colors.textOnPrimary,
+      fontSize: scaleFontSize(14),
+      fontWeight: "500",
+    },
+    sectionTitle: {
+      fontSize: scaleFontSize(18),
+      fontWeight: "700",
+      color: theme.colors.textPrimary,
+      marginHorizontal: theme.spacing.md,
+      marginBottom: theme.spacing.md,
+      marginTop: theme.spacing.md,
+    },
+    quickAccessContainer: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      justifyContent: "space-between",
+      paddingHorizontal: theme.spacing.md,
+    },
+    card: {
+      width: "48%",
+      marginBottom: theme.spacing.md,
+      borderRadius: theme.borderRadius.lg,
+      elevation: 0,
+      shadowOpacity: 0,
+    },
+    cardContent: {
+      alignItems: "center",
+      paddingVertical: theme.spacing.xl,
+    },
+    emoji: {
+      fontSize: scaleFontSize(40),
+      marginBottom: theme.spacing.sm,
+    },
+    cardText: {
+      fontSize: scaleFontSize(14),
+      fontWeight: "600",
+      color: theme.colors.textPrimary,
+      textAlign: "center",
+    },
+    testButtonsContainer: {
+      flexDirection: "row",
+      gap: theme.spacing.sm,
+      marginTop: theme.spacing.md,
+    },
+    testButton: {
+      backgroundColor: theme.colors.surface,
+      paddingHorizontal: scale(16),
+      paddingVertical: scale(8),
+      borderRadius: scale(16),
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+    },
+    testButtonText: {
+      color: theme.colors.textPrimary,
+      fontSize: scaleFontSize(13),
+      fontWeight: "500",
+    },
+  });
 
   // Re-check data whenever the screen comes into focus
   useFocusEffect(
@@ -156,10 +239,13 @@ export default function HomeScreen() {
 
         <Text style={styles.sectionTitle}>Quick Access</Text>
         <View style={styles.quickAccessContainer}>
-          {quickAccessItems.map((item) => (
+          {quickAccessItems.map((item, index) => (
             <Card
               key={item.title}
-              style={[styles.card, { backgroundColor: item.color }]}
+              style={[
+                styles.card,
+                { backgroundColor: theme.colors.cardColors[Object.keys(theme.colors.cardColors)[index] as keyof typeof theme.colors.cardColors] || theme.colors.surface }
+              ]}
               onPress={() => router.push(item.route)}
             >
               <Card.Content style={styles.cardContent}>
@@ -175,91 +261,3 @@ export default function HomeScreen() {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: "#F5E6D3",
-  },
-  container: {
-    paddingBottom: BrightTheme.spacing.xl,
-  },
-  header: {
-    paddingHorizontal: BrightTheme.spacing.xl,
-    paddingTop: BrightTheme.spacing.xl,
-    paddingBottom: BrightTheme.spacing.lg,
-    alignItems: "center",
-    backgroundColor: "#F5E6D3",
-  },
-  headerTitle: {
-    fontSize: scaleFontSize(28),
-    fontWeight: "400",
-    color: "#2C2C2C",
-    textAlign: "center",
-  },
-  startButton: {
-    backgroundColor: "#5e2607ff",
-    paddingHorizontal: scale(24),
-    paddingVertical: scale(10),
-    borderRadius: scale(20),
-    marginTop: BrightTheme.spacing.lg,
-  },
-  startButtonText: {
-    color: "#FFFFFF",
-    fontSize: scaleFontSize(14),
-    fontWeight: "500",
-  },
-  sectionTitle: {
-    fontSize: scaleFontSize(18),
-    fontWeight: "700",
-    color: "#2C2C2C",
-    marginHorizontal: BrightTheme.spacing.md,
-    marginBottom: BrightTheme.spacing.md,
-    marginTop: BrightTheme.spacing.md,
-  },
-  quickAccessContainer: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "space-between",
-    paddingHorizontal: BrightTheme.spacing.md,
-  },
-  card: {
-    width: "48%",
-    marginBottom: BrightTheme.spacing.md,
-    borderRadius: BrightTheme.borderRadius.lg,
-    elevation: 0,
-    shadowOpacity: 0,
-  },
-  cardContent: {
-    alignItems: "center",
-    paddingVertical: BrightTheme.spacing.xl,
-  },
-  emoji: {
-    fontSize: scaleFontSize(40),
-    marginBottom: BrightTheme.spacing.sm,
-  },
-  cardText: {
-    fontSize: scaleFontSize(14),
-    fontWeight: "600",
-    color: "#2C2C2C",
-    textAlign: "center",
-  },
-  testButtonsContainer: {
-    flexDirection: "row",
-    gap: BrightTheme.spacing.sm,
-    marginTop: BrightTheme.spacing.md,
-  },
-  testButton: {
-    backgroundColor: BrightTheme.colors.background,
-    paddingHorizontal: scale(16),
-    paddingVertical: scale(8),
-    borderRadius: scale(16),
-    borderWidth: 1,
-    borderColor: BrightTheme.colors.border,
-  },
-  testButtonText: {
-    color: BrightTheme.colors.textPrimary,
-    fontSize: scaleFontSize(13),
-    fontWeight: "500",
-  },
-});

@@ -11,9 +11,9 @@ import { useFont, SkFont } from "@shopify/react-native-skia";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useQuery } from "@tanstack/react-query";
 import { useQueryFoodIntakeChartData } from "@/hooks/queries/useMutationInsertFoodIntake";
-import { styles } from "./TrendsScreen.styles";
+import { createStyles } from "./TrendsScreen.styles";
 import { BannerAd } from "@/components/ads";
-import { BrightTheme } from "@/constants/Theme";
+import { useTheme } from "@/context/ThemeContext";
 
 export interface ChartDataItem {
   label: string;
@@ -37,6 +37,8 @@ const CHART_COLORS = [
 ];
 
 const TrendsAndAnalyticsScreen: React.FC = () => {
+  const { theme } = useTheme();
+  const styles = createStyles(theme);
   const chartAxisFont: SkFont | null = useFont(
     require("@/assets/fonts/SpaceMono-Regular.ttf"),
     12
@@ -247,7 +249,7 @@ const TrendsAndAnalyticsScreen: React.FC = () => {
           {isLoading ? (
             <View style={styles.centered}>
               <ActivityIndicator size="large" color="#C88B6B" />
-              <Text style={{ marginTop: 16, color: BrightTheme.colors.textSecondary }}>
+              <Text style={{ marginTop: 16, color: theme.colors.textSecondary }}>
                 Loading chart data...
               </Text>
             </View>

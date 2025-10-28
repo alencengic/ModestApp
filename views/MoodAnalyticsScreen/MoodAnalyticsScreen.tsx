@@ -21,14 +21,16 @@ import {
   FoodMoodCorrelation,
   FoodProductivityCorrelation,
 } from "@/storage/database";
-import { styles as externalStyles } from "./MoodAnalyticsScreen.styles";
-import { BrightTheme } from "@/constants/Theme";
+import { createStyles } from "./MoodAnalyticsScreen.styles";
+import { useTheme } from "@/context/ThemeContext";
 import { BannerAd, VideoAd } from "@/components/ads";
 import { scaleFontSize } from "@/utils/responsive";
 
 type CorrelationType = "mood" | "productivity";
 
 const MoodAnalyticsScreen: React.FC = () => {
+  const { theme } = useTheme();
+  const externalStyles = createStyles(theme);
   const POSITIVE_COLOR = "#3CB371";
   const NEUTRAL_COLOR = "#A9A9A9";
   const NEGATIVE_COLOR = "#CD5C5C";
@@ -201,14 +203,14 @@ const MoodAnalyticsScreen: React.FC = () => {
       <ScrollView>
         <View
           style={{
-            padding: BrightTheme.spacing.xl,
+            padding: theme.spacing.xl,
             alignItems: "center",
-            backgroundColor: BrightTheme.colors.background,
+            backgroundColor: theme.colors.background,
           }}
         >
           <View style={externalStyles.headerTopRow}>
             <View style={{ width: 40 }} />
-            <Text style={{ fontSize: scaleFontSize(48), marginBottom: BrightTheme.spacing.sm }}>
+            <Text style={{ fontSize: scaleFontSize(48), marginBottom: theme.spacing.sm }}>
               😊
             </Text>
             <TouchableOpacity
@@ -222,14 +224,14 @@ const MoodAnalyticsScreen: React.FC = () => {
             style={{
               fontSize: scaleFontSize(24),
               fontWeight: "600",
-              color: BrightTheme.colors.textPrimary,
-              marginBottom: BrightTheme.spacing.xs,
+              color: theme.colors.textPrimary,
+              marginBottom: theme.spacing.xs,
             }}
           >
             Mood Analytics
           </Text>
           <Text
-            style={{ fontSize: scaleFontSize(14), color: BrightTheme.colors.textSecondary }}
+            style={{ fontSize: scaleFontSize(14), color: theme.colors.textSecondary }}
           >
             Discover food-mood patterns
           </Text>

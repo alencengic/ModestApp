@@ -1,6 +1,6 @@
 import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
-import { BrightTheme } from "@/constants/Theme";
+import { useTheme } from "@/context/ThemeContext";
 
 type FeelingType = "great" | "good" | "okay" | "bad" | "terrible";
 
@@ -25,6 +25,72 @@ export const MealFeelingForm: React.FC<MealFeelingFormProps> = ({
   feeling,
   onChange,
 }) => {
+  const { theme } = useTheme();
+
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      padding: theme.spacing.md,
+    },
+    title: {
+      fontSize: 20,
+      fontWeight: "600",
+      color: theme.colors.textPrimary,
+      textAlign: "center",
+      marginBottom: theme.spacing.lg,
+    },
+    mealSummary: {
+      backgroundColor: theme.colors.surface,
+      padding: theme.spacing.md,
+      borderRadius: theme.borderRadius.md,
+      marginBottom: theme.spacing.lg,
+    },
+    mealLabel: {
+      fontSize: 14,
+      fontWeight: "600",
+      color: theme.colors.textPrimary,
+      marginBottom: theme.spacing.xs,
+    },
+    mealItems: {
+      fontSize: 14,
+      color: theme.colors.textSecondary,
+      lineHeight: 20,
+    },
+    feelingsContainer: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      justifyContent: "center",
+      gap: theme.spacing.md,
+    },
+    feelingButton: {
+      width: "45%",
+      aspectRatio: 1,
+      borderRadius: theme.borderRadius.lg,
+      justifyContent: "center",
+      alignItems: "center",
+      padding: theme.spacing.md,
+    },
+    feelingButtonActive: {
+      borderWidth: 3,
+      borderColor: theme.colors.primary,
+    },
+    feelingEmoji: {
+      fontSize: 48,
+      marginBottom: theme.spacing.sm,
+    },
+    feelingLabel: {
+      fontSize: 16,
+      fontWeight: "600",
+      color: theme.colors.textPrimary,
+    },
+    hint: {
+      fontSize: 14,
+      color: theme.colors.textSecondary,
+      textAlign: "center",
+      marginTop: theme.spacing.lg,
+    },
+  });
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>How did you feel after eating?</Text>
@@ -59,67 +125,3 @@ export const MealFeelingForm: React.FC<MealFeelingFormProps> = ({
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: BrightTheme.spacing.md,
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: "600",
-    color: BrightTheme.colors.textPrimary,
-    textAlign: "center",
-    marginBottom: BrightTheme.spacing.lg,
-  },
-  mealSummary: {
-    backgroundColor: BrightTheme.colors.surface,
-    padding: BrightTheme.spacing.md,
-    borderRadius: BrightTheme.borderRadius.md,
-    marginBottom: BrightTheme.spacing.lg,
-  },
-  mealLabel: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: BrightTheme.colors.textPrimary,
-    marginBottom: BrightTheme.spacing.xs,
-  },
-  mealItems: {
-    fontSize: 14,
-    color: BrightTheme.colors.textSecondary,
-    lineHeight: 20,
-  },
-  feelingsContainer: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "center",
-    gap: BrightTheme.spacing.md,
-  },
-  feelingButton: {
-    width: "45%",
-    aspectRatio: 1,
-    borderRadius: BrightTheme.borderRadius.lg,
-    justifyContent: "center",
-    alignItems: "center",
-    padding: BrightTheme.spacing.md,
-  },
-  feelingButtonActive: {
-    borderWidth: 3,
-    borderColor: BrightTheme.colors.primary,
-  },
-  feelingEmoji: {
-    fontSize: 48,
-    marginBottom: BrightTheme.spacing.sm,
-  },
-  feelingLabel: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: BrightTheme.colors.textPrimary,
-  },
-  hint: {
-    fontSize: 14,
-    color: BrightTheme.colors.textSecondary,
-    textAlign: "center",
-    marginTop: BrightTheme.spacing.lg,
-  },
-});

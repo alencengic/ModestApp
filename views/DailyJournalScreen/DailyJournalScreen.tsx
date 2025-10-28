@@ -18,19 +18,217 @@ import {
   insertJournalEntry,
   getJournalEntriesByRange,
 } from "@/storage/database";
-import { BrightTheme } from "@/constants/Theme";
+import { useTheme } from "@/context/ThemeContext";
 import { BannerAd } from "@/components/ads";
 
 const CHARACTER_LIMIT = 1000;
 
 const DailyJournalScreen: React.FC = () => {
   const router = useRouter();
+  const { theme } = useTheme();
   const [activeTab, setActiveTab] = useState<"write" | "read">("write");
   const [note, setNote] = useState("");
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [range, setRange] = useState<"day" | "week" | "month">("day");
   const [readDate, setReadDate] = useState<Date>(new Date());
+
+  const styles = StyleSheet.create({
+    container: {
+      paddingBottom: theme.spacing.xl,
+      backgroundColor: theme.colors.background,
+    },
+    header: {
+      padding: theme.spacing.xl,
+      alignItems: "center",
+      backgroundColor: theme.colors.background,
+    },
+    headerEmoji: {
+      fontSize: 48,
+      marginBottom: theme.spacing.sm,
+    },
+    title: {
+      fontSize: 24,
+      fontWeight: "600",
+      color: theme.colors.textPrimary,
+      marginBottom: theme.spacing.xs,
+    },
+    subtitle: {
+      fontSize: 14,
+      color: theme.colors.textSecondary,
+    },
+    tabContainer: {
+      flexDirection: "row",
+      margin: theme.spacing.md,
+      marginBottom: theme.spacing.sm,
+      borderRadius: theme.borderRadius.lg,
+      overflow: "hidden",
+      backgroundColor: theme.colors.surface,
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+    },
+    tabButton: {
+      flex: 1,
+      paddingVertical: theme.spacing.md,
+      alignItems: "center",
+      backgroundColor: "transparent",
+    },
+    tabButtonActive: {
+      backgroundColor: theme.colors.primary,
+    },
+    tabButtonText: {
+      fontSize: 15,
+      fontWeight: "500",
+      color: theme.colors.textSecondary,
+    },
+    tabButtonTextActive: {
+      color: theme.colors.textOnPrimary,
+      fontWeight: "600",
+    },
+    filterContainer: {
+      margin: theme.spacing.md,
+      padding: theme.spacing.lg,
+      backgroundColor: theme.colors.surface,
+      borderRadius: theme.borderRadius.lg,
+    },
+    filterTitle: {
+      fontWeight: "600",
+      fontSize: 16,
+      marginBottom: theme.spacing.md,
+      color: theme.colors.textPrimary,
+    },
+    buttonGroup: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      gap: theme.spacing.sm,
+    },
+    filterButton: {
+      paddingVertical: theme.spacing.sm,
+      paddingHorizontal: theme.spacing.md,
+      borderRadius: theme.borderRadius.round,
+      backgroundColor: theme.colors.background,
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+    },
+    filterButtonActive: {
+      backgroundColor: theme.colors.primary,
+      borderColor: theme.colors.primary,
+    },
+    filterButtonText: {
+      fontSize: 14,
+      fontWeight: "500",
+      color: theme.colors.textSecondary,
+    },
+    filterButtonTextActive: {
+      color: theme.colors.textOnPrimary,
+      fontWeight: "600",
+    },
+    inputContainer: {
+      margin: theme.spacing.md,
+      padding: theme.spacing.lg,
+      backgroundColor: theme.colors.surface,
+      borderRadius: theme.borderRadius.lg,
+    },
+    dateRow: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      marginBottom: theme.spacing.md,
+    },
+    inputLabel: {
+      fontSize: 16,
+      fontWeight: "600",
+      color: theme.colors.textPrimary,
+    },
+    dateText: {
+      fontSize: 14,
+      fontWeight: "500",
+      color: theme.colors.textSecondary,
+    },
+    textInput: {
+      borderColor: theme.colors.border,
+      borderWidth: 1,
+      borderRadius: theme.borderRadius.md,
+      padding: theme.spacing.md,
+      height: 200,
+      marginBottom: theme.spacing.sm,
+      textAlignVertical: "top",
+      fontSize: 16,
+      color: theme.colors.textPrimary,
+      backgroundColor: theme.colors.background,
+    },
+    counter: {
+      textAlign: "right",
+      marginBottom: theme.spacing.md,
+      color: theme.colors.textLight,
+      fontSize: 12,
+    },
+    saveButton: {
+      backgroundColor: theme.colors.primary,
+      padding: theme.spacing.md,
+      borderRadius: theme.borderRadius.round,
+      alignItems: "center",
+    },
+    saveButtonDisabled: {
+      opacity: 0.5,
+    },
+    saveButtonText: {
+      color: theme.colors.textOnPrimary,
+      fontSize: 16,
+      fontWeight: "600",
+    },
+    sectionTitle: {
+      fontSize: 18,
+      fontWeight: "600",
+      marginHorizontal: theme.spacing.md,
+      marginTop: theme.spacing.lg,
+      marginBottom: theme.spacing.md,
+      color: theme.colors.textPrimary,
+    },
+    emptyState: {
+      alignItems: "center",
+      padding: theme.spacing.xl,
+    },
+    emptyStateIcon: {
+      fontSize: 48,
+      marginBottom: theme.spacing.md,
+    },
+    noEntries: {
+      fontSize: 16,
+      color: theme.colors.textSecondary,
+      textAlign: "center",
+    },
+    entryContainer: {
+      backgroundColor: theme.colors.surface,
+      marginHorizontal: theme.spacing.md,
+      marginBottom: theme.spacing.md,
+      padding: theme.spacing.md,
+      borderRadius: theme.borderRadius.md,
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+    },
+    entryHeader: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      marginBottom: theme.spacing.sm,
+    },
+    entryDate: {
+      fontSize: 14,
+      color: theme.colors.textSecondary,
+      fontWeight: "500",
+    },
+    expandIcon: {
+      fontSize: 16,
+      color: theme.colors.primary,
+      fontWeight: "600",
+    },
+    entryPreview: {
+      fontSize: 14,
+      color: theme.colors.textPrimary,
+      lineHeight: 20,
+    },
+  });
 
   const mutation = useMutation({
     mutationFn: ({ content, date }: { content: string; date: string }) =>
@@ -135,7 +333,7 @@ const DailyJournalScreen: React.FC = () => {
             multiline
             maxLength={CHARACTER_LIMIT}
             placeholder="Write your thoughts..."
-            placeholderTextColor={BrightTheme.colors.textLight}
+            placeholderTextColor={theme.colors.textLight}
             value={note}
             onChangeText={setNote}
           />
@@ -256,200 +454,3 @@ const DailyJournalScreen: React.FC = () => {
 };
 
 export default DailyJournalScreen;
-
-const styles = StyleSheet.create({
-  container: {
-    paddingBottom: BrightTheme.spacing.xl,
-    backgroundColor: BrightTheme.colors.background,
-  },
-  header: {
-    padding: BrightTheme.spacing.xl,
-    alignItems: "center",
-    backgroundColor: BrightTheme.colors.background,
-  },
-  headerEmoji: {
-    fontSize: 48,
-    marginBottom: BrightTheme.spacing.sm,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "600",
-    color: BrightTheme.colors.textPrimary,
-    marginBottom: BrightTheme.spacing.xs,
-  },
-  subtitle: {
-    fontSize: 14,
-    color: BrightTheme.colors.textSecondary,
-  },
-  tabContainer: {
-    flexDirection: "row",
-    margin: BrightTheme.spacing.md,
-    marginBottom: BrightTheme.spacing.sm,
-    borderRadius: BrightTheme.borderRadius.lg,
-    overflow: "hidden",
-    backgroundColor: BrightTheme.colors.surface,
-    borderWidth: 1,
-    borderColor: BrightTheme.colors.border,
-  },
-  tabButton: {
-    flex: 1,
-    paddingVertical: BrightTheme.spacing.md,
-    alignItems: "center",
-    backgroundColor: "transparent",
-  },
-  tabButtonActive: {
-    backgroundColor: BrightTheme.colors.primary,
-  },
-  tabButtonText: {
-    fontSize: 15,
-    fontWeight: "500",
-    color: BrightTheme.colors.textSecondary,
-  },
-  tabButtonTextActive: {
-    color: BrightTheme.colors.textOnPrimary,
-    fontWeight: "600",
-  },
-  filterContainer: {
-    margin: BrightTheme.spacing.md,
-    padding: BrightTheme.spacing.lg,
-    backgroundColor: BrightTheme.colors.surface,
-    borderRadius: BrightTheme.borderRadius.lg,
-  },
-  filterTitle: {
-    fontWeight: "600",
-    fontSize: 16,
-    marginBottom: BrightTheme.spacing.md,
-    color: BrightTheme.colors.textPrimary,
-  },
-  buttonGroup: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: BrightTheme.spacing.sm,
-  },
-  filterButton: {
-    paddingVertical: BrightTheme.spacing.sm,
-    paddingHorizontal: BrightTheme.spacing.md,
-    borderRadius: BrightTheme.borderRadius.round,
-    backgroundColor: BrightTheme.colors.background,
-    borderWidth: 1,
-    borderColor: BrightTheme.colors.border,
-  },
-  filterButtonActive: {
-    backgroundColor: BrightTheme.colors.primary,
-    borderColor: BrightTheme.colors.primary,
-  },
-  filterButtonText: {
-    fontSize: 14,
-    fontWeight: "500",
-    color: BrightTheme.colors.textSecondary,
-  },
-  filterButtonTextActive: {
-    color: BrightTheme.colors.textOnPrimary,
-    fontWeight: "600",
-  },
-  inputContainer: {
-    margin: BrightTheme.spacing.md,
-    padding: BrightTheme.spacing.lg,
-    backgroundColor: BrightTheme.colors.surface,
-    borderRadius: BrightTheme.borderRadius.lg,
-  },
-  dateRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: BrightTheme.spacing.md,
-  },
-  inputLabel: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: BrightTheme.colors.textPrimary,
-  },
-  dateText: {
-    fontSize: 14,
-    fontWeight: "500",
-    color: BrightTheme.colors.textSecondary,
-  },
-  textInput: {
-    borderColor: BrightTheme.colors.border,
-    borderWidth: 1,
-    borderRadius: BrightTheme.borderRadius.md,
-    padding: BrightTheme.spacing.md,
-    height: 200,
-    marginBottom: BrightTheme.spacing.sm,
-    textAlignVertical: "top",
-    fontSize: 16,
-    color: BrightTheme.colors.textPrimary,
-    backgroundColor: BrightTheme.colors.background,
-  },
-  counter: {
-    textAlign: "right",
-    marginBottom: BrightTheme.spacing.md,
-    color: BrightTheme.colors.textLight,
-    fontSize: 12,
-  },
-  saveButton: {
-    backgroundColor: BrightTheme.colors.primary,
-    padding: BrightTheme.spacing.md,
-    borderRadius: BrightTheme.borderRadius.round,
-    alignItems: "center",
-  },
-  saveButtonDisabled: {
-    opacity: 0.5,
-  },
-  saveButtonText: {
-    color: BrightTheme.colors.textOnPrimary,
-    fontSize: 16,
-    fontWeight: "600",
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: "600",
-    marginHorizontal: BrightTheme.spacing.md,
-    marginTop: BrightTheme.spacing.lg,
-    marginBottom: BrightTheme.spacing.md,
-    color: BrightTheme.colors.textPrimary,
-  },
-  emptyState: {
-    alignItems: "center",
-    padding: BrightTheme.spacing.xl,
-  },
-  emptyStateIcon: {
-    fontSize: 48,
-    marginBottom: BrightTheme.spacing.md,
-  },
-  noEntries: {
-    fontSize: 16,
-    color: BrightTheme.colors.textSecondary,
-    textAlign: "center",
-  },
-  entryContainer: {
-    backgroundColor: BrightTheme.colors.surface,
-    marginHorizontal: BrightTheme.spacing.md,
-    marginBottom: BrightTheme.spacing.md,
-    padding: BrightTheme.spacing.md,
-    borderRadius: BrightTheme.borderRadius.md,
-    borderWidth: 1,
-    borderColor: BrightTheme.colors.border,
-  },
-  entryHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: BrightTheme.spacing.sm,
-  },
-  entryDate: {
-    fontSize: 14,
-    color: BrightTheme.colors.textSecondary,
-    fontWeight: "500",
-  },
-  expandIcon: {
-    fontSize: 16,
-    color: BrightTheme.colors.primary,
-    fontWeight: "600",
-  },
-  entryPreview: {
-    fontSize: 14,
-    color: BrightTheme.colors.textPrimary,
-    lineHeight: 20,
-  },
-});

@@ -2,7 +2,8 @@ import React, { useState, useMemo } from "react";
 import { SafeAreaView, Alert, ScrollView, View, KeyboardAvoidingView, Platform } from "react-native";
 import { DateTime } from "luxon";
 
-import { dailyEnterScreenStyles } from "./DailyEnterScreen.styles";
+import { createDailyEnterScreenStyles } from "./DailyEnterScreen.styles";
+import { useTheme } from "@/context/ThemeContext";
 import { Stepper, StepConfig } from "@/components/ui/Stepper";
 import { RatingComponent } from "@/components/RatingComponent";
 import FoodIntakeForm, { MealFeeling } from "@/views/FoodIntakeForm";
@@ -41,6 +42,8 @@ const MEAL_CONFIG = {
 };
 
 export default function DailyEnterScreen() {
+  const { theme } = useTheme();
+  const styles = createDailyEnterScreenStyles(theme);
   const foodScrollViewRef = React.useRef<ScrollView>(null);
   const [moodValue, setMoodValue] = useState<string | null>(null);
   const [productivityValue, setProductivityValue] = useState<number | null>(
@@ -277,7 +280,7 @@ export default function DailyEnterScreen() {
   ];
 
   return (
-    <SafeAreaView style={dailyEnterScreenStyles.safeArea}>
+    <SafeAreaView style={styles.safeArea}>
       <Stepper
         steps={steps}
         onComplete={handleCompleteAll}

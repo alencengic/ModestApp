@@ -1,10 +1,10 @@
 import { StyleSheet } from "react-native";
-import { BrightTheme } from "@/constants/Theme";
+import { Theme } from "@/constants/ColorPalettes";
 
-export const styles = StyleSheet.create({
+export const createStyles = (theme: Theme) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: BrightTheme.colors.background,
+    backgroundColor: theme.colors.background,
   },
   centered: {
     flex: 1,
@@ -14,12 +14,12 @@ export const styles = StyleSheet.create({
   },
   loadingText: {
     marginTop: 16,
-    color: BrightTheme.colors.textSecondary,
+    color: theme.colors.textSecondary,
     fontSize: 16,
   },
   header: {
-    padding: BrightTheme.spacing.lg,
-    paddingTop: BrightTheme.spacing.md,
+    padding: theme.spacing.lg,
+    paddingTop: theme.spacing.md,
   },
   headerRow: {
     flexDirection: "row",
@@ -29,43 +29,43 @@ export const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 24,
     fontWeight: "600",
-    color: BrightTheme.colors.textPrimary,
-    marginBottom: BrightTheme.spacing.sm,
+    color: theme.colors.textPrimary,
+    marginBottom: theme.spacing.sm,
   },
   headerSubtitle: {
     fontSize: 14,
-    color: BrightTheme.colors.textSecondary,
+    color: theme.colors.textSecondary,
     lineHeight: 22,
   },
   infoButton: {
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: BrightTheme.colors.primary,
+    backgroundColor: theme.colors.primary,
     justifyContent: "center",
     alignItems: "center",
   },
   infoButtonText: {
     fontSize: 20,
-    color: BrightTheme.colors.textOnPrimary,
+    color: theme.colors.textOnPrimary,
     fontWeight: "600",
   },
   summaryCard: {
     margin: 16,
     marginTop: 0,
     padding: 20,
-    backgroundColor: BrightTheme.colors.surface,
+    backgroundColor: theme.colors.surface,
     borderRadius: 16,
   },
   cardTitle: {
     fontSize: 16,
     fontWeight: "600",
-    color: BrightTheme.colors.textPrimary,
+    color: theme.colors.textPrimary,
     marginBottom: 8,
   },
   summaryText: {
     fontSize: 14,
-    color: BrightTheme.colors.textSecondary,
+    color: theme.colors.textSecondary,
     lineHeight: 20,
   },
   section: {
@@ -75,11 +75,11 @@ export const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: "600",
-    color: BrightTheme.colors.textPrimary,
+    color: theme.colors.textPrimary,
     marginBottom: 12,
   },
   patternCard: {
-    backgroundColor: BrightTheme.colors.surface,
+    backgroundColor: theme.colors.surface,
     borderRadius: 16,
     padding: 16,
     marginBottom: 12,
@@ -96,7 +96,7 @@ export const styles = StyleSheet.create({
   patternMood: {
     fontSize: 18,
     fontWeight: "600",
-    color: BrightTheme.colors.textPrimary,
+    color: theme.colors.textPrimary,
     flex: 1,
   },
   patternStats: {
@@ -104,22 +104,22 @@ export const styles = StyleSheet.create({
     justifyContent: "space-around",
     paddingVertical: 12,
     borderTopWidth: 1,
-    borderTopColor: BrightTheme.colors.border,
+    borderTopColor: theme.colors.border,
     borderBottomWidth: 1,
-    borderBottomColor: BrightTheme.colors.border,
+    borderBottomColor: theme.colors.border,
   },
   patternStat: {
     alignItems: "center",
   },
   patternLabel: {
     fontSize: 12,
-    color: BrightTheme.colors.textSecondary,
+    color: theme.colors.textSecondary,
     marginBottom: 4,
   },
   patternValue: {
     fontSize: 18,
     fontWeight: "700",
-    color: BrightTheme.colors.primary,
+    color: theme.colors.primary,
   },
   patternCondition: {
     marginTop: 12,
@@ -127,11 +127,11 @@ export const styles = StyleSheet.create({
   },
   patternConditionText: {
     fontSize: 14,
-    color: BrightTheme.colors.textSecondary,
+    color: theme.colors.textSecondary,
     textAlign: "center",
   },
   entryCard: {
-    backgroundColor: BrightTheme.colors.surface,
+    backgroundColor: theme.colors.surface,
     borderRadius: 12,
     padding: 16,
     marginBottom: 10,
@@ -143,12 +143,12 @@ export const styles = StyleSheet.create({
     marginBottom: 12,
     paddingBottom: 12,
     borderBottomWidth: 1,
-    borderBottomColor: BrightTheme.colors.border,
+    borderBottomColor: theme.colors.border,
   },
   entryDate: {
     fontSize: 14,
     fontWeight: "500",
-    color: BrightTheme.colors.textSecondary,
+    color: theme.colors.textSecondary,
   },
   entryMoodEmoji: {
     fontSize: 28,
@@ -163,12 +163,12 @@ export const styles = StyleSheet.create({
   },
   entryLabel: {
     fontSize: 14,
-    color: BrightTheme.colors.textSecondary,
+    color: theme.colors.textSecondary,
     fontWeight: "500",
   },
   entryValue: {
     fontSize: 14,
-    color: BrightTheme.colors.textPrimary,
+    color: theme.colors.textPrimary,
     fontWeight: "600",
   },
   emptyStateContainer: {
@@ -182,12 +182,12 @@ export const styles = StyleSheet.create({
   },
   emptyStateText: {
     fontSize: 16,
-    color: BrightTheme.colors.textSecondary,
+    color: theme.colors.textSecondary,
     textAlign: "center",
     lineHeight: 24,
   },
   errorText: {
-    color: BrightTheme.colors.error,
+    color: theme.colors.error,
     textAlign: "center",
     fontSize: 16,
     fontWeight: "600",
@@ -200,7 +200,7 @@ export const styles = StyleSheet.create({
     padding: 20,
   },
   modalContent: {
-    backgroundColor: BrightTheme.colors.surface,
+    backgroundColor: theme.colors.surface,
     borderRadius: 20,
     padding: 24,
     width: "100%",
@@ -210,32 +210,32 @@ export const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 24,
     fontWeight: "700",
-    color: BrightTheme.colors.textPrimary,
+    color: theme.colors.textPrimary,
     marginBottom: 20,
     textAlign: "center",
   },
   modalSectionTitle: {
     fontSize: 16,
     fontWeight: "600",
-    color: BrightTheme.colors.textPrimary,
+    color: theme.colors.textPrimary,
     marginTop: 16,
     marginBottom: 8,
   },
   modalText: {
     fontSize: 14,
-    color: BrightTheme.colors.textSecondary,
+    color: theme.colors.textSecondary,
     lineHeight: 22,
     marginBottom: 8,
   },
   modalCloseButton: {
-    backgroundColor: BrightTheme.colors.primary,
+    backgroundColor: theme.colors.primary,
     padding: 14,
-    borderRadius: BrightTheme.borderRadius.round,
+    borderRadius: theme.borderRadius.round,
     alignItems: "center",
     marginTop: 20,
   },
   modalCloseButtonText: {
-    color: BrightTheme.colors.textOnPrimary,
+    color: theme.colors.textOnPrimary,
     fontSize: 16,
     fontWeight: "600",
   },
@@ -243,7 +243,7 @@ export const styles = StyleSheet.create({
     margin: 16,
     marginTop: 8,
     padding: 20,
-    backgroundColor: BrightTheme.colors.surface,
+    backgroundColor: theme.colors.surface,
     borderRadius: 16,
   },
   insightRow: {
@@ -262,30 +262,30 @@ export const styles = StyleSheet.create({
   },
   insightLabel: {
     fontSize: 12,
-    color: BrightTheme.colors.textSecondary,
+    color: theme.colors.textSecondary,
     marginBottom: 4,
     textAlign: "center",
   },
   insightValue: {
     fontSize: 20,
     fontWeight: "700",
-    color: BrightTheme.colors.primary,
+    color: theme.colors.primary,
   },
   bestWeatherContainer: {
     marginTop: 12,
     padding: 16,
-    backgroundColor: BrightTheme.colors.background,
+    backgroundColor: theme.colors.background,
     borderRadius: 12,
   },
   bestWeatherLabel: {
     fontSize: 14,
     fontWeight: "600",
-    color: BrightTheme.colors.textPrimary,
+    color: theme.colors.textPrimary,
     marginBottom: 10,
     textAlign: "center",
   },
   bestWeatherBadge: {
-    backgroundColor: BrightTheme.colors.surface,
+    backgroundColor: theme.colors.surface,
     padding: 12,
     borderRadius: 8,
     alignItems: "center",
@@ -293,11 +293,11 @@ export const styles = StyleSheet.create({
   bestWeatherText: {
     fontSize: 18,
     fontWeight: "600",
-    color: BrightTheme.colors.textPrimary,
+    color: theme.colors.textPrimary,
     marginBottom: 4,
   },
   bestWeatherCount: {
     fontSize: 12,
-    color: BrightTheme.colors.textSecondary,
+    color: theme.colors.textSecondary,
   },
 });

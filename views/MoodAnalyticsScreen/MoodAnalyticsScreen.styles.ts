@@ -1,18 +1,18 @@
 import { StyleSheet, Platform } from "react-native";
-import { BrightTheme } from "@/constants/Theme";
+import { Theme } from "@/constants/ColorPalettes";
 import { scaleFontSize, scale } from "@/utils/responsive";
 
-export const styles = StyleSheet.create({
+export const createStyles = (theme: Theme) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: BrightTheme.colors.background,
+    backgroundColor: theme.colors.background,
   },
   chartWrapper: {
-    margin: BrightTheme.spacing.md,
-    padding: BrightTheme.spacing.lg,
-    backgroundColor: BrightTheme.colors.surface,
-    borderRadius: BrightTheme.borderRadius.lg,
-    ...BrightTheme.shadows.md,
+    margin: theme.spacing.md,
+    padding: theme.spacing.lg,
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.borderRadius.lg,
+    ...theme.shadows.md,
   },
   centered: {
     flex: 1,
@@ -135,7 +135,7 @@ export const styles = StyleSheet.create({
     justifyContent: "center",
   },
   toggleButtonActive: {
-    backgroundColor: BrightTheme.colors.primary,
+    backgroundColor: theme.colors.primary,
   },
   toggleButtonText: {
     fontSize: 16,
@@ -245,7 +245,7 @@ export const styles = StyleSheet.create({
   },
   foodItemTextSelected: {
     fontWeight: "600",
-    color: BrightTheme.colors.primary,
+    color: theme.colors.primary,
   },
 
   // Info button styles
@@ -254,7 +254,7 @@ export const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     width: "100%",
-    marginBottom: BrightTheme.spacing.sm,
+    marginBottom: theme.spacing.sm,
   },
   infoButton: {
     width: 40,
@@ -266,7 +266,7 @@ export const styles = StyleSheet.create({
   },
   infoButtonText: {
     fontSize: 24,
-    color: BrightTheme.colors.primary,
+    color: theme.colors.primary,
   },
 
   // Info modal styles

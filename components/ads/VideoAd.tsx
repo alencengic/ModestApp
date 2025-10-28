@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, Modal } from "react-native";
-import { BrightTheme } from "@/constants/Theme";
+import { useTheme } from "@/context/ThemeContext";
 
 interface VideoAdProps {
   onAdComplete?: () => void;
@@ -11,6 +11,7 @@ export const VideoAd: React.FC<VideoAdProps> = ({
   onAdComplete,
   rewardAmount
 }) => {
+  const { theme } = useTheme();
   const [isPlaying, setIsPlaying] = useState(false);
   const [countdown, setCountdown] = useState(5);
 
@@ -33,6 +34,90 @@ export const VideoAd: React.FC<VideoAdProps> = ({
       });
     }, 1000);
   };
+
+  const styles = StyleSheet.create({
+    container: {
+      marginVertical: theme.spacing.md,
+    },
+    card: {
+      backgroundColor: theme.colors.surface,
+      borderRadius: theme.borderRadius.lg,
+      padding: theme.spacing.lg,
+      alignItems: "center",
+      ...theme.shadows.md,
+      borderWidth: 2,
+      borderColor: theme.colors.primary,
+    },
+    icon: {
+      fontSize: 48,
+      marginBottom: theme.spacing.sm,
+    },
+    title: {
+      fontSize: 20,
+      fontWeight: "700",
+      color: theme.colors.textPrimary,
+      marginBottom: theme.spacing.xs,
+    },
+    reward: {
+      fontSize: 16,
+      fontWeight: "600",
+      color: theme.colors.secondary,
+      marginBottom: theme.spacing.md,
+    },
+    button: {
+      backgroundColor: theme.colors.primary,
+      paddingHorizontal: theme.spacing.xl,
+      paddingVertical: theme.spacing.md,
+      borderRadius: theme.borderRadius.round,
+      ...theme.shadows.sm,
+    },
+    buttonText: {
+      color: theme.colors.textOnPrimary,
+      fontSize: 16,
+      fontWeight: "700",
+    },
+    modalOverlay: {
+      flex: 1,
+      backgroundColor: "rgba(0, 0, 0, 0.9)",
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    videoContainer: {
+      width: "90%",
+      aspectRatio: 16 / 9,
+      backgroundColor: "#1a1a1a",
+      borderRadius: theme.borderRadius.lg,
+      justifyContent: "center",
+      alignItems: "center",
+      padding: theme.spacing.lg,
+    },
+    videoPlaceholder: {
+      fontSize: 64,
+      marginBottom: theme.spacing.md,
+    },
+    videoText: {
+      color: "#ffffff",
+      fontSize: 18,
+      fontWeight: "600",
+      marginBottom: theme.spacing.md,
+    },
+    countdownContainer: {
+      backgroundColor: "rgba(255, 255, 255, 0.2)",
+      paddingHorizontal: theme.spacing.md,
+      paddingVertical: theme.spacing.sm,
+      borderRadius: theme.borderRadius.md,
+    },
+    countdownText: {
+      color: "#ffffff",
+      fontSize: 16,
+      fontWeight: "700",
+    },
+    completedText: {
+      color: theme.colors.success,
+      fontSize: 20,
+      fontWeight: "700",
+    },
+  });
 
   return (
     <>
@@ -79,87 +164,3 @@ export const VideoAd: React.FC<VideoAdProps> = ({
     </>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    marginVertical: BrightTheme.spacing.md,
-  },
-  card: {
-    backgroundColor: BrightTheme.colors.surface,
-    borderRadius: BrightTheme.borderRadius.lg,
-    padding: BrightTheme.spacing.lg,
-    alignItems: "center",
-    ...BrightTheme.shadows.md,
-    borderWidth: 2,
-    borderColor: BrightTheme.colors.primary,
-  },
-  icon: {
-    fontSize: 48,
-    marginBottom: BrightTheme.spacing.sm,
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: "700",
-    color: BrightTheme.colors.textPrimary,
-    marginBottom: BrightTheme.spacing.xs,
-  },
-  reward: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: BrightTheme.colors.secondary,
-    marginBottom: BrightTheme.spacing.md,
-  },
-  button: {
-    backgroundColor: BrightTheme.colors.primary,
-    paddingHorizontal: BrightTheme.spacing.xl,
-    paddingVertical: BrightTheme.spacing.md,
-    borderRadius: BrightTheme.borderRadius.round,
-    ...BrightTheme.shadows.sm,
-  },
-  buttonText: {
-    color: BrightTheme.colors.textOnPrimary,
-    fontSize: 16,
-    fontWeight: "700",
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.9)",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  videoContainer: {
-    width: "90%",
-    aspectRatio: 16 / 9,
-    backgroundColor: "#1a1a1a",
-    borderRadius: BrightTheme.borderRadius.lg,
-    justifyContent: "center",
-    alignItems: "center",
-    padding: BrightTheme.spacing.lg,
-  },
-  videoPlaceholder: {
-    fontSize: 64,
-    marginBottom: BrightTheme.spacing.md,
-  },
-  videoText: {
-    color: "#ffffff",
-    fontSize: 18,
-    fontWeight: "600",
-    marginBottom: BrightTheme.spacing.md,
-  },
-  countdownContainer: {
-    backgroundColor: "rgba(255, 255, 255, 0.2)",
-    paddingHorizontal: BrightTheme.spacing.md,
-    paddingVertical: BrightTheme.spacing.sm,
-    borderRadius: BrightTheme.borderRadius.md,
-  },
-  countdownText: {
-    color: "#ffffff",
-    fontSize: 16,
-    fontWeight: "700",
-  },
-  completedText: {
-    color: BrightTheme.colors.success,
-    fontSize: 20,
-    fontWeight: "700",
-  },
-});
