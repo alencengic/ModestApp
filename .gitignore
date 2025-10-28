@@ -17,6 +17,20 @@ expo-env.d.ts
 *.key
 *.mobileprovision
 
+# iOS
+ios/Pods/
+ios/.xcode.env.local
+*.xcworkspace
+!default.xcworkspace
+ios/build/
+
+# Android
+android/build/
+android/.gradle/
+android/app/build/
+*.apk
+*.aab
+
 # Metro
 .metro-health-check*
 
