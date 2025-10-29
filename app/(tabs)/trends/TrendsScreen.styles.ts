@@ -51,6 +51,18 @@ export const createStyles = (theme: Theme) => StyleSheet.create({
     color: theme.colors.textOnPrimary,
     fontWeight: "600",
   },
+  selectedDateDisplay: {
+    marginTop: theme.spacing.md,
+    padding: theme.spacing.md,
+    backgroundColor: theme.colors.primary,
+    borderRadius: theme.borderRadius.md,
+    alignItems: "center",
+  },
+  selectedDateText: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: theme.colors.textOnPrimary,
+  },
   chartWrapper: {
     margin: theme.spacing.md,
     padding: theme.spacing.lg,
@@ -213,5 +225,146 @@ export const createStyles = (theme: Theme) => StyleSheet.create({
     fontSize: 12,
     color: theme.colors.textSecondary,
     fontWeight: "500",
+  },
+
+  // Summary card styles
+  summaryCard: {
+    margin: theme.spacing.md,
+    padding: theme.spacing.lg,
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.borderRadius.xl,
+  },
+  cardTitle: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: theme.colors.textPrimary,
+    marginBottom: theme.spacing.md,
+  },
+  summaryGrid: {
+    flexDirection: "row",
+    gap: theme.spacing.sm,
+  },
+  summaryItem: {
+    flex: 1,
+    padding: theme.spacing.md,
+    backgroundColor: theme.colors.background,
+    borderRadius: theme.borderRadius.md,
+    alignItems: "center",
+  },
+  summaryValue: {
+    fontSize: 24,
+    fontWeight: "700",
+    color: theme.colors.primary,
+    marginBottom: 4,
+  },
+  summaryLabel: {
+    fontSize: 11,
+    color: theme.colors.textSecondary,
+    textAlign: "center",
+  },
+
+  // Insights card styles
+  insightsCard: {
+    margin: theme.spacing.md,
+    marginTop: 0,
+    padding: theme.spacing.lg,
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.borderRadius.xl,
+  },
+  insightItem: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    marginTop: theme.spacing.md,
+    padding: theme.spacing.md,
+    backgroundColor: theme.colors.background,
+    borderRadius: theme.borderRadius.md,
+  },
+  insightIcon: {
+    fontSize: 24,
+    marginRight: theme.spacing.md,
+  },
+  insightText: {
+    flex: 1,
+  },
+  insightTitle: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: theme.colors.textPrimary,
+    marginBottom: 4,
+  },
+  insightDesc: {
+    fontSize: 12,
+    color: theme.colors.textSecondary,
+    lineHeight: 18,
+  },
+
+  // Top foods section
+  topFoodsSection: {
+    marginBottom: theme.spacing.lg,
+  },
+  topFoodsTitle: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: theme.colors.textPrimary,
+    marginBottom: theme.spacing.md,
+  },
+  topFoodsContainer: {
+    flexDirection: "row",
+    gap: theme.spacing.sm,
+  },
+  topFoodCard: {
+    flex: 1,
+    padding: theme.spacing.md,
+    backgroundColor: theme.colors.background,
+    borderRadius: theme.borderRadius.lg,
+    alignItems: "center",
+  },
+  topFoodMedal: {
+    fontSize: 32,
+    marginBottom: theme.spacing.xs,
+  },
+  topFoodName: {
+    fontSize: 13,
+    fontWeight: "600",
+    color: theme.colors.textPrimary,
+    marginBottom: 4,
+    textAlign: "center",
+  },
+  topFoodValue: {
+    fontSize: 11,
+    color: theme.colors.textSecondary,
+    marginBottom: theme.spacing.sm,
+  },
+  topFoodBar: {
+    width: "100%",
+    height: 6,
+    backgroundColor: theme.colors.border,
+    borderRadius: 3,
+    overflow: "hidden",
+    marginBottom: 4,
+  },
+  topFoodBarFill: {
+    height: 6,
+    borderRadius: 3,
+  },
+  topFoodPercentage: {
+    fontSize: 12,
+    fontWeight: "700",
+    color: theme.colors.primary,
+  },
+
+  // Enhanced food card styles
+  foodCardHighlight: {
+    borderWidth: 2,
+    borderColor: theme.colors.primary,
+  },
+  rankBadge: {
+    fontSize: 11,
+    fontWeight: "700",
+    color: theme.colors.primary,
+    backgroundColor: `${theme.colors.primary}20`,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: theme.borderRadius.round,
   },
 });

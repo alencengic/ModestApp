@@ -14,6 +14,7 @@ import {
   Platform,
   Keyboard,
 } from "react-native";
+import DateTimePicker from "@react-native-community/datetimepicker";
 import { useQuery } from "@tanstack/react-query";
 import {
   getFoodMoodCorrelationData,
@@ -41,6 +42,9 @@ const MoodAnalyticsScreen: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [isInfoModalVisible, setIsInfoModalVisible] = useState(false);
   const [selectedFoodName, setSelectedFoodName] = useState<string | null>(null);
+  const [dateRange, setDateRange] = useState<"all" | "week" | "month" | "custom">("all");
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
 
   const useQueryFoodCorrelation = () => {
     return {
@@ -238,6 +242,101 @@ const MoodAnalyticsScreen: React.FC = () => {
         </View>
 
         <BannerAd size="small" position="top" />
+
+        <View style={externalStyles.chartWrapper}>
+          <Text style={externalStyles.chartSectionTitle}>Time Period</Text>
+          <View style={externalStyles.buttonGroup}>
+            <TouchableOpacity
+              style={[
+                externalStyles.filterButton,
+                dateRange === "all" && externalStyles.filterButtonActive,
+              ]}
+              onPress={() => setDateRange("all")}
+            >
+              <Text
+                style={[
+                  externalStyles.filterButtonText,
+                  dateRange === "all" && externalStyles.filterButtonTextActive,
+                ]}
+              >
+                All Time
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[
+                externalStyles.filterButton,
+                dateRange === "week" && externalStyles.filterButtonActive,
+              ]}
+              onPress={() => setDateRange("week")}
+            >
+              <Text
+                style={[
+                  externalStyles.filterButtonText,
+                  dateRange === "week" && externalStyles.filterButtonTextActive,
+                ]}
+              >
+                This Week
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[
+                externalStyles.filterButton,
+                dateRange === "month" && externalStyles.filterButtonActive,
+              ]}
+              onPress={() => setDateRange("month")}
+            >
+              <Text
+                style={[
+                  externalStyles.filterButtonText,
+                  dateRange === "month" && externalStyles.filterButtonTextActive,
+                ]}
+              >
+                This Month
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[
+                externalStyles.filterButton,
+                dateRange === "custom" && externalStyles.filterButtonActive,
+              ]}
+              onPress={() => setShowDatePicker(true)}
+            >
+              <Text
+                style={[
+                  externalStyles.filterButtonText,
+                  dateRange === "custom" && externalStyles.filterButtonTextActive,
+                ]}
+              >
+                Custom
+              </Text>
+            </TouchableOpacity>
+          </View>
+          {showDatePicker && (
+            <DateTimePicker
+              value={selectedDate}
+              mode="date"
+              display="default"
+              onChange={(event, date) => {
+                setShowDatePicker(false);
+                if (date) {
+                  setSelectedDate(date);
+                  setDateRange("custom");
+                }
+              }}
+            />
+          )}
+          {dateRange === "custom" && (
+            <View style={externalStyles.selectedDateDisplay}>
+              <Text style={externalStyles.selectedDateText}>
+                Selected: {selectedDate.toLocaleDateString('en-US', {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric'
+                })}
+              </Text>
+            </View>
+          )}
+        </View>
 
         <View style={externalStyles.chartWrapper}>
           <Text style={externalStyles.chartSectionTitle}>Correlation Type</Text>

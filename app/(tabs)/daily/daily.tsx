@@ -19,11 +19,11 @@ import { moodRatingStyles } from "@/views/MoodRating/MoodRating.styles";
 import { productivityRatingStyles } from "@/views/ProductivityRating/ProductivityRating.styles";
 
 const moodOptions = [
-  { value: "Sad", display: "😢", label: "Sad" },
-  { value: "Neutral", display: "😔", label: "Neutral" },
-  { value: "Happy", display: "🙂", label: "Happy" },
+  { value: "Sad", display: "😞", label: "Sad" },
+  { value: "Neutral", display: "😐", label: "Neutral" },
+  { value: "Happy", display: "😊", label: "Happy" },
   { value: "Very Happy", display: "😄", label: "Very Happy" },
-  { value: "Ecstatic", display: "😁", label: "Ecstatic" },
+  { value: "Ecstatic", display: "🤩", label: "Ecstatic" },
 ];
 
 const productivityOptions = [1, 2, 3, 4, 5].map((rating) => ({

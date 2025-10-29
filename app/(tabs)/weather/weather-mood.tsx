@@ -62,6 +62,7 @@ const WeatherMoodScreen: React.FC = () => {
   const { theme } = useTheme();
   const styles = createStyles(theme);
   const [showInfoModal, setShowInfoModal] = useState(false);
+  const [filterMood, setFilterMood] = useState<string | null>(null);
 
   const {
     data: correlationData = [],
@@ -136,16 +137,21 @@ const WeatherMoodScreen: React.FC = () => {
 
     const temps = correlationData.map((d) => d.temperature);
     const avgTemp = temps.reduce((a, b) => a + b, 0) / temps.length;
+    const minTemp = Math.min(...temps);
+    const maxTemp = Math.max(...temps);
 
     const humidities = correlationData.map((d) => d.humidity);
     const avgHumidity = humidities.reduce((a, b) => a + b, 0) / humidities.length;
 
     // Find best weather conditions for mood
     const positiveConditions: Record<string, number> = {};
+    const positiveTemps: number[] = [];
+
     correlationData.forEach((entry) => {
       if (["Happy", "Very Happy", "Ecstatic"].includes(entry.mood)) {
         positiveConditions[entry.condition] =
           (positiveConditions[entry.condition] || 0) + 1;
+        positiveTemps.push(entry.temperature);
       }
     });
 
@@ -153,12 +159,39 @@ const WeatherMoodScreen: React.FC = () => {
       (a, b) => b[1] - a[1]
     )[0];
 
+    const optimalTemp = positiveTemps.length > 0
+      ? (positiveTemps.reduce((a, b) => a + b, 0) / positiveTemps.length)
+      : avgTemp;
+
+    // Calculate mood distribution
+    const positiveMoods = correlationData.filter(d =>
+      ["Happy", "Very Happy", "Ecstatic"].includes(d.mood)
+    ).length;
+    const positivePercentage = ((positiveMoods / correlationData.length) * 100).toFixed(0);
+
     return {
       avgTemp: avgTemp.toFixed(1),
+      minTemp: minTemp.toFixed(1),
+      maxTemp: maxTemp.toFixed(1),
+      optimalTemp: optimalTemp.toFixed(1),
       avgHumidity: avgHumidity.toFixed(0),
       bestCondition: bestCondition ? bestCondition[0] : "N/A",
       bestConditionCount: bestCondition ? bestCondition[1] : 0,
+      positivePercentage,
+      totalEntries: correlationData.length,
     };
+  }, [correlationData]);
+
+  // Filter data
+  const filteredData = useMemo(() => {
+    if (!filterMood || !correlationData) return correlationData;
+    return correlationData.filter(entry => entry.mood === filterMood);
+  }, [correlationData, filterMood]);
+
+  // Get unique moods for filter
+  const uniqueMoods = useMemo(() => {
+    if (!correlationData) return [];
+    return Array.from(new Set(correlationData.map(d => d.mood)));
   }, [correlationData]);
 
   if (isLoading) {
@@ -274,22 +307,99 @@ const WeatherMoodScreen: React.FC = () => {
           </View>
         </Modal>
 
+        {/* Mood Filter */}
+        <View style={styles.filterCard}>
+          <Text style={styles.cardTitle}>Filter by Mood</Text>
+          <View style={styles.filterButtons}>
+            <TouchableOpacity
+              style={[
+                styles.filterButton,
+                !filterMood && styles.filterButtonActive
+              ]}
+              onPress={() => setFilterMood(null)}
+            >
+              <Text style={[
+                styles.filterButtonText,
+                !filterMood && styles.filterButtonTextActive
+              ]}>
+                All
+              </Text>
+            </TouchableOpacity>
+            {uniqueMoods.map(mood => (
+              <TouchableOpacity
+                key={mood}
+                style={[
+                  styles.filterButton,
+                  filterMood === mood && styles.filterButtonActive
+                ]}
+                onPress={() => setFilterMood(mood)}
+              >
+                <Text style={[
+                  styles.filterButtonText,
+                  filterMood === mood && styles.filterButtonTextActive
+                ]}>
+                  {getMoodEmoji(mood)}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+          {filterMood && (
+            <Text style={styles.filterSubtext}>
+              Showing {filteredData.length} entries for {filterMood}
+            </Text>
+          )}
+        </View>
+
         {/* Summary Card */}
         <View style={styles.summaryCard}>
-          <Text style={styles.cardTitle}>Summary</Text>
-          <Text style={styles.summaryText}>
-            Tracking {correlationData.length} mood entries with weather data
-          </Text>
+          <Text style={styles.cardTitle}>Overview</Text>
+          <View style={styles.summaryRow}>
+            <View style={styles.summaryItem}>
+              <Text style={styles.summaryValue}>{correlationData.length}</Text>
+              <Text style={styles.summaryLabel}>Total Entries</Text>
+            </View>
+            <View style={styles.summaryItem}>
+              <Text style={styles.summaryValue}>{insights?.positivePercentage}%</Text>
+              <Text style={styles.summaryLabel}>Positive Mood</Text>
+            </View>
+          </View>
         </View>
 
         {/* Key Insights Card */}
         {insights && (
           <View style={styles.insightsCard}>
-            <Text style={styles.cardTitle}>Key Insights</Text>
+            <Text style={styles.cardTitle}>Weather Insights</Text>
+
+            {/* Temperature Range */}
+            <View style={styles.tempRangeContainer}>
+              <Text style={styles.tempRangeTitle}>Temperature Range</Text>
+              <View style={styles.tempRangeBar}>
+                <View style={styles.tempRangeTrack}>
+                  <View style={[styles.tempRangeFill, {
+                    left: '0%',
+                    width: '100%',
+                    backgroundColor: theme.colors.border
+                  }]} />
+                  <View style={[styles.tempRangeOptimal, {
+                    left: `${((parseFloat(insights.optimalTemp) - parseFloat(insights.minTemp)) / (parseFloat(insights.maxTemp) - parseFloat(insights.minTemp))) * 100}%`
+                  }]} />
+                </View>
+              </View>
+              <View style={styles.tempRangeLabels}>
+                <Text style={styles.tempRangeLabel}>{insights.minTemp}°C</Text>
+                <View style={styles.tempRangeOptimalLabel}>
+                  <Text style={styles.tempRangeOptimalText}>⭐ {insights.optimalTemp}°C</Text>
+                  <Text style={styles.tempRangeOptimalSubtext}>Your Happy Temp</Text>
+                </View>
+                <Text style={styles.tempRangeLabel}>{insights.maxTemp}°C</Text>
+              </View>
+            </View>
+
+            {/* Stats Grid */}
             <View style={styles.insightRow}>
               <View style={styles.insightItem}>
                 <Text style={styles.insightEmoji}>🌡️</Text>
-                <Text style={styles.insightLabel}>Avg Temperature</Text>
+                <Text style={styles.insightLabel}>Avg Temp</Text>
                 <Text style={styles.insightValue}>{insights.avgTemp}°C</Text>
               </View>
               <View style={styles.insightItem}>
@@ -298,17 +408,54 @@ const WeatherMoodScreen: React.FC = () => {
                 <Text style={styles.insightValue}>{insights.avgHumidity}%</Text>
               </View>
             </View>
+
             {insights.bestCondition !== "N/A" && (
               <View style={styles.bestWeatherContainer}>
                 <Text style={styles.bestWeatherLabel}>
-                  Your Best Weather for Positive Mood:
+                  ✨ Best Weather for Your Mood:
                 </Text>
                 <View style={styles.bestWeatherBadge}>
                   <Text style={styles.bestWeatherText}>
                     {getWeatherEmoji(insights.bestCondition)} {insights.bestCondition}
                   </Text>
                   <Text style={styles.bestWeatherCount}>
-                    ({insights.bestConditionCount} positive mood entries)
+                    ({insights.bestConditionCount} positive entries)
+                  </Text>
+                </View>
+              </View>
+            )}
+          </View>
+        )}
+
+        {/* Recommendations Card */}
+        {insights && insights.bestCondition !== "N/A" && (
+          <View style={styles.recommendationsCard}>
+            <Text style={styles.cardTitle}>💡 Personalized Tips</Text>
+            <View style={styles.recommendationItem}>
+              <Text style={styles.recommendationIcon}>🌤️</Text>
+              <View style={styles.recommendationText}>
+                <Text style={styles.recommendationTitle}>Plan activities on {insights.bestCondition} days</Text>
+                <Text style={styles.recommendationDesc}>
+                  You feel best during {insights.bestCondition} weather
+                </Text>
+              </View>
+            </View>
+            <View style={styles.recommendationItem}>
+              <Text style={styles.recommendationIcon}>🌡️</Text>
+              <View style={styles.recommendationText}>
+                <Text style={styles.recommendationTitle}>Your ideal temperature is around {insights.optimalTemp}°C</Text>
+                <Text style={styles.recommendationDesc}>
+                  Try to stay comfortable within this range
+                </Text>
+              </View>
+            </View>
+            {parseFloat(insights.positivePercentage) >= 70 && (
+              <View style={styles.recommendationItem}>
+                <Text style={styles.recommendationIcon}>😊</Text>
+                <View style={styles.recommendationText}>
+                  <Text style={styles.recommendationTitle}>Great mood consistency!</Text>
+                  <Text style={styles.recommendationDesc}>
+                    {insights.positivePercentage}% of your entries show positive mood
                   </Text>
                 </View>
               </View>
@@ -319,40 +466,65 @@ const WeatherMoodScreen: React.FC = () => {
         {/* Mood-Weather Patterns */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Mood-Weather Patterns</Text>
-          {stats?.map((pattern, index) => (
-            <View key={pattern.mood} style={styles.patternCard}>
-              <View style={styles.patternHeader}>
-                <Text style={styles.patternEmoji}>
-                  {getMoodEmoji(pattern.mood)}{" "}
-                  {getWeatherEmoji(pattern.mostCommonCondition)}
-                </Text>
-                <Text style={styles.patternMood}>{pattern.mood}</Text>
-              </View>
-              <View style={styles.patternStats}>
-                <View style={styles.patternStat}>
-                  <Text style={styles.patternLabel}>Occurrences</Text>
-                  <Text style={styles.patternValue}>{pattern.count}</Text>
-                </View>
-                <View style={styles.patternStat}>
-                  <Text style={styles.patternLabel}>Avg Temperature</Text>
-                  <Text style={styles.patternValue}>
-                    {pattern.avgTemp.toFixed(1)}°C
+          {stats?.map((pattern, index) => {
+            const percentage = (pattern.count / correlationData.length) * 100;
+            return (
+              <View key={pattern.mood} style={styles.patternCard}>
+                <View style={styles.patternHeader}>
+                  <View style={styles.patternMoodContainer}>
+                    <Text style={styles.patternEmoji}>
+                      {getMoodEmoji(pattern.mood)}
+                    </Text>
+                    <Text style={styles.patternMood}>{pattern.mood}</Text>
+                  </View>
+                  <Text style={styles.patternWeatherEmoji}>
+                    {getWeatherEmoji(pattern.mostCommonCondition)}
                   </Text>
                 </View>
+
+                {/* Progress bar */}
+                <View style={styles.progressBarContainer}>
+                  <View style={styles.progressBarTrack}>
+                    <View
+                      style={[
+                        styles.progressBarFill,
+                        {
+                          width: `${percentage}%`,
+                          backgroundColor: theme.colors.primary
+                        }
+                      ]}
+                    />
+                  </View>
+                  <Text style={styles.progressBarText}>
+                    {pattern.count} ({percentage.toFixed(0)}%)
+                  </Text>
+                </View>
+
+                <View style={styles.patternStats}>
+                  <View style={styles.patternStat}>
+                    <Text style={styles.patternLabel}>Avg Temp</Text>
+                    <Text style={styles.patternValue}>
+                      {pattern.avgTemp.toFixed(1)}°C
+                    </Text>
+                  </View>
+                  <View style={styles.patternStat}>
+                    <Text style={styles.patternLabel}>Weather</Text>
+                    <Text style={styles.patternValue}>
+                      {pattern.mostCommonCondition}
+                    </Text>
+                  </View>
+                </View>
               </View>
-              <View style={styles.patternCondition}>
-                <Text style={styles.patternConditionText}>
-                  Most common: {pattern.mostCommonCondition}
-                </Text>
-              </View>
-            </View>
-          ))}
+            );
+          })}
         </View>
 
         {/* Recent Entries */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Recent Entries</Text>
-          {correlationData.slice(0, 10).map((entry, index) => (
+          <Text style={styles.sectionTitle}>
+            Recent Entries {filterMood && `(${filterMood})`}
+          </Text>
+          {filteredData.slice(0, 10).map((entry, index) => (
             <View key={`${entry.date}-${index}`} style={styles.entryCard}>
               <View style={styles.entryHeader}>
                 <Text style={styles.entryDate}>

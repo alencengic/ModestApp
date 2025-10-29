@@ -37,6 +37,7 @@ export default function FoodAnalyticsScreen() {
   const [selectedSymptom, setSelectedSymptom] =
     useState<SymptomType>("bloating");
   const [isInfoModalVisible, setIsInfoModalVisible] = useState(false);
+  const [filterType, setFilterType] = useState<"all" | "positive" | "negative" | "neutral">("all");
 
   const {
     data: correlationData = [],
@@ -55,6 +56,51 @@ export default function FoodAnalyticsScreen() {
       ),
     [correlationData]
   );
+
+  // Filter data by score type
+  const filteredData = useMemo(() => {
+    if (filterType === "all") return sortedData;
+    return sortedData.filter(item => {
+      const score = item.averageSymptomScore;
+      if (filterType === "positive") return score > 0.2;
+      if (filterType === "negative") return score < -0.2;
+      return score >= -0.2 && score <= 0.2;
+    });
+  }, [sortedData, filterType]);
+
+  // Calculate insights
+  const insights = useMemo(() => {
+    if (!correlationData || correlationData.length === 0) return null;
+
+    const positiveFoods = correlationData.filter(d => d.averageSymptomScore > 0.2);
+    const negativeFoods = correlationData.filter(d => d.averageSymptomScore < -0.2);
+    const neutralFoods = correlationData.filter(d =>
+      d.averageSymptomScore >= -0.2 && d.averageSymptomScore <= 0.2
+    );
+
+    const bestFood = positiveFoods.length > 0
+      ? positiveFoods.reduce((prev, current) =>
+          current.averageSymptomScore > prev.averageSymptomScore ? current : prev
+        )
+      : null;
+
+    const worstFood = negativeFoods.length > 0
+      ? negativeFoods.reduce((prev, current) =>
+          current.averageSymptomScore < prev.averageSymptomScore ? current : prev
+        )
+      : null;
+
+    return {
+      total: correlationData.length,
+      positive: positiveFoods.length,
+      negative: negativeFoods.length,
+      neutral: neutralFoods.length,
+      bestFood,
+      worstFood,
+      positivePercentage: ((positiveFoods.length / correlationData.length) * 100).toFixed(0),
+      negativePercentage: ((negativeFoods.length / correlationData.length) * 100).toFixed(0),
+    };
+  }, [correlationData]);
 
   const getScoreColor = (score: number): string => {
     if (score > 0.2) return POSITIVE_COLOR;
@@ -306,6 +352,147 @@ export default function FoodAnalyticsScreen() {
       borderRadius: 8,
       lineHeight: 20,
     },
+
+    // Summary card styles
+    summaryCard: {
+      margin: theme.spacing.md,
+      padding: theme.spacing.lg,
+      backgroundColor: theme.colors.surface,
+      borderRadius: theme.borderRadius.lg,
+    },
+    cardSectionTitle: {
+      fontSize: 16,
+      fontWeight: "600",
+      color: theme.colors.textPrimary,
+      marginBottom: theme.spacing.md,
+    },
+    statsGrid: {
+      flexDirection: "row",
+      gap: theme.spacing.sm,
+    },
+    statBox: {
+      flex: 1,
+      padding: theme.spacing.md,
+      backgroundColor: theme.colors.background,
+      borderRadius: theme.borderRadius.md,
+      alignItems: "center",
+    },
+    statValue: {
+      fontSize: 24,
+      fontWeight: "700",
+      color: theme.colors.primary,
+      marginBottom: 4,
+    },
+    statLabel: {
+      fontSize: 11,
+      color: theme.colors.textSecondary,
+      textAlign: "center",
+    },
+
+    // Recommendations card styles
+    recommendationsCard: {
+      margin: theme.spacing.md,
+      marginTop: 0,
+      padding: theme.spacing.lg,
+      backgroundColor: theme.colors.surface,
+      borderRadius: theme.borderRadius.lg,
+    },
+    recommendationItem: {
+      flexDirection: "row",
+      alignItems: "flex-start",
+      marginTop: theme.spacing.md,
+      padding: theme.spacing.md,
+      backgroundColor: theme.colors.background,
+      borderRadius: theme.borderRadius.md,
+    },
+    recommendationIcon: {
+      fontSize: 24,
+      marginRight: theme.spacing.md,
+    },
+    recommendationText: {
+      flex: 1,
+    },
+    recommendationTitle: {
+      fontSize: 14,
+      fontWeight: "600",
+      color: theme.colors.textPrimary,
+      marginBottom: 4,
+    },
+    recommendationDesc: {
+      fontSize: 12,
+      color: theme.colors.textSecondary,
+      lineHeight: 18,
+    },
+
+    // Filter card styles
+    filterCard: {
+      margin: theme.spacing.md,
+      marginTop: 0,
+      padding: theme.spacing.lg,
+      backgroundColor: theme.colors.surface,
+      borderRadius: theme.borderRadius.lg,
+    },
+    filterButtons: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      gap: theme.spacing.sm,
+    },
+    filterButton: {
+      paddingVertical: theme.spacing.sm,
+      paddingHorizontal: theme.spacing.md,
+      borderRadius: theme.borderRadius.round,
+      backgroundColor: theme.colors.background,
+      borderWidth: 2,
+      borderColor: theme.colors.border,
+    },
+    filterButtonActive: {
+      backgroundColor: theme.colors.primary,
+      borderColor: theme.colors.primary,
+    },
+    filterButtonText: {
+      fontSize: 13,
+      fontWeight: "600",
+      color: theme.colors.textSecondary,
+    },
+    filterButtonTextActive: {
+      color: theme.colors.textOnPrimary,
+    },
+
+    // Updated food item styles
+    foodItemTitleContainer: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 8,
+      flex: 1,
+    },
+    scoreChip: {
+      paddingVertical: 4,
+      paddingHorizontal: 10,
+      borderRadius: theme.borderRadius.round,
+      fontSize: 13,
+      fontWeight: "700",
+    },
+
+    // Progress bar styles
+    progressBarContainer: {
+      marginVertical: theme.spacing.sm,
+    },
+    progressBarTrack: {
+      height: 6,
+      backgroundColor: theme.colors.border,
+      borderRadius: 3,
+      overflow: "hidden",
+      marginBottom: 6,
+    },
+    progressBarFill: {
+      height: 6,
+      borderRadius: 3,
+    },
+    progressBarLabel: {
+      fontSize: 11,
+      color: theme.colors.textSecondary,
+      fontWeight: "600",
+    },
   });
 
   const EmptyListComponent = () => (
@@ -339,6 +526,64 @@ export default function FoodAnalyticsScreen() {
 
       <BannerAd size="small" position="top" />
 
+      {/* Summary Stats */}
+      {insights && (
+        <View style={styles.summaryCard}>
+          <Text style={styles.cardSectionTitle}>Overview</Text>
+          <View style={styles.statsGrid}>
+            <View style={styles.statBox}>
+              <Text style={styles.statValue}>{insights.total}</Text>
+              <Text style={styles.statLabel}>Total Foods</Text>
+            </View>
+            <View style={[styles.statBox, { backgroundColor: `${POSITIVE_COLOR}20` }]}>
+              <Text style={[styles.statValue, { color: POSITIVE_COLOR }]}>
+                {insights.positive}
+              </Text>
+              <Text style={styles.statLabel}>Helpful</Text>
+            </View>
+            <View style={[styles.statBox, { backgroundColor: `${NEGATIVE_COLOR}20` }]}>
+              <Text style={[styles.statValue, { color: NEGATIVE_COLOR }]}>
+                {insights.negative}
+              </Text>
+              <Text style={styles.statLabel}>Trigger</Text>
+            </View>
+          </View>
+        </View>
+      )}
+
+      {/* Recommendations */}
+      {insights && (insights.bestFood || insights.worstFood) && (
+        <View style={styles.recommendationsCard}>
+          <Text style={styles.cardSectionTitle}>💡 Recommendations for {symptomLabels[selectedSymptom]}</Text>
+          {insights.bestFood && (
+            <View style={styles.recommendationItem}>
+              <Text style={styles.recommendationIcon}>✅</Text>
+              <View style={styles.recommendationText}>
+                <Text style={styles.recommendationTitle}>
+                  Try more {insights.bestFood.foodName}
+                </Text>
+                <Text style={styles.recommendationDesc}>
+                  Best for reducing {selectedSymptom} (Score: {insights.bestFood.averageSymptomScore.toFixed(2)})
+                </Text>
+              </View>
+            </View>
+          )}
+          {insights.worstFood && (
+            <View style={styles.recommendationItem}>
+              <Text style={styles.recommendationIcon}>⚠️</Text>
+              <View style={styles.recommendationText}>
+                <Text style={styles.recommendationTitle}>
+                  Limit {insights.worstFood.foodName}
+                </Text>
+                <Text style={styles.recommendationDesc}>
+                  May trigger {selectedSymptom} (Score: {insights.worstFood.averageSymptomScore.toFixed(2)})
+                </Text>
+              </View>
+            </View>
+          )}
+        </View>
+      )}
+
       <Card style={styles.card}>
         <Card.Content>
           <Text style={styles.sectionTitle}>Select Symptom</Text>
@@ -367,8 +612,47 @@ export default function FoodAnalyticsScreen() {
         </Card.Content>
       </Card>
 
+      {/* Filter by Score Type */}
+      <View style={styles.filterCard}>
+        <Text style={styles.cardSectionTitle}>Filter Results</Text>
+        <View style={styles.filterButtons}>
+          <TouchableOpacity
+            style={[styles.filterButton, filterType === "all" && styles.filterButtonActive]}
+            onPress={() => setFilterType("all")}
+          >
+            <Text style={[styles.filterButtonText, filterType === "all" && styles.filterButtonTextActive]}>
+              All ({sortedData.length})
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.filterButton, filterType === "positive" && styles.filterButtonActive]}
+            onPress={() => setFilterType("positive")}
+          >
+            <Text style={[styles.filterButtonText, filterType === "positive" && styles.filterButtonTextActive]}>
+              Helpful ({insights?.positive || 0})
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.filterButton, filterType === "negative" && styles.filterButtonActive]}
+            onPress={() => setFilterType("negative")}
+          >
+            <Text style={[styles.filterButtonText, filterType === "negative" && styles.filterButtonTextActive]}>
+              Trigger ({insights?.negative || 0})
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.filterButton, filterType === "neutral" && styles.filterButtonActive]}
+            onPress={() => setFilterType("neutral")}
+          >
+            <Text style={[styles.filterButtonText, filterType === "neutral" && styles.filterButtonTextActive]}>
+              Neutral ({insights?.neutral || 0})
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+
       <Card style={styles.card}>
-        <Card.Title title="Correlated Foods" />
+        <Card.Title title={`Correlated Foods ${filterType !== "all" ? `(${filterType})` : ""}`} />
         <Card.Content>
           {isLoading ? (
             <ActivityIndicator
@@ -378,11 +662,12 @@ export default function FoodAnalyticsScreen() {
             />
           ) : isError ? (
             <Text style={styles.errorText}>Error: {error.message}</Text>
-          ) : sortedData.length > 0 ? (
+          ) : filteredData.length > 0 ? (
             <View>
-              {sortedData.map((item, index) => {
+              {filteredData.map((item, index) => {
                 const scoreColor = getScoreColor(item.averageSymptomScore);
-                const isLastItem = index === sortedData.length - 1;
+                const isLastItem = index === filteredData.length - 1;
+                const percentage = Math.abs((item.averageSymptomScore / 1) * 100);
                 return (
                   <View
                     key={item.foodName}
@@ -392,35 +677,49 @@ export default function FoodAnalyticsScreen() {
                     ]}
                   >
                     <View style={styles.foodItemHeader}>
-                      <Icon source="food-croissant" size={20} color="#666" />
-                      <Text style={styles.foodItemTitle}>{item.foodName}</Text>
+                      <View style={styles.foodItemTitleContainer}>
+                        <Icon source="food-croissant" size={20} color="#666" />
+                        <Text style={styles.foodItemTitle}>{item.foodName}</Text>
+                      </View>
+                      <Text style={[
+                        styles.scoreChip,
+                        {
+                          backgroundColor: `${scoreColor}20`,
+                          color: scoreColor
+                        }
+                      ]}>
+                        {item.averageSymptomScore > 0 ? '+' : ''}{item.averageSymptomScore.toFixed(2)}
+                      </Text>
                     </View>
-                    <View style={styles.foodItemDetails}>
-                      <View style={styles.detailRow}>
-                        <Text style={styles.detailLabel}>Avg Score:</Text>
-                        <Text
-                          style={[
-                            styles.detailValue,
-                            { color: scoreColor, fontWeight: "bold" },
-                          ]}
-                        >
-                          {item.averageSymptomScore.toFixed(2)}
-                        </Text>
-                      </View>
-                      <View style={styles.detailRow}>
-                        <Text style={styles.detailLabel}>Occurrences:</Text>
-                        <Text style={styles.detailValue}>
-                          {item.occurrences}
-                        </Text>
-                      </View>
-                      <View style={styles.colorIndicatorRow}>
-                        <Text style={styles.detailLabel}>Association:</Text>
+
+                    {/* Progress Bar */}
+                    <View style={styles.progressBarContainer}>
+                      <View style={styles.progressBarTrack}>
                         <View
                           style={[
-                            styles.colorIndicatorSwatch,
-                            { backgroundColor: scoreColor },
+                            styles.progressBarFill,
+                            {
+                              width: `${Math.min(percentage * 100, 100)}%`,
+                              backgroundColor: scoreColor,
+                            },
                           ]}
                         />
+                      </View>
+                      <Text style={styles.progressBarLabel}>
+                        {item.averageSymptomScore > 0.2
+                          ? "Helpful"
+                          : item.averageSymptomScore < -0.2
+                          ? "May Trigger"
+                          : "Neutral"}
+                      </Text>
+                    </View>
+
+                    <View style={styles.foodItemDetails}>
+                      <View style={styles.detailRow}>
+                        <Text style={styles.detailLabel}>📊 Logged:</Text>
+                        <Text style={styles.detailValue}>
+                          {item.occurrences} times
+                        </Text>
                       </View>
                     </View>
                   </View>

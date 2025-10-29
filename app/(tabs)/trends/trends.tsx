@@ -96,6 +96,36 @@ const TrendsAndAnalyticsScreen: React.FC = () => {
     );
   }, [chartData]);
 
+  // Calculate insights
+  const insights = useMemo(() => {
+    if (!chartData || chartData.length === 0) return null;
+
+    const totalEntries = chartData.reduce((sum, item) => sum + item.value, 0);
+    const avgEntriesPerFood = (totalEntries / chartData.length).toFixed(1);
+
+    // Find diversity score (more foods = higher diversity)
+    const diversityScore = Math.min((chartData.length / 10) * 100, 100).toFixed(0);
+
+    // Top 3 foods (create a copy to avoid mutating chartData)
+    const top3 = [...chartData]
+      .sort((a, b) => b.value - a.value)
+      .slice(0, 3);
+
+    // Calculate if user is eating variety
+    const topFoodPercentage = topItem ? ((topItem.value / totalEntries) * 100).toFixed(0) : 0;
+    const isBalanced = parseFloat(topFoodPercentage) < 40;
+
+    return {
+      totalEntries,
+      avgEntriesPerFood,
+      diversityScore,
+      top3,
+      topFoodPercentage,
+      isBalanced,
+      uniqueFoods: chartData.length,
+    };
+  }, [chartData, topItem]);
+
   const isDataValid = useMemo(() => {
     if (!chartData || chartData.length === 0) return false;
     return chartData.every(
@@ -117,6 +147,11 @@ const TrendsAndAnalyticsScreen: React.FC = () => {
       value: item.value,
     }));
   }, [chartData, isDataValid]);
+
+  // Sorted chart data for display (sorted by value, highest first)
+  const sortedChartData = useMemo(() => {
+    return [...chartData].sort((a, b) => b.value - a.value);
+  }, [chartData]);
 
   const getRangeLabel = () => {
     switch (range) {
@@ -240,7 +275,92 @@ const TrendsAndAnalyticsScreen: React.FC = () => {
               }}
             />
           )}
+          {range === "custom" && (
+            <View style={styles.selectedDateDisplay}>
+              <Text style={styles.selectedDateText}>
+                Selected: {selectedDate.toLocaleDateString('en-US', {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric'
+                })}
+              </Text>
+            </View>
+          )}
         </View>
+
+        {/* Summary Stats */}
+        {insights && !isLoading && isDataValid && (
+          <View style={styles.summaryCard}>
+            <Text style={styles.cardTitle}>Summary</Text>
+            <View style={styles.summaryGrid}>
+              <View style={styles.summaryItem}>
+                <Text style={styles.summaryValue}>{insights.totalEntries}</Text>
+                <Text style={styles.summaryLabel}>Total Entries</Text>
+              </View>
+              <View style={styles.summaryItem}>
+                <Text style={styles.summaryValue}>{insights.uniqueFoods}</Text>
+                <Text style={styles.summaryLabel}>Unique Foods</Text>
+              </View>
+              <View style={styles.summaryItem}>
+                <Text style={styles.summaryValue}>{insights.diversityScore}%</Text>
+                <Text style={styles.summaryLabel}>Diversity Score</Text>
+              </View>
+            </View>
+          </View>
+        )}
+
+        {/* Insights & Recommendations */}
+        {insights && !isLoading && isDataValid && (
+          <View style={styles.insightsCard}>
+            <Text style={styles.cardTitle}>💡 Insights & Tips</Text>
+
+            {insights.isBalanced ? (
+              <View style={styles.insightItem}>
+                <Text style={styles.insightIcon}>✅</Text>
+                <View style={styles.insightText}>
+                  <Text style={styles.insightTitle}>Great food variety!</Text>
+                  <Text style={styles.insightDesc}>
+                    Your top food is only {insights.topFoodPercentage}% of your diet. Keep it up!
+                  </Text>
+                </View>
+              </View>
+            ) : (
+              <View style={styles.insightItem}>
+                <Text style={styles.insightIcon}>⚠️</Text>
+                <View style={styles.insightText}>
+                  <Text style={styles.insightTitle}>Try more variety</Text>
+                  <Text style={styles.insightDesc}>
+                    {topItem?.label} makes up {insights.topFoodPercentage}% of your diet. Consider diversifying.
+                  </Text>
+                </View>
+              </View>
+            )}
+
+            {parseFloat(insights.diversityScore) >= 70 && (
+              <View style={styles.insightItem}>
+                <Text style={styles.insightIcon}>🌟</Text>
+                <View style={styles.insightText}>
+                  <Text style={styles.insightTitle}>Excellent diversity!</Text>
+                  <Text style={styles.insightDesc}>
+                    You're eating {insights.uniqueFoods} different foods. This promotes better nutrition.
+                  </Text>
+                </View>
+              </View>
+            )}
+
+            {parseFloat(insights.diversityScore) < 50 && (
+              <View style={styles.insightItem}>
+                <Text style={styles.insightIcon}>💡</Text>
+                <View style={styles.insightText}>
+                  <Text style={styles.insightTitle}>Expand your food choices</Text>
+                  <Text style={styles.insightDesc}>
+                    Try adding 2-3 new foods this week to improve nutritional balance.
+                  </Text>
+                </View>
+              </View>
+            )}
+          </View>
+        )}
 
         <View style={styles.chartWrapper}>
           <Text style={styles.chartTitle}>Food Intake Analysis</Text>
@@ -270,12 +390,52 @@ const TrendsAndAnalyticsScreen: React.FC = () => {
             </View>
           ) : (
             <>
+              {/* Top 3 Foods Highlight */}
+              {insights && insights.top3.length > 0 && (
+                <View style={styles.topFoodsSection}>
+                  <Text style={styles.topFoodsTitle}>🏆 Top Foods</Text>
+                  <View style={styles.topFoodsContainer}>
+                    {insights.top3.map((item, index) => {
+                      const percentage = ((item.value / totalItems) * 100).toFixed(1);
+                      const medals = ["🥇", "🥈", "🥉"];
+                      return (
+                        <View key={index} style={styles.topFoodCard}>
+                          <Text style={styles.topFoodMedal}>{medals[index]}</Text>
+                          <Text style={styles.topFoodName} numberOfLines={1}>
+                            {item.label}
+                          </Text>
+                          <Text style={styles.topFoodValue}>
+                            {item.value} entries
+                          </Text>
+                          <View style={styles.topFoodBar}>
+                            <View
+                              style={[
+                                styles.topFoodBarFill,
+                                {
+                                  width: `${percentage}%`,
+                                  backgroundColor: item.color,
+                                },
+                              ]}
+                            />
+                          </View>
+                          <Text style={styles.topFoodPercentage}>{percentage}%</Text>
+                        </View>
+                      );
+                    })}
+                  </View>
+                </View>
+              )}
+
               {/* Visual Food Cards */}
               <View style={styles.foodCardsContainer}>
-                {chartData.map((item, index) => {
+                {sortedChartData.map((item, index) => {
                   const percentage = ((item.value / totalItems) * 100).toFixed(1);
+                  const isTopFood = index < 3;
                   return (
-                    <View key={index} style={styles.foodCard}>
+                    <View key={index} style={[
+                      styles.foodCard,
+                      isTopFood && styles.foodCardHighlight
+                    ]}>
                       <View
                         style={[
                           styles.foodCardBar,
@@ -296,6 +456,9 @@ const TrendsAndAnalyticsScreen: React.FC = () => {
                           <Text style={styles.foodCardLabel} numberOfLines={1}>
                             {item.label}
                           </Text>
+                          {isTopFood && (
+                            <Text style={styles.rankBadge}>#{index + 1}</Text>
+                          )}
                         </View>
                         <View style={styles.foodCardStats}>
                           <Text style={styles.foodCardValue}>{item.value}</Text>

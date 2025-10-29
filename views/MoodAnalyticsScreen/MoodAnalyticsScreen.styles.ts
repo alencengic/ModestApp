@@ -329,4 +329,39 @@ export const createStyles = (theme: Theme) => StyleSheet.create({
     borderRadius: 8,
     lineHeight: 20,
   },
+
+  // Date filter styles
+  filterButton: {
+    paddingVertical: theme.spacing.sm,
+    paddingHorizontal: theme.spacing.md,
+    borderRadius: theme.borderRadius.round,
+    backgroundColor: theme.colors.background,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+  },
+  filterButtonActive: {
+    backgroundColor: theme.colors.primary,
+    borderColor: theme.colors.primary,
+  },
+  filterButtonText: {
+    fontSize: 14,
+    fontWeight: "500",
+    color: theme.colors.textSecondary,
+  },
+  filterButtonTextActive: {
+    color: theme.colors.textOnPrimary,
+    fontWeight: "600",
+  },
+  selectedDateDisplay: {
+    marginTop: theme.spacing.md,
+    padding: theme.spacing.md,
+    backgroundColor: theme.colors.primary,
+    borderRadius: theme.borderRadius.md,
+    alignItems: "center",
+  },
+  selectedDateText: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: theme.colors.textOnPrimary,
+  },
 });

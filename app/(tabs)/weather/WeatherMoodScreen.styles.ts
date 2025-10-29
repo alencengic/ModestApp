@@ -300,4 +300,203 @@ export const createStyles = (theme: Theme) => StyleSheet.create({
     fontSize: 12,
     color: theme.colors.textSecondary,
   },
+
+  // Filter styles
+  filterCard: {
+    margin: 16,
+    marginTop: 8,
+    padding: 16,
+    backgroundColor: theme.colors.surface,
+    borderRadius: 16,
+  },
+  filterButtons: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
+    marginTop: 8,
+  },
+  filterButton: {
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderRadius: theme.borderRadius.round,
+    backgroundColor: theme.colors.background,
+    borderWidth: 2,
+    borderColor: theme.colors.border,
+  },
+  filterButtonActive: {
+    backgroundColor: theme.colors.primary,
+    borderColor: theme.colors.primary,
+  },
+  filterButtonText: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: theme.colors.textSecondary,
+  },
+  filterButtonTextActive: {
+    color: theme.colors.textOnPrimary,
+  },
+  filterSubtext: {
+    marginTop: 12,
+    fontSize: 13,
+    color: theme.colors.textSecondary,
+    textAlign: "center",
+  },
+
+  // Summary row styles
+  summaryRow: {
+    flexDirection: "row",
+    gap: 16,
+    marginTop: 12,
+  },
+  summaryItem: {
+    flex: 1,
+    alignItems: "center",
+    padding: 16,
+    backgroundColor: theme.colors.background,
+    borderRadius: 12,
+  },
+  summaryValue: {
+    fontSize: 28,
+    fontWeight: "700",
+    color: theme.colors.primary,
+    marginBottom: 4,
+  },
+  summaryLabel: {
+    fontSize: 12,
+    color: theme.colors.textSecondary,
+    textAlign: "center",
+  },
+
+  // Temperature range styles
+  tempRangeContainer: {
+    marginBottom: 20,
+    padding: 16,
+    backgroundColor: theme.colors.background,
+    borderRadius: 12,
+  },
+  tempRangeTitle: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: theme.colors.textPrimary,
+    marginBottom: 12,
+    textAlign: "center",
+  },
+  tempRangeBar: {
+    marginVertical: 16,
+  },
+  tempRangeTrack: {
+    height: 8,
+    backgroundColor: theme.colors.border,
+    borderRadius: 4,
+    position: "relative",
+    overflow: "visible",
+  },
+  tempRangeFill: {
+    position: "absolute",
+    height: 8,
+    borderRadius: 4,
+  },
+  tempRangeOptimal: {
+    position: "absolute",
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    backgroundColor: theme.colors.primary,
+    top: -6,
+    transform: [{ translateX: -10 }],
+    borderWidth: 3,
+    borderColor: theme.colors.textOnPrimary,
+  },
+  tempRangeLabels: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+  },
+  tempRangeLabel: {
+    fontSize: 12,
+    fontWeight: "600",
+    color: theme.colors.textSecondary,
+  },
+  tempRangeOptimalLabel: {
+    alignItems: "center",
+    position: "absolute",
+    left: "50%",
+    transform: [{ translateX: -50 }],
+  },
+  tempRangeOptimalText: {
+    fontSize: 14,
+    fontWeight: "700",
+    color: theme.colors.primary,
+  },
+  tempRangeOptimalSubtext: {
+    fontSize: 10,
+    color: theme.colors.textSecondary,
+  },
+
+  // Recommendations card styles
+  recommendationsCard: {
+    margin: 16,
+    marginTop: 8,
+    padding: 20,
+    backgroundColor: theme.colors.surface,
+    borderRadius: 16,
+  },
+  recommendationItem: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    marginTop: 16,
+    padding: 12,
+    backgroundColor: theme.colors.background,
+    borderRadius: 12,
+  },
+  recommendationIcon: {
+    fontSize: 28,
+    marginRight: 12,
+  },
+  recommendationText: {
+    flex: 1,
+  },
+  recommendationTitle: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: theme.colors.textPrimary,
+    marginBottom: 4,
+  },
+  recommendationDesc: {
+    fontSize: 12,
+    color: theme.colors.textSecondary,
+    lineHeight: 18,
+  },
+
+  // Progress bar styles
+  progressBarContainer: {
+    marginBottom: 12,
+  },
+  progressBarTrack: {
+    height: 8,
+    backgroundColor: theme.colors.border,
+    borderRadius: 4,
+    overflow: "hidden",
+    marginBottom: 6,
+  },
+  progressBarFill: {
+    height: 8,
+    borderRadius: 4,
+  },
+  progressBarText: {
+    fontSize: 12,
+    color: theme.colors.textSecondary,
+    fontWeight: "600",
+    textAlign: "right",
+  },
+
+  // Updated pattern styles
+  patternMoodContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    flex: 1,
+  },
+  patternWeatherEmoji: {
+    fontSize: 28,
+  },
 });
