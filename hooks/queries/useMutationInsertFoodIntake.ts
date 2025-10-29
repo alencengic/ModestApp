@@ -3,7 +3,7 @@ import {
   insertFoodIntake as dbInsertFoodIntake,
   getFoodIntakeChartData as dbGetChartData,
 } from "@/storage/database";
-import { ChartData } from "@/app/(tabs)/trends/trends";
+import { ChartDataItem } from "@/app/(tabs)/trends/trends";
 import { handleQueryError } from "./helpers/handleQueryError.helper";
 
 export const useMutationInsertFoodIntake = () => {
@@ -25,5 +25,5 @@ export const useQueryFoodIntakeChartData = (
   return {
     queryKey: ["chartData", range, customDate?.toISOString()],
     queryFn: () => dbGetChartData(range, customDate),
-  } satisfies Parameters<typeof useQuery<ChartData[]>>[0];
+  } satisfies Parameters<typeof useQuery<ChartDataItem[]>>[0];
 };

@@ -1,122 +1,116 @@
-import { StyleSheet, Platform } from "react-native";
+import { StyleSheet } from "react-native";
+import { Theme } from "@/constants/ColorPalettes";
+import { scaleFontSize, scale } from "@/utils/responsive";
 
-export const styles = StyleSheet.create({
+export const createStyles = (theme: Theme) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F5F5F5",
+    backgroundColor: theme.colors.background,
   },
-  chartWrapper: {
-    margin: 10,
-    padding: 15,
-    backgroundColor: "white",
-    borderRadius: 10,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
-    elevation: 3,
+  header: {
+    padding: theme.spacing.xl,
+    alignItems: "center",
+    backgroundColor: theme.colors.background,
   },
-  centered: {
-    flex: 1,
+  headerEmoji: {
+    fontSize: scaleFontSize(56),
+    marginBottom: theme.spacing.md,
+  },
+  headerTitle: {
+    fontSize: scaleFontSize(26),
+    fontWeight: "700",
+    color: theme.colors.textPrimary,
+    marginBottom: theme.spacing.sm,
+    textAlign: "center",
+  },
+  headerDescription: {
+    fontSize: scaleFontSize(15),
+    color: theme.colors.textSecondary,
+    textAlign: "center",
+    paddingHorizontal: theme.spacing.xl,
+    lineHeight: 22,
+  },
+  optionsContainer: {
+    paddingHorizontal: theme.spacing.md,
+    paddingVertical: theme.spacing.lg,
+  },
+  optionCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.borderRadius.lg,
+    padding: theme.spacing.lg,
+    marginBottom: theme.spacing.md,
+    borderLeftWidth: 4,
+    ...theme.shadows.md,
+  },
+  optionEmojiContainer: {
+    width: scale(60),
+    height: scale(60),
+    borderRadius: scale(30),
+    backgroundColor: theme.colors.background,
+    alignItems: "center",
     justifyContent: "center",
-    alignItems: "center",
-    minHeight: 100,
-    padding: 20,
+    marginRight: theme.spacing.md,
   },
-  centeredText: {
-    fontSize: 16,
-    color: "#666",
-    textAlign: "center",
+  optionEmoji: {
+    fontSize: scaleFontSize(32),
   },
-  errorText: {
-    fontSize: 16,
-    color: "#e74c3c",
-    textAlign: "center",
+  optionContent: {
+    flex: 1,
   },
-  chartSectionTitle: {
-    fontSize: 19,
-    fontWeight: "600",
-    marginBottom: 15,
-    color: "#34495e",
+  optionTitle: {
+    fontSize: scaleFontSize(18),
+    fontWeight: "700",
+    color: theme.colors.textPrimary,
+    marginBottom: theme.spacing.xs / 2,
   },
-  pickerContainer: {
-    marginHorizontal: 10,
-    marginBottom: 20,
-    borderColor: "#e0e0e0",
-    borderWidth: 1,
-    borderRadius: 8,
+  optionDescription: {
+    fontSize: scaleFontSize(14),
+    color: theme.colors.textSecondary,
+    lineHeight: 20,
   },
-  picker: {
-    width: "100%",
-    height: Platform.OS === "android" ? 50 : undefined,
+  optionChevron: {
+    fontSize: scaleFontSize(28),
+    color: theme.colors.primary,
+    fontWeight: "700",
+    marginLeft: theme.spacing.sm,
   },
-  foodListItem: {
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: "#f0f0f0",
+  infoCard: {
+    margin: theme.spacing.md,
+    padding: theme.spacing.lg,
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.borderRadius.lg,
+    ...theme.shadows.sm,
   },
-  foodListItemLast: {
-    borderBottomWidth: 0,
+  infoTitle: {
+    fontSize: scaleFontSize(18),
+    fontWeight: "700",
+    color: theme.colors.textPrimary,
+    marginBottom: theme.spacing.sm,
   },
-  foodListItemName: {
-    fontSize: 17,
-    fontWeight: "600",
-    color: "#2c3e50",
-    marginBottom: 8,
+  infoText: {
+    fontSize: scaleFontSize(15),
+    color: theme.colors.textPrimary,
+    lineHeight: 22,
+    marginBottom: theme.spacing.md,
   },
-  detailRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 6,
-    paddingVertical: 2,
+  infoBullets: {
+    marginBottom: theme.spacing.md,
   },
-  detailLabel: {
-    fontSize: 14,
-    color: "#7f8c8d",
+  infoBullet: {
+    fontSize: scaleFontSize(14),
+    color: theme.colors.textSecondary,
+    lineHeight: 24,
+    marginBottom: theme.spacing.xs / 2,
   },
-  detailValue: {
-    fontSize: 14,
-    color: "#34495e",
-    fontWeight: "500",
-  },
-  moodIndicatorRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginTop: 8,
-  },
-  moodIndicatorSwatch: {
-    width: 18,
-    height: 18,
-    marginLeft: 10,
-    borderRadius: 9,
-    borderWidth: 1,
-    borderColor: "#e0e0e0",
-  },
-
-  filterContainer: {
-    padding: 15,
-    backgroundColor: "white",
-    marginHorizontal: 10,
-    marginTop: 10,
-    borderRadius: 8,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.2,
-    shadowRadius: 1.41,
-    elevation: 2,
-  },
-  filterTitle: {
-    fontSize: 18,
-    fontWeight: "600",
-    marginBottom: 12,
-    color: "#333",
-  },
-  buttonGroup: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    flexWrap: "wrap",
-    gap: 8,
+  infoNote: {
+    fontSize: scaleFontSize(13),
+    color: theme.colors.textSecondary,
+    fontStyle: "italic",
+    padding: theme.spacing.md,
+    backgroundColor: theme.colors.background,
+    borderRadius: theme.borderRadius.md,
+    lineHeight: 20,
   },
 });

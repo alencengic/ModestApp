@@ -1,8 +1,8 @@
 import { StyleSheet } from "react-native";
 
-export const dailyEnterScreenStyles = StyleSheet.create({
+export const createDailyEnterScreenStyles = (theme: any) => StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: "#f8f8f8",
+    backgroundColor: theme.colors.background,
   },
 });

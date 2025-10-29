@@ -1,24 +1,93 @@
 import {
   DarkTheme,
   DefaultTheme,
-  ThemeProvider,
+  ThemeProvider as NavigationThemeProvider,
 } from "@react-navigation/native";
 import { useFonts } from "expo-font";
-import { Stack } from "expo-router";
+import { Stack, useRouter, useSegments } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import "react-native-reanimated";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import { useColorScheme } from "@/hooks/useColorScheme";
+import { useWeatherSync } from "@/hooks/useWeatherSync";
+import { requestNotificationPermissions, scheduleDailyNotifications } from "@/services/notificationService";
+import { ThemeProvider, useTheme } from "@/context/ThemeContext";
+import { UserProfileProvider } from "@/context/UserProfileContext";
 
 SplashScreen.preventAutoHideAsync();
 
 const queryClient = new QueryClient();
 
+function RootLayoutNav() {
+  const router = useRouter();
+  const segments = useSegments();
+  const { isDark } = useTheme();
+  const [hasSeenOnboarding, setHasSeenOnboarding] = useState<boolean | null>(null);
+
+  useWeatherSync();
+
+  useEffect(() => {
+    const checkOnboarding = async () => {
+      const seen = await AsyncStorage.getItem("hasSeenOnboarding");
+      setHasSeenOnboarding(seen === "true");
+    };
+    checkOnboarding();
+  }, []);
+
+  // Re-check onboarding status when segments change (e.g., after completing onboarding)
+  useEffect(() => {
+    const recheckOnboarding = async () => {
+      const seen = await AsyncStorage.getItem("hasSeenOnboarding");
+      if (seen === "true" && !hasSeenOnboarding) {
+        setHasSeenOnboarding(true);
+      }
+    };
+    recheckOnboarding();
+  }, [segments]);
+
+  useEffect(() => {
+    if (hasSeenOnboarding !== null) {
+      // Redirect to onboarding if not seen
+      if (!hasSeenOnboarding && !segments.includes("onboarding")) {
+        router.replace("/onboarding");
+      }
+    }
+  }, [hasSeenOnboarding, segments]);
+
+  useEffect(() => {
+    const setupNotifications = async () => {
+      const hasPermission = await requestNotificationPermissions();
+      if (hasPermission) {
+        await scheduleDailyNotifications();
+      }
+    };
+
+    setupNotifications();
+  }, []);
+
+  if (hasSeenOnboarding === null) {
+    return null;
+  }
+
+  return (
+    <NavigationThemeProvider value={isDark ? DarkTheme : DefaultTheme}>
+      <Stack>
+        <Stack.Screen name="onboarding" options={{ headerShown: false }} />
+        <Stack.Screen name="profile-setup" options={{ headerShown: false }} />
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen name="journal-entry-detail" options={{ headerShown: false }} />
+        <Stack.Screen name="+not-found" />
+      </Stack>
+      <StatusBar style="auto" />
+    </NavigationThemeProvider>
+  );
+}
+
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
   const [loaded] = useFonts({
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
   });
@@ -35,12 +104,10 @@ export default function RootLayout() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-        <Stack>
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen name="+not-found" />
-        </Stack>
-        <StatusBar style="auto" />
+      <ThemeProvider>
+        <UserProfileProvider>
+          <RootLayoutNav />
+        </UserProfileProvider>
       </ThemeProvider>
     </QueryClientProvider>
   );

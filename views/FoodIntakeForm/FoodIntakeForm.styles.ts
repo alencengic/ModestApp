@@ -6,42 +6,360 @@ export const foodIntakeFormStyles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   title: {
-    fontSize: 20,
-    marginBottom: 10,
+    fontSize: 24,
+    marginBottom: 20,
     fontWeight: "bold",
     textAlign: "center",
+    color: "#333",
   },
-  inputContainer: {
-    marginBottom: 15,
-    zIndex: 1000,
+  subtitle: {
+    fontSize: 14,
+    marginBottom: 25,
+    textAlign: "center",
+    color: "#666",
   },
-  inputLabel: {
-    fontSize: 16,
+  mealSection: {
+    marginBottom: 25,
+  },
+  mealCard: {
+    backgroundColor: "#f8f9fa",
+    borderRadius: 12,
+    padding: 15,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  mealCardFilled: {
+    backgroundColor: "#e3f2fd",
+    borderWidth: 1,
+    borderColor: "#007AFF",
+  },
+  mealHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 10,
+  },
+  mealIcon: {
+    fontSize: 24,
+    marginRight: 10,
+  },
+  mealLabel: {
+    fontSize: 18,
     fontWeight: "bold",
-    marginBottom: 6,
+    color: "#333",
+    flex: 1,
+  },
+  clearButton: {
+    padding: 5,
+  },
+  clearButtonText: {
+    color: "#ff6b6b",
+    fontSize: 14,
+    fontWeight: "600",
   },
   inputField: {
-    height: 40,
-    borderColor: "#ccc",
+    height: 48,
+    borderColor: "#ddd",
     borderWidth: 1,
-    borderRadius: 5,
-    paddingLeft: 10,
+    borderRadius: 8,
+    paddingHorizontal: 15,
     fontSize: 16,
-    marginTop: 5,
+    backgroundColor: "#fff",
+    color: "#333",
+  },
+  inputFieldFocused: {
+    borderColor: "#007AFF",
+    borderWidth: 2,
+  },
+  suggestionsContainer: {
+    marginTop: 10,
+    maxHeight: 180,
+    borderRadius: 8,
+    backgroundColor: "#fff",
+    borderWidth: 1,
+    borderColor: "#ddd",
+    overflow: "hidden",
+  },
+  suggestionItem: {
+    padding: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: "#f0f0f0",
+  },
+  suggestionItemLast: {
+    borderBottomWidth: 0,
+  },
+  suggestionText: {
+    fontSize: 16,
+    color: "#333",
+  },
+  noSuggestions: {
+    padding: 15,
+    alignItems: "center",
+  },
+  noSuggestionsText: {
+    fontSize: 14,
+    color: "#999",
+    fontStyle: "italic",
+  },
+  closeButton: {
+    marginTop: 10,
+    padding: 12,
+    backgroundColor: "#f0f0f0",
+    borderRadius: 8,
+    alignItems: "center",
+  },
+  closeButtonText: {
+    color: "#007AFF",
+    fontSize: 14,
+    fontWeight: "600",
+  },
+  emptyState: {
+    padding: 20,
+    alignItems: "center",
+  },
+  emptyStateText: {
+    fontSize: 14,
+    color: "#999",
+    textAlign: "center",
+  },
+  chipContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
+    marginTop: 10,
+  },
+  chip: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#007AFF",
+    borderRadius: 20,
+    paddingVertical: 6,
+    paddingLeft: 12,
+    paddingRight: 8,
+    gap: 6,
+  },
+  chipText: {
+    color: "#fff",
+    fontSize: 14,
+    fontWeight: "500",
+  },
+  chipRemove: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    backgroundColor: "rgba(255, 255, 255, 0.3)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  chipRemoveText: {
+    color: "#fff",
+    fontSize: 12,
+    fontWeight: "bold",
+  },
+  addButton: {
+    padding: 10,
+    backgroundColor: "#007AFF",
+    borderRadius: 8,
+    alignItems: "center",
+  },
+  addButtonDisabled: {
+    backgroundColor: "#ccc",
+  },
+  addButtonText: {
+    color: "#fff",
+    fontSize: 13,
+    fontWeight: "600",
+  },
+  inputRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  pickerButton: {
+    width: 48,
+    height: 48,
+    backgroundColor: "#007AFF",
+    borderRadius: 8,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  pickerButtonText: {
+    fontSize: 24,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: "flex-end",
+  },
+  modalContainer: {
+    backgroundColor: "#fff",
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    maxHeight: "70%",
+    paddingBottom: 20,
+  },
+  modalHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: "#e0e0e0",
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#333",
+  },
+  modalCloseButton: {
+    padding: 5,
+  },
+  modalCloseText: {
+    fontSize: 24,
+    color: "#666",
+  },
+  modalScrollView: {
+    paddingHorizontal: 20,
+  },
+  modalItem: {
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: "#f0f0f0",
+  },
+  modalItemText: {
+    fontSize: 16,
+    color: "#333",
+  },
+  searchContainer: {
+    paddingHorizontal: 20,
+    paddingTop: 15,
+    paddingBottom: 10,
+  },
+  searchInput: {
+    height: 48,
+    borderColor: "#ddd",
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingHorizontal: 15,
+    fontSize: 16,
+    backgroundColor: "#fff",
+    color: "#333",
+  },
+  addNewItemButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 15,
+    backgroundColor: "#e3f2fd",
+    borderBottomWidth: 1,
+    borderBottomColor: "#007AFF",
+  },
+  addNewItemIcon: {
+    fontSize: 18,
+    marginRight: 10,
+  },
+  addNewItemText: {
+    fontSize: 16,
+    color: "#007AFF",
+    fontWeight: "600",
+    flex: 1,
+  },
+  noResults: {
+    padding: 20,
+    alignItems: "center",
+  },
+  noResultsText: {
+    fontSize: 14,
+    color: "#999",
+    fontStyle: "italic",
   },
 
-  dropdownContainer: {
-    borderColor: "#ccc",
-    borderWidth: 1,
-    borderRadius: 5,
+  // New styles for action buttons
+  actionButtonsContainer: {
+    flexDirection: "row",
+    gap: 8,
+    marginTop: 10,
   },
-  dropdown: {
+  loadMealButton: {
+    padding: 10,
     backgroundColor: "#fff",
+    borderRadius: 8,
+    alignItems: "center",
+    borderWidth: 2,
+    borderColor: "#007AFF",
   },
-  dropdownText: {
+  loadMealButtonText: {
+    color: "#007AFF",
+    fontSize: 13,
+    fontWeight: "600",
+  },
+
+  // Meal selector modal styles
+  loadingContainer: {
+    padding: 40,
+    alignItems: "center",
+  },
+  loadingText: {
     fontSize: 16,
+    color: "#666",
   },
-  dropdownList: {
-    borderColor: "#ccc",
+  emptyMealsContainer: {
+    padding: 40,
+    alignItems: "center",
+  },
+  emptyMealsIcon: {
+    fontSize: 48,
+    marginBottom: 16,
+  },
+  emptyMealsText: {
+    fontSize: 15,
+    color: "#666",
+    textAlign: "center",
+    lineHeight: 22,
+  },
+  mealItem: {
+    paddingVertical: 16,
+    paddingHorizontal: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: "#f0f0f0",
+    backgroundColor: "#fafafa",
+    marginBottom: 8,
+    borderRadius: 8,
+  },
+  mealItemHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 8,
+  },
+  mealItemName: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: "#333",
+    flex: 1,
+  },
+  mealItemBadge: {
+    backgroundColor: "#007AFF",
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  mealItemBadgeText: {
+    fontSize: 11,
+    fontWeight: "600",
+    color: "#fff",
+    textTransform: "capitalize",
+  },
+  mealItemFoods: {
+    fontSize: 13,
+    color: "#666",
+    lineHeight: 18,
+    marginBottom: 4,
+  },
+  mealItemCount: {
+    fontSize: 12,
+    color: "#999",
+    fontStyle: "italic",
   },
 });

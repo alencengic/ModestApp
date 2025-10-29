@@ -13,23 +13,24 @@ export const moodRatingStyles = StyleSheet.create({
   moodButtons: {
     flexDirection: "row",
     justifyContent: "center",
-    gap: 10,
+    gap: 8,
   },
   moodButton: {
-    width: 60,
-    height: 60,
+    width: 48,
+    height: 48,
     justifyContent: "center",
     alignItems: "center",
-    borderWidth: 1,
-    borderRadius: 30,
+    borderWidth: 2,
+    borderRadius: 24,
     borderColor: "#ccc",
     backgroundColor: "#e0e0e0",
   },
   selectedMood: {
     backgroundColor: "#ffd700",
+    borderColor: "#ffa500",
   },
   emoji: {
-    fontSize: 30,
+    fontSize: 24,
   },
   selectedText: {
     marginTop: 15,

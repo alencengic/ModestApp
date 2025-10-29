@@ -1,18 +1,30 @@
 import React from "react";
-import { Platform, Pressable, Text, View } from "react-native";
 import { Drawer } from "expo-router/drawer";
 import { IconSymbol } from "@/components/ui/IconSymbol";
-import { Colors } from "@/constants/Colors";
-import { useColorScheme } from "@/hooks/useColorScheme";
+import { useTheme } from "@/context/ThemeContext";
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
+  const { theme } = useTheme();
 
   return (
     <Drawer
       screenOptions={{
-        drawerActiveTintColor: Colors[colorScheme ?? "light"].tint,
+        drawerActiveTintColor: theme.colors.primary,
+        drawerInactiveTintColor: theme.colors.textSecondary,
+        drawerStyle: {
+          backgroundColor: theme.colors.background,
+        },
+        drawerLabelStyle: {
+          color: theme.colors.textPrimary,
+        },
         headerShown: true,
+        headerStyle: {
+          backgroundColor: theme.colors.surface,
+        },
+        headerTintColor: theme.colors.primary,
+        headerTitleStyle: {
+          color: theme.colors.textPrimary,
+        },
       }}
     >
       <Drawer.Screen
@@ -21,15 +33,6 @@ export default function TabLayout() {
           title: "Home",
           drawerIcon: ({ color }) => (
             <IconSymbol size={24} name="house.fill" color={color} />
-          ),
-        }}
-      />
-      <Drawer.Screen
-        name="daily/daily"
-        options={{
-          title: "Daily Entry",
-          drawerIcon: ({ color }) => (
-            <IconSymbol size={24} name="slider.horizontal.3" color={color} />
           ),
         }}
       />
@@ -61,10 +64,88 @@ export default function TabLayout() {
         }}
       />
       <Drawer.Screen
-        name="daily/(partials)"
+        name="trends/food-analytics"
+        options={{
+          title: "Food Analytics",
+          drawerIcon: ({ color }) => (
+            <IconSymbol size={24} name="fork.knife" color={color} />
+          ),
+        }}
+      />
+      <Drawer.Screen
+        name="meals/meals"
+        options={{
+          title: "My Meals",
+          drawerIcon: ({ color }) => (
+            <IconSymbol size={24} name="list.bullet.clipboard" color={color} />
+          ),
+        }}
+      />
+      <Drawer.Screen
+        name="weather/weather-mood"
+        options={{
+          title: "Weather & Mood",
+          drawerIcon: ({ color }) => (
+            <IconSymbol size={24} name="cloud.sun.fill" color={color} />
+          ),
+        }}
+      />
+      <Drawer.Screen
+        name="daily/daily"
+        options={{
+          drawerItemStyle: { display: "none" },
+          headerShown: true,
+          title: "Daily Entry",
+        }}
+      />
+      <Drawer.Screen
+        name="weather"
         options={{
           drawerItemStyle: { display: "none" },
           headerShown: false,
+        }}
+      />
+      <Drawer.Screen
+        name="symptoms/post-meal"
+        options={{
+          drawerItemStyle: { display: "none" },
+          headerShown: true,
+          title: "Symptoms",
+        }}
+      />
+      <Drawer.Screen
+        name="settings/user-profile"
+        options={{
+          title: "User Profile",
+          drawerIcon: ({ color }) => (
+            <IconSymbol size={24} name="person.fill" color={color} />
+          ),
+          headerShown: true,
+        }}
+      />
+      <Drawer.Screen
+        name="settings/settings"
+        options={{
+          title: "Settings",
+          drawerIcon: ({ color }) => (
+            <IconSymbol size={24} name="gearshape.fill" color={color} />
+          ),
+        }}
+      />
+      <Drawer.Screen
+        name="mood/lifestyle-analysis"
+        options={{
+          drawerItemStyle: { display: "none" },
+          headerShown: true,
+          title: "Lifestyle Factors",
+        }}
+      />
+      <Drawer.Screen
+        name="mood/food-impact-analysis"
+        options={{
+          drawerItemStyle: { display: "none" },
+          headerShown: true,
+          title: "Food Impact Analysis",
         }}
       />
     </Drawer>
