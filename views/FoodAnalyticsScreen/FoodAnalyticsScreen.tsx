@@ -184,6 +184,51 @@ export default function FoodAnalyticsScreen() {
     return NEUTRAL_COLOR;
   };
 
+  // Convert score to user-friendly description
+  const getScoreDescription = (score: number): string => {
+    const isNegative = isNegativeSymptom(selectedSymptom);
+    const absScore = Math.abs(score);
+
+    if (absScore <= 0.2) {
+      return "No clear impact";
+    }
+
+    if (isNegative) {
+      // For negative symptoms (bloating, pain, etc.)
+      if (score < -0.6) return "Helps significantly";
+      if (score < -0.4) return "Helps moderately";
+      if (score < -0.2) return "Helps slightly";
+      if (score > 0.6) return "Strong trigger";
+      if (score > 0.4) return "Moderate trigger";
+      return "Mild trigger";
+    } else {
+      // For positive symptoms (energy)
+      if (score > 0.6) return "Major boost";
+      if (score > 0.4) return "Good boost";
+      if (score > 0.2) return "Slight boost";
+      if (score < -0.6) return "Strongly draining";
+      if (score < -0.4) return "Moderately draining";
+      return "Slightly draining";
+    }
+  };
+
+  // Get impact level (0-5)
+  const getImpactLevel = (score: number): number => {
+    const absScore = Math.abs(score);
+    if (absScore < 0.2) return 0;
+    if (absScore < 0.3) return 1;
+    if (absScore < 0.5) return 2;
+    if (absScore < 0.7) return 3;
+    if (absScore < 0.9) return 4;
+    return 5;
+  };
+
+  // Get impact stars
+  const getImpactStars = (score: number): string => {
+    const level = getImpactLevel(score);
+    return "●".repeat(level) + "○".repeat(5 - level);
+  };
+
   const styles = StyleSheet.create({
     container: {
       paddingBottom: theme.spacing.xl,
@@ -586,6 +631,25 @@ export default function FoodAnalyticsScreen() {
       fontWeight: "600",
       color: theme.colors.textOnPrimary,
     },
+
+    // Impact description styles
+    impactDescriptionContainer: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      marginVertical: theme.spacing.sm,
+      paddingHorizontal: theme.spacing.xs,
+    },
+    impactDescription: {
+      fontSize: 15,
+      fontWeight: "600",
+      flex: 1,
+    },
+    impactStars: {
+      fontSize: 14,
+      letterSpacing: 2,
+      color: theme.colors.textSecondary,
+    },
   });
 
   const EmptyListComponent = () => (
@@ -778,14 +842,15 @@ export default function FoodAnalyticsScreen() {
                         <Icon source="food-croissant" size={20} color="#666" />
                         <Text style={styles.foodItemTitle}>{item.foodName}</Text>
                       </View>
-                      <Text style={[
-                        styles.scoreChip,
-                        {
-                          backgroundColor: `${scoreColor}20`,
-                          color: scoreColor
-                        }
-                      ]}>
-                        {item.averageSymptomScore > 0 ? '+' : ''}{item.averageSymptomScore.toFixed(2)}
+                    </View>
+
+                    {/* Impact Description */}
+                    <View style={styles.impactDescriptionContainer}>
+                      <Text style={[styles.impactDescription, { color: scoreColor }]}>
+                        {getScoreDescription(item.averageSymptomScore)}
+                      </Text>
+                      <Text style={styles.impactStars}>
+                        {getImpactStars(item.averageSymptomScore)}
                       </Text>
                     </View>
 
@@ -802,22 +867,6 @@ export default function FoodAnalyticsScreen() {
                           ]}
                         />
                       </View>
-                      <Text style={styles.progressBarLabel}>
-                        {(() => {
-                          const isNegative = isNegativeSymptom(selectedSymptom);
-                          const score = item.averageSymptomScore;
-
-                          if (Math.abs(score) <= 0.2) return "Neutral";
-
-                          if (isNegative) {
-                            // For negative symptoms: low score is helpful, high score triggers
-                            return score < -0.2 ? "Helpful" : "May Trigger";
-                          } else {
-                            // For positive symptoms: high score is helpful, low score triggers
-                            return score > 0.2 ? "Helpful" : "May Trigger";
-                          }
-                        })()}
-                      </Text>
                     </View>
 
                     <View style={styles.foodItemDetails}>

@@ -123,17 +123,49 @@ const FoodImpactAnalysisScreen: React.FC = () => {
     );
   }, [allFoodNamesForPicker, searchQuery]);
 
+  // Convert score to user-friendly description
+  const getScoreDescription = (score: number): string => {
+    const absScore = Math.abs(score);
+
+    if (absScore <= 0.2) {
+      return "No clear impact";
+    }
+
+    // For both mood and productivity, higher is better
+    if (score > 0.6) return "Strong positive effect";
+    if (score > 0.4) return "Moderate positive effect";
+    if (score > 0.2) return "Slight positive effect";
+    if (score < -0.6) return "Strong negative effect";
+    if (score < -0.4) return "Moderate negative effect";
+    return "Slight negative effect";
+  };
+
+  // Get impact level (0-5)
+  const getImpactLevel = (score: number): number => {
+    const absScore = Math.abs(score);
+    if (absScore < 0.2) return 0;
+    if (absScore < 0.3) return 1;
+    if (absScore < 0.5) return 2;
+    if (absScore < 0.7) return 3;
+    if (absScore < 0.9) return 4;
+    return 5;
+  };
+
+  // Get impact stars
+  const getImpactStars = (score: number): string => {
+    const level = getImpactLevel(score);
+    return "●".repeat(level) + "○".repeat(5 - level);
+  };
+
   const FoodListItemDetail: React.FC<{
     item: FoodMoodCorrelation | FoodProductivityCorrelation;
     isLastItem?: boolean;
   }> = ({ item, isLastItem = false }) => {
     const score = getScore(item);
     const color = getColor(score);
-    const category = getCategory(score);
-    const label =
-      correlationType === "mood"
-        ? "Avg. Mood Score"
-        : "Avg. Productivity Score";
+    const description = getScoreDescription(score);
+    const stars = getImpactStars(score);
+    const percentage = Math.abs(score / 1) * 100;
 
     return (
       <View
@@ -143,32 +175,35 @@ const FoodImpactAnalysisScreen: React.FC = () => {
         ]}
       >
         <Text style={externalStyles.foodListItemName}>{item.foodName}</Text>
-        <View style={externalStyles.detailRow}>
-          <Text style={externalStyles.detailLabel}>{label}:</Text>
-          <Text
-            style={[externalStyles.detailValue, { color, fontWeight: "bold" }]}
-          >
-            {score.toFixed(2)}
+
+        {/* Impact Description */}
+        <View style={externalStyles.impactDescriptionContainer}>
+          <Text style={[externalStyles.impactDescription, { color }]}>
+            {description}
+          </Text>
+          <Text style={externalStyles.impactStars}>
+            {stars}
           </Text>
         </View>
-        <View style={externalStyles.detailRow}>
-          <Text style={externalStyles.detailLabel}>Category:</Text>
-          <Text style={[externalStyles.detailValue, { color }]}>
-            {category}
-          </Text>
+
+        {/* Progress Bar */}
+        <View style={externalStyles.progressBarContainer}>
+          <View style={externalStyles.progressBarTrack}>
+            <View
+              style={[
+                externalStyles.progressBarFill,
+                {
+                  width: `${Math.min(percentage * 100, 100)}%`,
+                  backgroundColor: color,
+                },
+              ]}
+            />
+          </View>
         </View>
+
         <View style={externalStyles.detailRow}>
-          <Text style={externalStyles.detailLabel}>Occurrences:</Text>
-          <Text style={externalStyles.detailValue}>{item.occurrences}</Text>
-        </View>
-        <View style={externalStyles.moodIndicatorRow}>
-          <Text style={externalStyles.detailLabel}>Association:</Text>
-          <View
-            style={[
-              externalStyles.moodIndicatorSwatch,
-              { backgroundColor: color },
-            ]}
-          />
+          <Text style={externalStyles.detailLabel}>📊 Logged:</Text>
+          <Text style={externalStyles.detailValue}>{item.occurrences} times</Text>
         </View>
       </View>
     );

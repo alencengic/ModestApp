@@ -355,4 +355,39 @@ export const createStyles = (theme: Theme) => StyleSheet.create({
     fontWeight: "600",
     color: theme.colors.textOnPrimary,
   },
+
+  // Impact description styles
+  impactDescriptionContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginVertical: theme.spacing.sm,
+    paddingHorizontal: theme.spacing.xs,
+  },
+  impactDescription: {
+    fontSize: 15,
+    fontWeight: "600",
+    flex: 1,
+  },
+  impactStars: {
+    fontSize: 14,
+    letterSpacing: 2,
+    color: theme.colors.textSecondary,
+  },
+
+  // Progress bar styles
+  progressBarContainer: {
+    marginVertical: theme.spacing.sm,
+  },
+  progressBarTrack: {
+    height: 6,
+    backgroundColor: theme.colors.border,
+    borderRadius: 3,
+    overflow: "hidden",
+    marginBottom: 6,
+  },
+  progressBarFill: {
+    height: 6,
+    borderRadius: 3,
+  },
 });
