@@ -36,11 +36,6 @@ export const fetchWeatherData = async (
     const { latitude, longitude } = location;
     const url = `${WEATHER_API_BASE_URL}/weather?lat=${latitude}&lon=${longitude}&appid=${WEATHER_API_KEY}&units=metric`;
 
-    console.log(
-      "Fetching weather from OpenWeatherMap:",
-      url.replace(WEATHER_API_KEY, "***")
-    );
-
     const response = await fetch(url);
 
     if (!response.ok) {
@@ -51,7 +46,6 @@ export const fetchWeatherData = async (
     }
 
     const data: WeatherApiResponse = await response.json();
-    console.log("Weather data received:", data);
     return data;
   } catch (error) {
     console.error("Error fetching weather data:", error);
