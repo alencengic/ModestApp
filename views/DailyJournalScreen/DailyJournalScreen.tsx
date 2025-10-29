@@ -228,6 +228,15 @@ const DailyJournalScreen: React.FC = () => {
       color: theme.colors.textPrimary,
       lineHeight: 20,
     },
+    datePickerContainer: {
+      alignItems: "center",
+      justifyContent: "center",
+      backgroundColor: theme.colors.surface,
+      marginHorizontal: theme.spacing.md,
+      marginBottom: theme.spacing.md,
+      borderRadius: theme.borderRadius.lg,
+      padding: theme.spacing.md,
+    },
   });
 
   const mutation = useMutation({
@@ -403,18 +412,23 @@ const DailyJournalScreen: React.FC = () => {
           </View>
 
           {showDatePicker && (
-            <DateTimePicker
-              value={readDate}
-              mode="date"
-              display="default"
-              onChange={(event, date) => {
-                setShowDatePicker(false);
-                if (date) {
-                  setReadDate(date);
-                  setRange("day");
-                }
-              }}
-            />
+            <View style={styles.datePickerContainer}>
+              <DateTimePicker
+                value={readDate}
+                mode="date"
+                display={Platform.OS === "ios" ? "spinner" : "default"}
+                onChange={(event, date) => {
+                  setShowDatePicker(Platform.OS === "ios");
+                  if (event.type === "set" && date) {
+                    setReadDate(date);
+                    setRange("day");
+                    setShowDatePicker(false);
+                  } else if (event.type === "dismissed") {
+                    setShowDatePicker(false);
+                  }
+                }}
+              />
+            </View>
           )}
 
           <Text style={styles.sectionTitle}>Saved Entries</Text>

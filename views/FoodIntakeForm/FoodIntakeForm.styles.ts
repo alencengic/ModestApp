@@ -159,8 +159,7 @@ export const foodIntakeFormStyles = StyleSheet.create({
     fontWeight: "bold",
   },
   addButton: {
-    marginTop: 10,
-    padding: 12,
+    padding: 10,
     backgroundColor: "#007AFF",
     borderRadius: 8,
     alignItems: "center",
@@ -170,7 +169,7 @@ export const foodIntakeFormStyles = StyleSheet.create({
   },
   addButtonText: {
     color: "#fff",
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: "600",
   },
   inputRow: {
@@ -272,6 +271,94 @@ export const foodIntakeFormStyles = StyleSheet.create({
   },
   noResultsText: {
     fontSize: 14,
+    color: "#999",
+    fontStyle: "italic",
+  },
+
+  // New styles for action buttons
+  actionButtonsContainer: {
+    flexDirection: "row",
+    gap: 8,
+    marginTop: 10,
+  },
+  loadMealButton: {
+    padding: 10,
+    backgroundColor: "#fff",
+    borderRadius: 8,
+    alignItems: "center",
+    borderWidth: 2,
+    borderColor: "#007AFF",
+  },
+  loadMealButtonText: {
+    color: "#007AFF",
+    fontSize: 13,
+    fontWeight: "600",
+  },
+
+  // Meal selector modal styles
+  loadingContainer: {
+    padding: 40,
+    alignItems: "center",
+  },
+  loadingText: {
+    fontSize: 16,
+    color: "#666",
+  },
+  emptyMealsContainer: {
+    padding: 40,
+    alignItems: "center",
+  },
+  emptyMealsIcon: {
+    fontSize: 48,
+    marginBottom: 16,
+  },
+  emptyMealsText: {
+    fontSize: 15,
+    color: "#666",
+    textAlign: "center",
+    lineHeight: 22,
+  },
+  mealItem: {
+    paddingVertical: 16,
+    paddingHorizontal: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: "#f0f0f0",
+    backgroundColor: "#fafafa",
+    marginBottom: 8,
+    borderRadius: 8,
+  },
+  mealItemHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 8,
+  },
+  mealItemName: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: "#333",
+    flex: 1,
+  },
+  mealItemBadge: {
+    backgroundColor: "#007AFF",
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  mealItemBadgeText: {
+    fontSize: 11,
+    fontWeight: "600",
+    color: "#fff",
+    textTransform: "capitalize",
+  },
+  mealItemFoods: {
+    fontSize: 13,
+    color: "#666",
+    lineHeight: 18,
+    marginBottom: 4,
+  },
+  mealItemCount: {
+    fontSize: 12,
     color: "#999",
     fontStyle: "italic",
   },

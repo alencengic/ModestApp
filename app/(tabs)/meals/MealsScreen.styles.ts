@@ -1,0 +1,371 @@
+import { StyleSheet } from "react-native";
+import { Theme } from "@/constants/ColorPalettes";
+
+export const createStyles = (theme: Theme) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.colors.background,
+    },
+    centered: {
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "center",
+      padding: 20,
+    },
+    loadingText: {
+      marginTop: 16,
+      color: theme.colors.textSecondary,
+      fontSize: 16,
+    },
+    header: {
+      padding: theme.spacing.lg,
+      paddingTop: theme.spacing.md,
+    },
+    headerTitle: {
+      fontSize: 28,
+      fontWeight: "700",
+      color: theme.colors.textPrimary,
+      marginBottom: theme.spacing.xs,
+    },
+    headerSubtitle: {
+      fontSize: 14,
+      color: theme.colors.textSecondary,
+      lineHeight: 20,
+    },
+    filterCard: {
+      margin: theme.spacing.md,
+      marginTop: 0,
+      padding: theme.spacing.lg,
+      backgroundColor: theme.colors.surface,
+      borderRadius: theme.borderRadius.xl,
+    },
+    filterTitle: {
+      fontSize: 16,
+      fontWeight: "600",
+      color: theme.colors.textPrimary,
+      marginBottom: theme.spacing.md,
+    },
+    filterButtons: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      gap: 8,
+    },
+    filterButton: {
+      paddingVertical: 10,
+      paddingHorizontal: 16,
+      borderRadius: theme.borderRadius.round,
+      backgroundColor: theme.colors.background,
+      borderWidth: 2,
+      borderColor: theme.colors.border,
+    },
+    filterButtonActive: {
+      backgroundColor: theme.colors.primary,
+      borderColor: theme.colors.primary,
+    },
+    filterButtonText: {
+      fontSize: 14,
+      fontWeight: "600",
+      color: theme.colors.textSecondary,
+    },
+    filterButtonTextActive: {
+      color: theme.colors.textOnPrimary,
+    },
+    createButtonContainer: {
+      paddingHorizontal: theme.spacing.md,
+      paddingVertical: theme.spacing.sm,
+    },
+    createButton: {
+      backgroundColor: theme.colors.primary,
+      padding: theme.spacing.md,
+      borderRadius: theme.borderRadius.lg,
+      alignItems: "center",
+    },
+    createButtonText: {
+      color: theme.colors.textOnPrimary,
+      fontSize: 16,
+      fontWeight: "700",
+    },
+    mealsContainer: {
+      padding: theme.spacing.md,
+      paddingTop: theme.spacing.sm,
+    },
+    mealCard: {
+      backgroundColor: theme.colors.surface,
+      borderRadius: theme.borderRadius.lg,
+      padding: theme.spacing.lg,
+      marginBottom: theme.spacing.md,
+    },
+    mealCardHeader: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "flex-start",
+      marginBottom: theme.spacing.md,
+    },
+    mealTitleRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      flex: 1,
+      marginRight: theme.spacing.sm,
+    },
+    mealEmoji: {
+      fontSize: 24,
+      marginRight: theme.spacing.sm,
+    },
+    mealName: {
+      fontSize: 18,
+      fontWeight: "700",
+      color: theme.colors.textPrimary,
+      flex: 1,
+    },
+    mealTypeBadge: {
+      backgroundColor: theme.colors.primary + "20",
+      paddingHorizontal: 12,
+      paddingVertical: 4,
+      borderRadius: theme.borderRadius.round,
+    },
+    mealTypeBadgeText: {
+      fontSize: 12,
+      fontWeight: "600",
+      color: theme.colors.primary,
+    },
+    foodItemsContainer: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      gap: 8,
+      marginBottom: theme.spacing.md,
+    },
+    foodChip: {
+      backgroundColor: theme.colors.background,
+      paddingVertical: 6,
+      paddingHorizontal: 12,
+      borderRadius: theme.borderRadius.md,
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+    },
+    foodChipText: {
+      fontSize: 13,
+      color: theme.colors.textPrimary,
+      fontWeight: "500",
+    },
+    mealCardActions: {
+      flexDirection: "row",
+      gap: 8,
+      marginTop: theme.spacing.sm,
+    },
+    actionButton: {
+      flex: 1,
+      paddingVertical: 10,
+      paddingHorizontal: 16,
+      borderRadius: theme.borderRadius.md,
+      backgroundColor: theme.colors.primary,
+      alignItems: "center",
+    },
+    actionButtonDanger: {
+      backgroundColor: theme.colors.background,
+      borderWidth: 1,
+      borderColor: theme.colors.error,
+    },
+    actionButtonText: {
+      fontSize: 14,
+      fontWeight: "600",
+      color: theme.colors.textOnPrimary,
+    },
+    actionButtonTextDanger: {
+      color: theme.colors.error,
+    },
+    emptyStateContainer: {
+      padding: 40,
+      alignItems: "center",
+      marginTop: 40,
+    },
+    emptyStateIcon: {
+      fontSize: 64,
+      marginBottom: 20,
+    },
+    emptyStateText: {
+      fontSize: 16,
+      color: theme.colors.textSecondary,
+      textAlign: "center",
+      lineHeight: 24,
+    },
+
+    // Modal styles
+    modalOverlay: {
+      flex: 1,
+      backgroundColor: "rgba(0, 0, 0, 0.5)",
+      justifyContent: "flex-end",
+    },
+    modalContent: {
+      backgroundColor: theme.colors.surface,
+      borderTopLeftRadius: 20,
+      borderTopRightRadius: 20,
+      padding: theme.spacing.xl,
+      maxHeight: "90%",
+    },
+    modalTitle: {
+      fontSize: 24,
+      fontWeight: "700",
+      color: theme.colors.textPrimary,
+      marginBottom: theme.spacing.lg,
+      textAlign: "center",
+    },
+    inputLabel: {
+      fontSize: 14,
+      fontWeight: "600",
+      color: theme.colors.textPrimary,
+      marginBottom: theme.spacing.sm,
+      marginTop: theme.spacing.md,
+    },
+    textInput: {
+      backgroundColor: theme.colors.background,
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+      borderRadius: theme.borderRadius.md,
+      padding: theme.spacing.md,
+      fontSize: 16,
+      color: theme.colors.textPrimary,
+    },
+    typeSelector: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      gap: 8,
+    },
+    typeButton: {
+      paddingVertical: 8,
+      paddingHorizontal: 14,
+      borderRadius: theme.borderRadius.round,
+      backgroundColor: theme.colors.background,
+      borderWidth: 2,
+      borderColor: theme.colors.border,
+    },
+    typeButtonActive: {
+      backgroundColor: theme.colors.primary,
+      borderColor: theme.colors.primary,
+    },
+    typeButtonText: {
+      fontSize: 13,
+      fontWeight: "600",
+      color: theme.colors.textSecondary,
+    },
+    typeButtonTextActive: {
+      color: theme.colors.textOnPrimary,
+    },
+    selectedFoodsContainer: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      gap: 8,
+      marginBottom: theme.spacing.sm,
+    },
+    selectedFoodChip: {
+      flexDirection: "row",
+      alignItems: "center",
+      backgroundColor: theme.colors.primary,
+      paddingVertical: 6,
+      paddingLeft: 12,
+      paddingRight: 8,
+      borderRadius: theme.borderRadius.round,
+      gap: 6,
+    },
+    selectedFoodText: {
+      fontSize: 13,
+      color: theme.colors.textOnPrimary,
+      fontWeight: "600",
+    },
+    removeFoodButton: {
+      fontSize: 20,
+      color: theme.colors.textOnPrimary,
+      fontWeight: "700",
+      lineHeight: 20,
+    },
+    addFoodButton: {
+      backgroundColor: theme.colors.background,
+      borderWidth: 2,
+      borderColor: theme.colors.primary,
+      borderStyle: "dashed",
+      padding: theme.spacing.md,
+      borderRadius: theme.borderRadius.md,
+      alignItems: "center",
+      marginTop: theme.spacing.sm,
+    },
+    addFoodButtonText: {
+      color: theme.colors.primary,
+      fontSize: 14,
+      fontWeight: "600",
+    },
+    foodPickerContainer: {
+      marginTop: theme.spacing.md,
+      backgroundColor: theme.colors.background,
+      borderRadius: theme.borderRadius.md,
+      padding: theme.spacing.md,
+      maxHeight: 300,
+    },
+    searchInput: {
+      backgroundColor: theme.colors.surface,
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+      borderRadius: theme.borderRadius.md,
+      padding: theme.spacing.sm,
+      fontSize: 14,
+      color: theme.colors.textPrimary,
+      marginBottom: theme.spacing.sm,
+    },
+    foodList: {
+      maxHeight: 240,
+    },
+    foodOption: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      padding: theme.spacing.md,
+      borderBottomWidth: 1,
+      borderBottomColor: theme.colors.border,
+    },
+    foodOptionSelected: {
+      backgroundColor: theme.colors.primary + "10",
+    },
+    foodOptionText: {
+      fontSize: 14,
+      color: theme.colors.textPrimary,
+      flex: 1,
+    },
+    foodOptionTextSelected: {
+      fontWeight: "600",
+      color: theme.colors.primary,
+    },
+    checkmark: {
+      fontSize: 18,
+      color: theme.colors.primary,
+      fontWeight: "700",
+    },
+    modalActions: {
+      flexDirection: "row",
+      gap: 12,
+      marginTop: theme.spacing.xl,
+      paddingTop: theme.spacing.md,
+    },
+    modalButton: {
+      flex: 1,
+      paddingVertical: 14,
+      borderRadius: theme.borderRadius.lg,
+      alignItems: "center",
+    },
+    modalButtonSecondary: {
+      backgroundColor: theme.colors.background,
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+    },
+    modalButtonPrimary: {
+      backgroundColor: theme.colors.primary,
+    },
+    modalButtonTextSecondary: {
+      fontSize: 16,
+      fontWeight: "600",
+      color: theme.colors.textSecondary,
+    },
+    modalButtonTextPrimary: {
+      fontSize: 16,
+      fontWeight: "600",
+      color: theme.colors.textOnPrimary,
+    },
+  });

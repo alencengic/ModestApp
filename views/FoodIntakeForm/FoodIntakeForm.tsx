@@ -14,6 +14,8 @@ import {
 import { getDistinctMeals } from "@/storage/database";
 import { foodIntakeFormStyles } from "./FoodIntakeForm.styles";
 import { COMMON_FOODS } from "@/constants/FoodDatabase";
+import { useGetAllMeals } from "@/hooks/queries/useMeals";
+import { getMealFoodsArray, type Meal, type MealType as StorageMealType } from "@/storage/meals";
 
 type MealType = "breakfast" | "lunch" | "dinner" | "snacks";
 
@@ -93,6 +95,9 @@ const FoodIntakeFormComponent = forwardRef<FoodIntakeFormRef, FoodIntakeFormProp
   const [activeModalMeal, setActiveModalMeal] = useState<MealType | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
 
+  const [mealSelectorVisible, setMealSelectorVisible] = useState(false);
+  const [activeMealType, setActiveMealType] = useState<MealType | null>(null);
+
   const [userFoods, setUserFoods] = useState<string[]>([]);
 
   const [viewPositions, setViewPositions] = useState<Record<MealType, number>>({
@@ -164,6 +169,28 @@ const FoodIntakeFormComponent = forwardRef<FoodIntakeFormRef, FoodIntakeFormProp
     setModalVisible(false);
     setActiveModalMeal(null);
     setSearchQuery("");
+  };
+
+  const openMealSelector = (type: MealType) => {
+    setActiveMealType(type);
+    setMealSelectorVisible(true);
+  };
+
+  const closeMealSelector = () => {
+    setMealSelectorVisible(false);
+    setActiveMealType(null);
+  };
+
+  const handleLoadMeal = (meal: Meal) => {
+    if (!activeMealType) return;
+
+    const foods = getMealFoodsArray(meal);
+    setMealItems((prev) => ({
+      ...prev,
+      [activeMealType]: [...prev[activeMealType], ...foods.filter(food => !prev[activeMealType].includes(food))],
+    }));
+
+    closeMealSelector();
   };
 
   const handleAddItem = (type: MealType, item: string) => {
@@ -280,15 +307,25 @@ const FoodIntakeFormComponent = forwardRef<FoodIntakeFormRef, FoodIntakeFormProp
             </View>
           )}
 
-          {/* Picker button to open modal */}
-          <TouchableOpacity
-            style={foodIntakeFormStyles.addButton}
-            onPress={() => openModalPicker(type)}
-          >
-            <Text style={foodIntakeFormStyles.addButtonText}>
-              + Add Items
-            </Text>
-          </TouchableOpacity>
+          {/* Action buttons */}
+          <View style={foodIntakeFormStyles.actionButtonsContainer}>
+            <TouchableOpacity
+              style={[foodIntakeFormStyles.addButton, { flex: 1 }]}
+              onPress={() => openModalPicker(type)}
+            >
+              <Text style={foodIntakeFormStyles.addButtonText}>
+                + Add Items
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[foodIntakeFormStyles.loadMealButton, { flex: 1 }]}
+              onPress={() => openMealSelector(type)}
+            >
+              <Text style={foodIntakeFormStyles.loadMealButtonText}>
+                Load Meal
+              </Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
     );
@@ -423,9 +460,107 @@ const FoodIntakeFormComponent = forwardRef<FoodIntakeFormRef, FoodIntakeFormProp
           </Pressable>
         </KeyboardAvoidingView>
       </Modal>
+
+      {/* Meal Selector Modal */}
+      <MealSelectorModal
+        visible={mealSelectorVisible}
+        mealType={activeMealType as StorageMealType}
+        onClose={closeMealSelector}
+        onSelectMeal={handleLoadMeal}
+      />
     </View>
   );
 });
+
+// Meal Selector Modal Component
+interface MealSelectorModalProps {
+  visible: boolean;
+  mealType: StorageMealType;
+  onClose: () => void;
+  onSelectMeal: (meal: Meal) => void;
+}
+
+const MealSelectorModal: React.FC<MealSelectorModalProps> = ({
+  visible,
+  mealType,
+  onClose,
+  onSelectMeal,
+}) => {
+  const { data: allMeals = [], isLoading } = useGetAllMeals();
+
+  // Filter meals: show meals of the specific type OR meals with no type (Any)
+  const filteredMeals = allMeals.filter(
+    (meal) => meal.meal_type === mealType || meal.meal_type === null
+  );
+
+  return (
+    <Modal visible={visible} animationType="slide" transparent onRequestClose={onClose}>
+      <Pressable style={foodIntakeFormStyles.modalOverlay} onPress={onClose}>
+        <Pressable
+          style={foodIntakeFormStyles.modalContainer}
+          onPress={(e) => e.stopPropagation()}
+        >
+          <View style={foodIntakeFormStyles.modalHeader}>
+            <Text style={foodIntakeFormStyles.modalTitle}>Load Saved Meal</Text>
+            <TouchableOpacity
+              style={foodIntakeFormStyles.modalCloseButton}
+              onPress={onClose}
+            >
+              <Text style={foodIntakeFormStyles.modalCloseText}>✕</Text>
+            </TouchableOpacity>
+          </View>
+
+          {isLoading ? (
+            <View style={foodIntakeFormStyles.loadingContainer}>
+              <Text style={foodIntakeFormStyles.loadingText}>Loading meals...</Text>
+            </View>
+          ) : filteredMeals.length === 0 ? (
+            <View style={foodIntakeFormStyles.emptyMealsContainer}>
+              <Text style={foodIntakeFormStyles.emptyMealsIcon}>🍽️</Text>
+              <Text style={foodIntakeFormStyles.emptyMealsText}>
+                No saved meals yet.{"\n\n"}
+                Create reusable meal templates in the "My Meals" screen from the menu to quickly log your favorite meals!
+              </Text>
+            </View>
+          ) : (
+            <ScrollView
+              style={foodIntakeFormStyles.modalScrollView}
+              keyboardShouldPersistTaps="handled"
+            >
+              {filteredMeals.map((meal) => {
+                const foods = getMealFoodsArray(meal);
+                return (
+                  <TouchableOpacity
+                    key={meal.id}
+                    style={foodIntakeFormStyles.mealItem}
+                    onPress={() => onSelectMeal(meal)}
+                  >
+                    <View style={foodIntakeFormStyles.mealItemHeader}>
+                      <Text style={foodIntakeFormStyles.mealItemName}>{meal.name}</Text>
+                      {meal.meal_type && (
+                        <View style={foodIntakeFormStyles.mealItemBadge}>
+                          <Text style={foodIntakeFormStyles.mealItemBadgeText}>
+                            {meal.meal_type}
+                          </Text>
+                        </View>
+                      )}
+                    </View>
+                    <Text style={foodIntakeFormStyles.mealItemFoods}>
+                      {foods.join(", ")}
+                    </Text>
+                    <Text style={foodIntakeFormStyles.mealItemCount}>
+                      {foods.length} item{foods.length !== 1 ? "s" : ""}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </ScrollView>
+          )}
+        </Pressable>
+      </Pressable>
+    </Modal>
+  );
+};
 
 FoodIntakeFormComponent.displayName = 'FoodIntakeForm';
 

@@ -59,6 +59,15 @@ export const openDatabase = async () => {
       weather_id INTEGER,
       FOREIGN KEY (weather_id) REFERENCES weather_data(id)
     );
+
+    CREATE TABLE IF NOT EXISTS meals (
+      id TEXT PRIMARY KEY NOT NULL,
+      name TEXT NOT NULL,
+      meal_type TEXT,
+      foods TEXT NOT NULL,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    );
   `);
 
   // Migration: Add missing columns to weather_data if they don't exist

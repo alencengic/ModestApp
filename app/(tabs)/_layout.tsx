@@ -73,6 +73,15 @@ export default function TabLayout() {
         }}
       />
       <Drawer.Screen
+        name="meals/meals"
+        options={{
+          title: "My Meals",
+          drawerIcon: ({ color }) => (
+            <IconSymbol size={24} name="list.bullet.clipboard" color={color} />
+          ),
+        }}
+      />
+      <Drawer.Screen
         name="weather/weather-mood"
         options={{
           title: "Weather & Mood",
