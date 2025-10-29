@@ -132,6 +132,22 @@ export default function TabLayout() {
           headerShown: true,
         }}
       />
+      <Drawer.Screen
+        name="mood/lifestyle-analysis"
+        options={{
+          drawerItemStyle: { display: "none" },
+          headerShown: true,
+          title: "Lifestyle Factors",
+        }}
+      />
+      <Drawer.Screen
+        name="mood/food-impact-analysis"
+        options={{
+          drawerItemStyle: { display: "none" },
+          headerShown: true,
+          title: "Food Impact Analysis",
+        }}
+      />
     </Drawer>
   );
 }

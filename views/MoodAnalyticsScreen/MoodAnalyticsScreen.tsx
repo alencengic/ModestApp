@@ -1,614 +1,92 @@
-import React, { useMemo, useState, useEffect } from "react";
+import React from "react";
 import {
   SafeAreaView,
   ScrollView,
   View,
-  ActivityIndicator,
   Text,
   TouchableOpacity,
-  Modal,
-  TextInput,
-  FlatList,
-  Pressable,
-  KeyboardAvoidingView,
-  Platform,
-  Keyboard,
 } from "react-native";
-import DateTimePicker from "@react-native-community/datetimepicker";
-import { useQuery } from "@tanstack/react-query";
-import {
-  getFoodMoodCorrelationData,
-  getFoodProductivityCorrelationData,
-  FoodMoodCorrelation,
-  FoodProductivityCorrelation,
-} from "@/storage/database";
+import { useRouter } from "expo-router";
 import { createStyles } from "./MoodAnalyticsScreen.styles";
 import { useTheme } from "@/context/ThemeContext";
-import { BannerAd, VideoAd } from "@/components/ads";
+import { BannerAd } from "@/components/ads";
 import { scaleFontSize } from "@/utils/responsive";
-
-type CorrelationType = "mood" | "productivity";
 
 const MoodAnalyticsScreen: React.FC = () => {
   const { theme } = useTheme();
-  const externalStyles = createStyles(theme);
-  const POSITIVE_COLOR = "#3CB371";
-  const NEUTRAL_COLOR = "#A9A9A9";
-  const NEGATIVE_COLOR = "#CD5C5C";
+  const router = useRouter();
+  const styles = createStyles(theme);
 
-  const [correlationType, setCorrelationType] =
-    useState<CorrelationType>("mood");
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [isInfoModalVisible, setIsInfoModalVisible] = useState(false);
-  const [selectedFoodName, setSelectedFoodName] = useState<string | null>(null);
-  const [dateRange, setDateRange] = useState<"all" | "week" | "month" | "custom">("all");
-  const [showDatePicker, setShowDatePicker] = useState(false);
-  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
-
-  const useQueryFoodCorrelation = () => {
-    return {
-      queryKey: ["foodCorrelation", correlationType],
-      queryFn: async () => {
-        return correlationType === "mood"
-          ? getFoodMoodCorrelationData()
-          : getFoodProductivityCorrelationData();
-      },
-    };
-  };
-
-  const correlationQueryOptions = useQueryFoodCorrelation();
-  const {
-    data: rawData = [],
-    isLoading,
-    isError,
-    error,
-    isFetching,
-  } = useQuery<(FoodMoodCorrelation | FoodProductivityCorrelation)[], Error>({
-    ...correlationQueryOptions,
-    placeholderData: (previousData) => previousData,
-  });
-
-  const getScore = (
-    item: FoodMoodCorrelation | FoodProductivityCorrelation
-  ) => {
-    return "averageMoodScore" in item
-      ? item.averageMoodScore
-      : item.averageProductivityScore;
-  };
-
-  const getCategory = (score: number): string => {
-    if (score > 0.2) return "Positive";
-    if (score < -0.2) return "Negative";
-    return "Neutral";
-  };
-
-  const getColor = (score: number): string => {
-    if (score > 0.2) return POSITIVE_COLOR;
-    if (score < -0.2) return NEGATIVE_COLOR;
-    return NEUTRAL_COLOR;
-  };
-
-  const topPositiveFoods = useMemo(() => {
-    return (rawData || [])
-      .filter((item) => getScore(item) > 0.2)
-      .sort((a, b) => getScore(b) - getScore(a))
-      .slice(0, 6);
-  }, [rawData]);
-
-  const topNegativeFoods = useMemo(() => {
-    return (rawData || [])
-      .filter((item) => getScore(item) < -0.2)
-      .sort((a, b) => getScore(a) - getScore(b))
-      .slice(0, 6);
-  }, [rawData]);
-
-  const allFoodNamesForPicker: string[] = useMemo(() => {
-    const foodNames = new Set((rawData || []).map((item) => item.foodName));
-    return Array.from(foodNames).sort();
-  }, [rawData]);
-
-  // Reset selected food when correlation type changes
-  useEffect(() => {
-    setSelectedFoodName(null);
-  }, [correlationType]);
-
-  const selectedFoodRawDetails = useMemo(() => {
-    if (!selectedFoodName) return undefined;
-    return (rawData || []).find((item) => item.foodName === selectedFoodName);
-  }, [rawData, selectedFoodName]);
-
-  const filteredFoods = useMemo(() => {
-    if (!searchQuery.trim()) return allFoodNamesForPicker;
-    return allFoodNamesForPicker.filter((food) =>
-      food.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-  }, [allFoodNamesForPicker, searchQuery]);
-
-  const FoodListItemDetail: React.FC<{
-    item: FoodMoodCorrelation | FoodProductivityCorrelation;
-    isLastItem?: boolean;
-  }> = ({ item, isLastItem = false }) => {
-    const score = getScore(item);
-    const color = getColor(score);
-    const category = getCategory(score);
-    const label =
-      correlationType === "mood"
-        ? "Avg. Mood Score"
-        : "Avg. Productivity Score";
-
-    return (
-      <View
-        style={[
-          externalStyles.foodListItem,
-          isLastItem && externalStyles.foodListItemLast,
-        ]}
-      >
-        <Text style={externalStyles.foodListItemName}>{item.foodName}</Text>
-        <View style={externalStyles.detailRow}>
-          <Text style={externalStyles.detailLabel}>{label}:</Text>
-          <Text
-            style={[externalStyles.detailValue, { color, fontWeight: "bold" }]}
-          >
-            {score.toFixed(2)}
-          </Text>
-        </View>
-        <View style={externalStyles.detailRow}>
-          <Text style={externalStyles.detailLabel}>Category:</Text>
-          <Text style={[externalStyles.detailValue, { color }]}>
-            {category}
-          </Text>
-        </View>
-        <View style={externalStyles.detailRow}>
-          <Text style={externalStyles.detailLabel}>Occurrences:</Text>
-          <Text style={externalStyles.detailValue}>{item.occurrences}</Text>
-        </View>
-        <View style={externalStyles.moodIndicatorRow}>
-          <Text style={externalStyles.detailLabel}>Association:</Text>
-          <View
-            style={[
-              externalStyles.moodIndicatorSwatch,
-              { backgroundColor: color },
-            ]}
-          />
-        </View>
-      </View>
-    );
-  };
-
-  // Only show loading screen if there's no data at all (initial load)
-  if (isLoading && rawData.length === 0) {
-    return (
-      <SafeAreaView style={externalStyles.container}>
-        <View style={externalStyles.centered}>
-          <ActivityIndicator size="large" color="#007AFF" />
-          <Text style={externalStyles.centeredText}>
-            Loading food correlation data...
-          </Text>
-        </View>
-      </SafeAreaView>
-    );
-  }
-
-  if (isError) {
-    return (
-      <SafeAreaView style={externalStyles.container}>
-        <View style={externalStyles.centered}>
-          <Text style={externalStyles.errorText}>
-            Error loading data. {error?.message}
-          </Text>
-        </View>
-      </SafeAreaView>
-    );
-  }
+  const analysisOptions = [
+    {
+      id: "lifestyle",
+      title: "Lifestyle Factors",
+      description: "Analyze how work schedule and exercise habits impact your well-being",
+      emoji: "📊",
+      route: "/(tabs)/mood/lifestyle-analysis" as any,
+      color: theme.colors.primary,
+    },
+    {
+      id: "food",
+      title: "Food Impact Analysis",
+      description: "Discover which foods affect your mood and productivity",
+      emoji: "🍎",
+      route: "/(tabs)/mood/food-impact-analysis" as any,
+      color: theme.colors.secondary,
+    },
+  ];
 
   return (
-    <SafeAreaView style={externalStyles.container}>
+    <SafeAreaView style={styles.container}>
       <ScrollView>
-        <View
-          style={{
-            padding: theme.spacing.xl,
-            alignItems: "center",
-            backgroundColor: theme.colors.background,
-          }}
-        >
-          <View style={externalStyles.headerTopRow}>
-            <View style={{ width: 40 }} />
-            <Text style={{ fontSize: scaleFontSize(48), marginBottom: theme.spacing.sm }}>
-              😊
-            </Text>
-            <TouchableOpacity
-              style={externalStyles.infoButton}
-              onPress={() => setIsInfoModalVisible(true)}
-            >
-              <Text style={externalStyles.infoButtonText}>ⓘ</Text>
-            </TouchableOpacity>
-          </View>
-          <Text
-            style={{
-              fontSize: scaleFontSize(24),
-              fontWeight: "600",
-              color: theme.colors.textPrimary,
-              marginBottom: theme.spacing.xs,
-            }}
-          >
-            Mood Analytics
+        <View style={styles.header}>
+          <Text style={styles.headerEmoji}>😊</Text>
+          <Text style={styles.headerTitle}>
+            Mood & Productivity Analytics
           </Text>
-          <Text
-            style={{ fontSize: scaleFontSize(14), color: theme.colors.textSecondary }}
-          >
-            Discover food-mood patterns
+          <Text style={styles.headerDescription}>
+            Understand how food and lifestyle choices affect your well-being
           </Text>
         </View>
 
         <BannerAd size="small" position="top" />
 
-        <View style={externalStyles.chartWrapper}>
-          <Text style={externalStyles.chartSectionTitle}>Time Period</Text>
-          <View style={externalStyles.buttonGroup}>
+        <View style={styles.optionsContainer}>
+          {analysisOptions.map((option) => (
             <TouchableOpacity
-              style={[
-                externalStyles.filterButton,
-                dateRange === "all" && externalStyles.filterButtonActive,
-              ]}
-              onPress={() => setDateRange("all")}
+              key={option.id}
+              style={[styles.optionCard, { borderLeftColor: option.color }]}
+              onPress={() => router.push(option.route)}
             >
-              <Text
-                style={[
-                  externalStyles.filterButtonText,
-                  dateRange === "all" && externalStyles.filterButtonTextActive,
-                ]}
-              >
-                All Time
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[
-                externalStyles.filterButton,
-                dateRange === "week" && externalStyles.filterButtonActive,
-              ]}
-              onPress={() => setDateRange("week")}
-            >
-              <Text
-                style={[
-                  externalStyles.filterButtonText,
-                  dateRange === "week" && externalStyles.filterButtonTextActive,
-                ]}
-              >
-                This Week
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[
-                externalStyles.filterButton,
-                dateRange === "month" && externalStyles.filterButtonActive,
-              ]}
-              onPress={() => setDateRange("month")}
-            >
-              <Text
-                style={[
-                  externalStyles.filterButtonText,
-                  dateRange === "month" && externalStyles.filterButtonTextActive,
-                ]}
-              >
-                This Month
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[
-                externalStyles.filterButton,
-                dateRange === "custom" && externalStyles.filterButtonActive,
-              ]}
-              onPress={() => setShowDatePicker(true)}
-            >
-              <Text
-                style={[
-                  externalStyles.filterButtonText,
-                  dateRange === "custom" && externalStyles.filterButtonTextActive,
-                ]}
-              >
-                Custom
-              </Text>
-            </TouchableOpacity>
-          </View>
-          {showDatePicker && (
-            <DateTimePicker
-              value={selectedDate}
-              mode="date"
-              display="default"
-              onChange={(event, date) => {
-                setShowDatePicker(false);
-                if (date) {
-                  setSelectedDate(date);
-                  setDateRange("custom");
-                }
-              }}
-            />
-          )}
-          {dateRange === "custom" && (
-            <View style={externalStyles.selectedDateDisplay}>
-              <Text style={externalStyles.selectedDateText}>
-                Selected: {selectedDate.toLocaleDateString('en-US', {
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric'
-                })}
-              </Text>
-            </View>
-          )}
-        </View>
-
-        <View style={externalStyles.chartWrapper}>
-          <Text style={externalStyles.chartSectionTitle}>Correlation Type</Text>
-          <View style={externalStyles.toggleContainer}>
-            <TouchableOpacity
-              style={[
-                externalStyles.toggleButton,
-                correlationType === "mood" && externalStyles.toggleButtonActive,
-              ]}
-              onPress={() => setCorrelationType("mood")}
-            >
-              <Text
-                style={[
-                  externalStyles.toggleButtonText,
-                  correlationType === "mood" &&
-                    externalStyles.toggleButtonTextActive,
-                ]}
-              >
-                Mood
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[
-                externalStyles.toggleButton,
-                correlationType === "productivity" &&
-                  externalStyles.toggleButtonActive,
-              ]}
-              onPress={() => setCorrelationType("productivity")}
-            >
-              <Text
-                style={[
-                  externalStyles.toggleButtonText,
-                  correlationType === "productivity" &&
-                    externalStyles.toggleButtonTextActive,
-                ]}
-              >
-                Productivity
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-
-        <View style={externalStyles.chartWrapper}>
-          <Text style={externalStyles.chartSectionTitle}>
-            Explore Specific Food
-          </Text>
-          <TouchableOpacity
-            style={externalStyles.foodSelectorButton}
-            onPress={() => setIsModalVisible(true)}
-          >
-            <Text style={externalStyles.foodSelectorButtonText}>
-              {selectedFoodName || "Select a food..."}
-            </Text>
-            <Text style={externalStyles.foodSelectorButtonIcon}>▼</Text>
-          </TouchableOpacity>
-
-          {selectedFoodName && (
-            <TouchableOpacity
-              style={externalStyles.clearButton}
-              onPress={() => setSelectedFoodName(null)}
-            >
-              <Text style={externalStyles.clearButtonText}>Clear Selection</Text>
-            </TouchableOpacity>
-          )}
-
-          {selectedFoodRawDetails && (
-            <FoodListItemDetail
-              item={selectedFoodRawDetails}
-              isLastItem={true}
-            />
-          )}
-          {selectedFoodName && !selectedFoodRawDetails && (
-            <Text style={{ padding: 10, color: "orange", textAlign: "center" }}>
-              No detailed correlation data found for {selectedFoodName}.
-            </Text>
-          )}
-        </View>
-
-        <Modal
-          visible={isModalVisible}
-          animationType="slide"
-          transparent={true}
-          onRequestClose={() => setIsModalVisible(false)}
-        >
-          <KeyboardAvoidingView
-            behavior={Platform.OS === "ios" ? "padding" : "height"}
-            style={{ flex: 1 }}
-          >
-            <View style={externalStyles.modalOverlay}>
-              <View style={externalStyles.modalContainer}>
-                <View style={externalStyles.modalHeader}>
-                  <Text style={externalStyles.modalTitle}>Select Food</Text>
-                  <Pressable
-                    style={externalStyles.modalCloseButton}
-                    onPress={() => {
-                      setIsModalVisible(false);
-                      setSearchQuery("");
-                    }}
-                  >
-                    <Text style={externalStyles.modalCloseButtonText}>✕</Text>
-                  </Pressable>
-                </View>
-
-                <TextInput
-                  style={externalStyles.searchInput}
-                  placeholder="Search foods..."
-                  value={searchQuery}
-                  onChangeText={setSearchQuery}
-                  autoFocus
-                  placeholderTextColor="#999"
-                />
-
-                <FlatList
-                  data={filteredFoods}
-                  keyExtractor={(item) => item}
-                  keyboardShouldPersistTaps="handled"
-                  renderItem={({ item }) => (
-                    <TouchableOpacity
-                      style={[
-                        externalStyles.foodItem,
-                        selectedFoodName === item &&
-                          externalStyles.foodItemSelected,
-                      ]}
-                      onPress={() => {
-                        Keyboard.dismiss();
-                        setSelectedFoodName(item);
-                        setIsModalVisible(false);
-                        setSearchQuery("");
-                      }}
-                    >
-                      <Text
-                        style={[
-                          externalStyles.foodItemText,
-                          selectedFoodName === item &&
-                            externalStyles.foodItemTextSelected,
-                        ]}
-                      >
-                        {item}
-                      </Text>
-                    </TouchableOpacity>
-                  )}
-                  ListEmptyComponent={
-                    <View style={externalStyles.centered}>
-                      <Text style={externalStyles.centeredText}>
-                        No foods found
-                      </Text>
-                    </View>
-                  }
-                />
+              <View style={styles.optionEmojiContainer}>
+                <Text style={styles.optionEmoji}>{option.emoji}</Text>
               </View>
-            </View>
-          </KeyboardAvoidingView>
-        </Modal>
-
-        <View style={externalStyles.chartWrapper}>
-          <Text style={externalStyles.chartSectionTitle}>
-            Top Positive Foods
-          </Text>
-          {topPositiveFoods.length > 0 ? (
-            topPositiveFoods.map((food, index) => (
-              <FoodListItemDetail
-                key={food.foodName + index + "positive"}
-                item={food}
-                isLastItem={index === topPositiveFoods.length - 1}
-              />
-            ))
-          ) : (
-            <View style={externalStyles.centered}>
-              <Text style={externalStyles.centeredText}>
-                Not enough data for positive foods.
-              </Text>
-            </View>
-          )}
+              <View style={styles.optionContent}>
+                <Text style={styles.optionTitle}>{option.title}</Text>
+                <Text style={styles.optionDescription}>{option.description}</Text>
+              </View>
+              <Text style={styles.optionChevron}>›</Text>
+            </TouchableOpacity>
+          ))}
         </View>
 
-        <View style={externalStyles.chartWrapper}>
-          <Text style={externalStyles.chartSectionTitle}>
-            Top Negative Foods
+        <View style={styles.infoCard}>
+          <Text style={styles.infoTitle}>About Analytics</Text>
+          <Text style={styles.infoText}>
+            These tools help you identify patterns in your mood and productivity by analyzing your daily entries.
           </Text>
-          {topNegativeFoods.length > 0 ? (
-            topNegativeFoods.map((food, index) => (
-              <FoodListItemDetail
-                key={food.foodName + index + "negative"}
-                item={food}
-                isLastItem={index === topNegativeFoods.length - 1}
-              />
-            ))
-          ) : (
-            <View style={externalStyles.centered}>
-              <Text style={externalStyles.centeredText}>
-                Not enough data for negative foods.
-              </Text>
-            </View>
-          )}
+          <View style={styles.infoBullets}>
+            <Text style={styles.infoBullet}>• Track lifestyle patterns and their effects</Text>
+            <Text style={styles.infoBullet}>• Identify foods that boost or lower your mood</Text>
+            <Text style={styles.infoBullet}>• Make informed decisions about your health</Text>
+          </View>
+          <Text style={styles.infoNote}>
+            The more entries you add, the more accurate your insights become.
+          </Text>
         </View>
 
         <BannerAd size="medium" position="bottom" />
       </ScrollView>
-
-      <Modal
-        visible={isInfoModalVisible}
-        animationType="fade"
-        transparent={true}
-        onRequestClose={() => setIsInfoModalVisible(false)}
-      >
-        <View style={externalStyles.infoModalOverlay}>
-          <View style={externalStyles.infoModalContainer}>
-            <View style={externalStyles.modalHeader}>
-              <Text style={externalStyles.modalTitle}>Score Explanation</Text>
-              <Pressable
-                style={externalStyles.modalCloseButton}
-                onPress={() => setIsInfoModalVisible(false)}
-              >
-                <Text style={externalStyles.modalCloseButtonText}>✕</Text>
-              </Pressable>
-            </View>
-
-            <ScrollView style={externalStyles.infoModalContent}>
-              <Text style={externalStyles.infoText}>
-                The scores represent the correlation between foods and your mood/productivity levels.
-              </Text>
-
-              <View style={externalStyles.colorExplanation}>
-                <View style={externalStyles.colorRow}>
-                  <View
-                    style={[
-                      externalStyles.colorDot,
-                      { backgroundColor: POSITIVE_COLOR },
-                    ]}
-                  />
-                  <Text style={externalStyles.colorLabel}>
-                    <Text style={{ fontWeight: "bold" }}>Positive ({">"} 0.2):</Text> Foods associated with better mood/productivity
-                  </Text>
-                </View>
-
-                <View style={externalStyles.colorRow}>
-                  <View
-                    style={[
-                      externalStyles.colorDot,
-                      { backgroundColor: NEUTRAL_COLOR },
-                    ]}
-                  />
-                  <Text style={externalStyles.colorLabel}>
-                    <Text style={{ fontWeight: "bold" }}>Neutral (-0.2 to 0.2):</Text> No significant correlation
-                  </Text>
-                </View>
-
-                <View style={externalStyles.colorRow}>
-                  <View
-                    style={[
-                      externalStyles.colorDot,
-                      { backgroundColor: NEGATIVE_COLOR },
-                    ]}
-                  />
-                  <Text style={externalStyles.colorLabel}>
-                    <Text style={{ fontWeight: "bold" }}>Negative ({"<"} -0.2):</Text> Foods associated with worse mood/productivity
-                  </Text>
-                </View>
-              </View>
-
-              <Text style={externalStyles.infoText}>
-                <Text style={{ fontWeight: "bold" }}>How it works:{"\n"}</Text>
-                The app analyzes your food entries and mood/productivity ratings to calculate average scores. Higher scores indicate a positive correlation, while lower scores suggest a negative impact.
-              </Text>
-
-              <Text style={externalStyles.infoNote}>
-                Note: These correlations are based on your personal data. More entries lead to more accurate insights.
-              </Text>
-            </ScrollView>
-          </View>
-        </View>
-      </Modal>
     </SafeAreaView>
   );
 };

@@ -1,5 +1,7 @@
 import { openDatabase } from "./db_connection";
 import { FoodIntake } from "./food_intakes";
+import { isWorkingDay, isSportDay } from "./userProfile";
+import { DateTime } from "luxon";
 
 export interface FoodMoodCorrelation {
   foodName: string;
@@ -275,4 +277,168 @@ export const getFoodProductivityCorrelationData = async (): Promise<
     averageProductivityScore: stats.sumProductivity / stats.occurrences,
     occurrences: stats.occurrences,
   }));
+};
+
+// Working Days vs Non-Working Days Analysis
+export interface WorkingDayAnalysis {
+  workingDays: {
+    averageMood: number;
+    averageProductivity: number;
+    count: number;
+  };
+  nonWorkingDays: {
+    averageMood: number;
+    averageProductivity: number;
+    count: number;
+  };
+}
+
+export const getWorkingDayAnalysis = async (): Promise<WorkingDayAnalysis> => {
+  const db = await openDatabase();
+
+  const moodRatings: MoodRating[] = await db.getAllAsync(
+    "SELECT * FROM mood_ratings ORDER BY date"
+  );
+  const productivityRatings: ProductivityRating[] = await db.getAllAsync(
+    "SELECT * FROM productivity_ratings ORDER BY date"
+  );
+
+  let workingDayMoodSum = 0;
+  let workingDayMoodCount = 0;
+  let nonWorkingDayMoodSum = 0;
+  let nonWorkingDayMoodCount = 0;
+
+  // Process mood ratings
+  for (const rating of moodRatings) {
+    const moodScore = MOOD_SCORE_MAP[rating.mood];
+    if (moodScore === undefined) continue;
+
+    const date = DateTime.fromISO(rating.date).toJSDate();
+    const isWorking = await isWorkingDay(date);
+
+    if (isWorking) {
+      workingDayMoodSum += moodScore;
+      workingDayMoodCount++;
+    } else {
+      nonWorkingDayMoodSum += moodScore;
+      nonWorkingDayMoodCount++;
+    }
+  }
+
+  let workingDayProdSum = 0;
+  let workingDayProdCount = 0;
+  let nonWorkingDayProdSum = 0;
+  let nonWorkingDayProdCount = 0;
+
+  // Process productivity ratings
+  for (const rating of productivityRatings) {
+    if (typeof rating.productivity !== "number") continue;
+
+    const date = DateTime.fromISO(rating.date).toJSDate();
+    const isWorking = await isWorkingDay(date);
+    const normalizedScore = rating.productivity - 3; // Normalize to -2 to +2
+
+    if (isWorking) {
+      workingDayProdSum += normalizedScore;
+      workingDayProdCount++;
+    } else {
+      nonWorkingDayProdSum += normalizedScore;
+      nonWorkingDayProdCount++;
+    }
+  }
+
+  return {
+    workingDays: {
+      averageMood: workingDayMoodCount > 0 ? workingDayMoodSum / workingDayMoodCount : 0,
+      averageProductivity: workingDayProdCount > 0 ? workingDayProdSum / workingDayProdCount : 0,
+      count: Math.max(workingDayMoodCount, workingDayProdCount),
+    },
+    nonWorkingDays: {
+      averageMood: nonWorkingDayMoodCount > 0 ? nonWorkingDayMoodSum / nonWorkingDayMoodCount : 0,
+      averageProductivity: nonWorkingDayProdCount > 0 ? nonWorkingDayProdSum / nonWorkingDayProdCount : 0,
+      count: Math.max(nonWorkingDayMoodCount, nonWorkingDayProdCount),
+    },
+  };
+};
+
+// Training Days vs Non-Training Days Analysis
+export interface TrainingDayAnalysis {
+  trainingDays: {
+    averageMood: number;
+    averageProductivity: number;
+    count: number;
+  };
+  nonTrainingDays: {
+    averageMood: number;
+    averageProductivity: number;
+    count: number;
+  };
+}
+
+export const getTrainingDayAnalysis = async (): Promise<TrainingDayAnalysis> => {
+  const db = await openDatabase();
+
+  const moodRatings: MoodRating[] = await db.getAllAsync(
+    "SELECT * FROM mood_ratings ORDER BY date"
+  );
+  const productivityRatings: ProductivityRating[] = await db.getAllAsync(
+    "SELECT * FROM productivity_ratings ORDER BY date"
+  );
+
+  let trainingDayMoodSum = 0;
+  let trainingDayMoodCount = 0;
+  let nonTrainingDayMoodSum = 0;
+  let nonTrainingDayMoodCount = 0;
+
+  // Process mood ratings
+  for (const rating of moodRatings) {
+    const moodScore = MOOD_SCORE_MAP[rating.mood];
+    if (moodScore === undefined) continue;
+
+    const date = DateTime.fromISO(rating.date).toJSDate();
+    const isTraining = await isSportDay(date);
+
+    if (isTraining) {
+      trainingDayMoodSum += moodScore;
+      trainingDayMoodCount++;
+    } else {
+      nonTrainingDayMoodSum += moodScore;
+      nonTrainingDayMoodCount++;
+    }
+  }
+
+  let trainingDayProdSum = 0;
+  let trainingDayProdCount = 0;
+  let nonTrainingDayProdSum = 0;
+  let nonTrainingDayProdCount = 0;
+
+  // Process productivity ratings
+  for (const rating of productivityRatings) {
+    if (typeof rating.productivity !== "number") continue;
+
+    const date = DateTime.fromISO(rating.date).toJSDate();
+    const isTraining = await isSportDay(date);
+    const normalizedScore = rating.productivity - 3; // Normalize to -2 to +2
+
+    if (isTraining) {
+      trainingDayProdSum += normalizedScore;
+      trainingDayProdCount++;
+    } else {
+      nonTrainingDayProdSum += normalizedScore;
+      nonTrainingDayProdCount++;
+    }
+  }
+
+  return {
+    trainingDays: {
+      averageMood: trainingDayMoodCount > 0 ? trainingDayMoodSum / trainingDayMoodCount : 0,
+      averageProductivity: trainingDayProdCount > 0 ? trainingDayProdSum / trainingDayProdCount : 0,
+      count: Math.max(trainingDayMoodCount, trainingDayProdCount),
+    },
+    nonTrainingDays: {
+      averageMood: nonTrainingDayMoodCount > 0 ? nonTrainingDayMoodSum / nonTrainingDayMoodCount : 0,
+      averageProductivity: nonTrainingDayProdCount > 0 ? nonTrainingDayProdSum / nonTrainingDayProdCount : 0,
+      count: Math.max(nonTrainingDayMoodCount, nonTrainingDayProdCount),
+    },
+  };
 };
