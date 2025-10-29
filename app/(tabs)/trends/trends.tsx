@@ -12,7 +12,6 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import { useQuery } from "@tanstack/react-query";
 import { useQueryFoodIntakeChartData } from "@/hooks/queries/useMutationInsertFoodIntake";
 import { createStyles } from "./TrendsScreen.styles";
-import { BannerAd } from "@/components/ads";
 import { useTheme } from "@/context/ThemeContext";
 
 export interface ChartDataItem {
@@ -180,8 +179,6 @@ const TrendsAndAnalyticsScreen: React.FC = () => {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView>
-        <BannerAd size="small" position="top" />
-
         <View style={styles.filterContainer}>
           <Text style={styles.filterTitle}>Time Period</Text>
           <View style={styles.buttonGroup}>
@@ -500,8 +497,6 @@ const TrendsAndAnalyticsScreen: React.FC = () => {
             </>
           )}
         </View>
-
-        <BannerAd size="medium" position="bottom" />
       </ScrollView>
     </SafeAreaView>
   );

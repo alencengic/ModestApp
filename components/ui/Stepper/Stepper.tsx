@@ -62,6 +62,11 @@ export const Stepper: React.FC<StepperProps> = ({
     }
   };
 
+  const handleCancel = () => {
+    // Navigate back to previous screen
+    router.back();
+  };
+
   const handleSkip = async () => {
     // Skip to the last step to complete
     setIsCompleting(true);
@@ -280,24 +285,21 @@ export const Stepper: React.FC<StepperProps> = ({
 
       {/* Navigation Buttons */}
       <View style={styles.navigationContainer}>
-        <TouchableOpacity
-          style={[
-            styles.button,
-            styles.backButton,
-            isFirstStep && styles.buttonDisabled,
-          ]}
-          onPress={handleBack}
-          disabled={isFirstStep}
-        >
-          <Text
-            style={[
-              styles.buttonText,
-              isFirstStep && styles.buttonTextDisabled,
-            ]}
+        {isFirstStep ? (
+          <TouchableOpacity
+            style={[styles.button, styles.backButton]}
+            onPress={handleCancel}
           >
-            Back
-          </Text>
-        </TouchableOpacity>
+            <Text style={styles.buttonText}>Cancel</Text>
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity
+            style={[styles.button, styles.backButton]}
+            onPress={handleBack}
+          >
+            <Text style={styles.buttonText}>Back</Text>
+          </TouchableOpacity>
+        )}
 
         {canSkip && !isLastStep && (
           <TouchableOpacity

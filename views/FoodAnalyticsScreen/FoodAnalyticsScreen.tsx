@@ -8,7 +8,6 @@ import {
   FoodSymptomCorrelation,
 } from "../../storage/correlations";
 import { useTheme } from "@/context/ThemeContext";
-import { BannerAd } from "@/components/ads";
 
 const symptomTypes: SymptomType[] = [
   "bloating",
@@ -28,6 +27,14 @@ const symptomLabels: Record<SymptomType, string> = {
   pain: "Pain",
 };
 
+// For these symptoms, higher scores = worse (symptom increases)
+// For energy, higher scores = better
+const isNegativeSymptom = (symptom: SymptomType) => {
+  return ["bloating", "diarrhea", "nausea", "pain"].includes(symptom);
+};
+
+const ITEMS_PER_PAGE = 10;
+
 export default function FoodAnalyticsScreen() {
   const { theme } = useTheme();
   const POSITIVE_COLOR = "#3CB371";
@@ -37,7 +44,8 @@ export default function FoodAnalyticsScreen() {
   const [selectedSymptom, setSelectedSymptom] =
     useState<SymptomType>("bloating");
   const [isInfoModalVisible, setIsInfoModalVisible] = useState(false);
-  const [filterType, setFilterType] = useState<"all" | "positive" | "negative" | "neutral">("all");
+  const [filterType, setFilterType] = useState<"all" | "helpful" | "trigger" | "neutral">("all");
+  const [visibleItems, setVisibleItems] = useState(ITEMS_PER_PAGE);
 
   const {
     data: correlationData = [],
@@ -57,54 +65,122 @@ export default function FoodAnalyticsScreen() {
     [correlationData]
   );
 
+  // Reset visible items when symptom or filter changes
+  React.useEffect(() => {
+    setVisibleItems(ITEMS_PER_PAGE);
+  }, [selectedSymptom, filterType]);
+
   // Filter data by score type
   const filteredData = useMemo(() => {
     if (filterType === "all") return sortedData;
+
+    const isNegative = isNegativeSymptom(selectedSymptom);
+
     return sortedData.filter(item => {
       const score = item.averageSymptomScore;
-      if (filterType === "positive") return score > 0.2;
-      if (filterType === "negative") return score < -0.2;
+
+      if (filterType === "helpful") {
+        // For negative symptoms: low scores are helpful
+        // For positive symptoms: high scores are helpful
+        return isNegative ? score < -0.2 : score > 0.2;
+      }
+
+      if (filterType === "trigger") {
+        // For negative symptoms: high scores are triggers
+        // For positive symptoms: low scores are triggers
+        return isNegative ? score > 0.2 : score < -0.2;
+      }
+
+      // Neutral
       return score >= -0.2 && score <= 0.2;
     });
-  }, [sortedData, filterType]);
+  }, [sortedData, filterType, selectedSymptom]);
+
+  // Paginated data
+  const paginatedData = useMemo(() => {
+    return filteredData.slice(0, visibleItems);
+  }, [filteredData, visibleItems]);
+
+  const hasMore = filteredData.length > visibleItems;
+
+  const loadMore = () => {
+    setVisibleItems(prev => Math.min(prev + ITEMS_PER_PAGE, filteredData.length));
+  };
 
   // Calculate insights
   const insights = useMemo(() => {
     if (!correlationData || correlationData.length === 0) return null;
 
-    const positiveFoods = correlationData.filter(d => d.averageSymptomScore > 0.2);
-    const negativeFoods = correlationData.filter(d => d.averageSymptomScore < -0.2);
+    const isNegative = isNegativeSymptom(selectedSymptom);
+
+    // For negative symptoms (bloating, diarrhea, etc):
+    //   - High scores = triggers (bad)
+    //   - Low scores = helps reduce (good)
+    // For positive symptoms (energy):
+    //   - High scores = helpful (good)
+    //   - Low scores = reduces (bad)
+
+    const helpfulFoods = isNegative
+      ? correlationData.filter(d => d.averageSymptomScore < -0.2) // Low score = reduces symptom
+      : correlationData.filter(d => d.averageSymptomScore > 0.2);  // High score = increases energy
+
+    const triggerFoods = isNegative
+      ? correlationData.filter(d => d.averageSymptomScore > 0.2)  // High score = worsens symptom
+      : correlationData.filter(d => d.averageSymptomScore < -0.2); // Low score = decreases energy
+
     const neutralFoods = correlationData.filter(d =>
       d.averageSymptomScore >= -0.2 && d.averageSymptomScore <= 0.2
     );
 
-    const bestFood = positiveFoods.length > 0
-      ? positiveFoods.reduce((prev, current) =>
-          current.averageSymptomScore > prev.averageSymptomScore ? current : prev
-        )
-      : null;
+    const bestFood = isNegative
+      ? (helpfulFoods.length > 0
+          ? helpfulFoods.reduce((prev, current) =>
+              current.averageSymptomScore < prev.averageSymptomScore ? current : prev
+            )
+          : null)
+      : (helpfulFoods.length > 0
+          ? helpfulFoods.reduce((prev, current) =>
+              current.averageSymptomScore > prev.averageSymptomScore ? current : prev
+            )
+          : null);
 
-    const worstFood = negativeFoods.length > 0
-      ? negativeFoods.reduce((prev, current) =>
-          current.averageSymptomScore < prev.averageSymptomScore ? current : prev
-        )
-      : null;
+    const worstFood = isNegative
+      ? (triggerFoods.length > 0
+          ? triggerFoods.reduce((prev, current) =>
+              current.averageSymptomScore > prev.averageSymptomScore ? current : prev
+            )
+          : null)
+      : (triggerFoods.length > 0
+          ? triggerFoods.reduce((prev, current) =>
+              current.averageSymptomScore < prev.averageSymptomScore ? current : prev
+            )
+          : null);
 
     return {
       total: correlationData.length,
-      positive: positiveFoods.length,
-      negative: negativeFoods.length,
+      helpful: helpfulFoods.length,
+      trigger: triggerFoods.length,
       neutral: neutralFoods.length,
       bestFood,
       worstFood,
-      positivePercentage: ((positiveFoods.length / correlationData.length) * 100).toFixed(0),
-      negativePercentage: ((negativeFoods.length / correlationData.length) * 100).toFixed(0),
+      helpfulPercentage: ((helpfulFoods.length / correlationData.length) * 100).toFixed(0),
+      triggerPercentage: ((triggerFoods.length / correlationData.length) * 100).toFixed(0),
     };
-  }, [correlationData]);
+  }, [correlationData, selectedSymptom]);
 
   const getScoreColor = (score: number): string => {
-    if (score > 0.2) return POSITIVE_COLOR;
-    if (score < -0.2) return NEGATIVE_COLOR;
+    const isNegative = isNegativeSymptom(selectedSymptom);
+
+    if (isNegative) {
+      // For negative symptoms: high score = bad (red), low score = good (green)
+      if (score > 0.2) return NEGATIVE_COLOR;
+      if (score < -0.2) return POSITIVE_COLOR;
+    } else {
+      // For positive symptoms: high score = good (green), low score = bad (red)
+      if (score > 0.2) return POSITIVE_COLOR;
+      if (score < -0.2) return NEGATIVE_COLOR;
+    }
+
     return NEUTRAL_COLOR;
   };
 
@@ -493,6 +569,23 @@ export default function FoodAnalyticsScreen() {
       color: theme.colors.textSecondary,
       fontWeight: "600",
     },
+
+    // Load More button styles
+    loadMoreButton: {
+      marginTop: theme.spacing.md,
+      paddingVertical: theme.spacing.md,
+      paddingHorizontal: theme.spacing.lg,
+      backgroundColor: theme.colors.primary,
+      borderRadius: theme.borderRadius.round,
+      alignItems: "center",
+      alignSelf: "center",
+      minWidth: "80%",
+    },
+    loadMoreText: {
+      fontSize: 14,
+      fontWeight: "600",
+      color: theme.colors.textOnPrimary,
+    },
   });
 
   const EmptyListComponent = () => (
@@ -524,8 +617,6 @@ export default function FoodAnalyticsScreen() {
         <Text style={styles.headerSubtitle}>Track symptom correlations</Text>
       </View>
 
-      <BannerAd size="small" position="top" />
-
       {/* Summary Stats */}
       {insights && (
         <View style={styles.summaryCard}>
@@ -537,13 +628,13 @@ export default function FoodAnalyticsScreen() {
             </View>
             <View style={[styles.statBox, { backgroundColor: `${POSITIVE_COLOR}20` }]}>
               <Text style={[styles.statValue, { color: POSITIVE_COLOR }]}>
-                {insights.positive}
+                {insights.helpful}
               </Text>
               <Text style={styles.statLabel}>Helpful</Text>
             </View>
             <View style={[styles.statBox, { backgroundColor: `${NEGATIVE_COLOR}20` }]}>
               <Text style={[styles.statValue, { color: NEGATIVE_COLOR }]}>
-                {insights.negative}
+                {insights.trigger}
               </Text>
               <Text style={styles.statLabel}>Trigger</Text>
             </View>
@@ -563,7 +654,10 @@ export default function FoodAnalyticsScreen() {
                   Try more {insights.bestFood.foodName}
                 </Text>
                 <Text style={styles.recommendationDesc}>
-                  Best for reducing {selectedSymptom} (Score: {insights.bestFood.averageSymptomScore.toFixed(2)})
+                  {isNegativeSymptom(selectedSymptom)
+                    ? `Helps reduce ${selectedSymptom}`
+                    : `Best for boosting ${selectedSymptom}`
+                  } (Score: {insights.bestFood.averageSymptomScore.toFixed(2)})
                 </Text>
               </View>
             </View>
@@ -576,7 +670,10 @@ export default function FoodAnalyticsScreen() {
                   Limit {insights.worstFood.foodName}
                 </Text>
                 <Text style={styles.recommendationDesc}>
-                  May trigger {selectedSymptom} (Score: {insights.worstFood.averageSymptomScore.toFixed(2)})
+                  {isNegativeSymptom(selectedSymptom)
+                    ? `May increase ${selectedSymptom}`
+                    : `May reduce ${selectedSymptom}`
+                  } (Score: {insights.worstFood.averageSymptomScore.toFixed(2)})
                 </Text>
               </View>
             </View>
@@ -625,19 +722,19 @@ export default function FoodAnalyticsScreen() {
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={[styles.filterButton, filterType === "positive" && styles.filterButtonActive]}
-            onPress={() => setFilterType("positive")}
+            style={[styles.filterButton, filterType === "helpful" && styles.filterButtonActive]}
+            onPress={() => setFilterType("helpful")}
           >
-            <Text style={[styles.filterButtonText, filterType === "positive" && styles.filterButtonTextActive]}>
-              Helpful ({insights?.positive || 0})
+            <Text style={[styles.filterButtonText, filterType === "helpful" && styles.filterButtonTextActive]}>
+              Helpful ({insights?.helpful || 0})
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={[styles.filterButton, filterType === "negative" && styles.filterButtonActive]}
-            onPress={() => setFilterType("negative")}
+            style={[styles.filterButton, filterType === "trigger" && styles.filterButtonActive]}
+            onPress={() => setFilterType("trigger")}
           >
-            <Text style={[styles.filterButtonText, filterType === "negative" && styles.filterButtonTextActive]}>
-              Trigger ({insights?.negative || 0})
+            <Text style={[styles.filterButtonText, filterType === "trigger" && styles.filterButtonTextActive]}>
+              Trigger ({insights?.trigger || 0})
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
@@ -664,7 +761,7 @@ export default function FoodAnalyticsScreen() {
             <Text style={styles.errorText}>Error: {error.message}</Text>
           ) : filteredData.length > 0 ? (
             <View>
-              {filteredData.map((item, index) => {
+              {paginatedData.map((item, index) => {
                 const scoreColor = getScoreColor(item.averageSymptomScore);
                 const isLastItem = index === filteredData.length - 1;
                 const percentage = Math.abs((item.averageSymptomScore / 1) * 100);
@@ -706,11 +803,20 @@ export default function FoodAnalyticsScreen() {
                         />
                       </View>
                       <Text style={styles.progressBarLabel}>
-                        {item.averageSymptomScore > 0.2
-                          ? "Helpful"
-                          : item.averageSymptomScore < -0.2
-                          ? "May Trigger"
-                          : "Neutral"}
+                        {(() => {
+                          const isNegative = isNegativeSymptom(selectedSymptom);
+                          const score = item.averageSymptomScore;
+
+                          if (Math.abs(score) <= 0.2) return "Neutral";
+
+                          if (isNegative) {
+                            // For negative symptoms: low score is helpful, high score triggers
+                            return score < -0.2 ? "Helpful" : "May Trigger";
+                          } else {
+                            // For positive symptoms: high score is helpful, low score triggers
+                            return score > 0.2 ? "Helpful" : "May Trigger";
+                          }
+                        })()}
                       </Text>
                     </View>
 
@@ -725,14 +831,22 @@ export default function FoodAnalyticsScreen() {
                   </View>
                 );
               })}
+              {hasMore && (
+                <TouchableOpacity
+                  style={styles.loadMoreButton}
+                  onPress={loadMore}
+                >
+                  <Text style={styles.loadMoreText}>
+                    Load More ({filteredData.length - visibleItems} remaining)
+                  </Text>
+                </TouchableOpacity>
+              )}
             </View>
           ) : (
             <EmptyListComponent />
           )}
         </Card.Content>
       </Card>
-
-      <BannerAd size="medium" position="bottom" />
 
       <Modal
         visible={isInfoModalVisible}
@@ -754,7 +868,7 @@ export default function FoodAnalyticsScreen() {
 
             <ScrollView style={styles.infoModalContent}>
               <Text style={styles.infoText}>
-                The scores represent the correlation between foods and your symptom levels.
+                The scores represent the correlation between foods and your {symptomLabels[selectedSymptom].toLowerCase()} levels.
               </Text>
 
               <View style={styles.colorExplanation}>
@@ -766,7 +880,9 @@ export default function FoodAnalyticsScreen() {
                     ]}
                   />
                   <Text style={styles.colorLabel}>
-                    <Text style={{ fontWeight: "bold" }}>Positive ({">"} 0.2):</Text> Foods associated with increased symptoms
+                    <Text style={{ fontWeight: "bold" }}>Helpful (Green):</Text> {isNegativeSymptom(selectedSymptom)
+                      ? "Foods that help reduce this symptom"
+                      : "Foods that boost energy levels"}
                   </Text>
                 </View>
 
@@ -778,7 +894,7 @@ export default function FoodAnalyticsScreen() {
                     ]}
                   />
                   <Text style={styles.colorLabel}>
-                    <Text style={{ fontWeight: "bold" }}>Neutral (-0.2 to 0.2):</Text> No significant correlation
+                    <Text style={{ fontWeight: "bold" }}>Neutral (Gray):</Text> No significant correlation detected
                   </Text>
                 </View>
 
@@ -790,14 +906,18 @@ export default function FoodAnalyticsScreen() {
                     ]}
                   />
                   <Text style={styles.colorLabel}>
-                    <Text style={{ fontWeight: "bold" }}>Negative ({"<"} -0.2):</Text> Foods associated with decreased symptoms
+                    <Text style={{ fontWeight: "bold" }}>Trigger (Red):</Text> {isNegativeSymptom(selectedSymptom)
+                      ? "Foods that may increase this symptom"
+                      : "Foods that may reduce energy"}
                   </Text>
                 </View>
               </View>
 
               <Text style={styles.infoText}>
                 <Text style={{ fontWeight: "bold" }}>How it works:{"\n"}</Text>
-                The app analyzes your food entries and symptom ratings to calculate average scores. Higher scores indicate foods that may worsen symptoms, while lower scores suggest foods that may help reduce symptoms.
+                The app analyzes your food entries and symptom ratings to calculate correlation scores. {isNegativeSymptom(selectedSymptom)
+                  ? "Lower scores (green) indicate foods eaten before experiencing less of this symptom, while higher scores (red) indicate foods associated with more of this symptom."
+                  : "Higher scores (green) indicate foods eaten before experiencing more energy, while lower scores (red) indicate foods associated with lower energy levels."}
               </Text>
 
               <Text style={styles.infoNote}>

@@ -12,6 +12,15 @@ export const createStyles = (theme: Theme) => StyleSheet.create({
     alignItems: "center",
     backgroundColor: theme.colors.background,
   },
+  backButton: {
+    alignSelf: "flex-start",
+    marginBottom: theme.spacing.md,
+  },
+  backButtonText: {
+    fontSize: 16,
+    color: theme.colors.primary,
+    fontWeight: "600",
+  },
   headerEmoji: {
     fontSize: scaleFontSize(48),
     marginBottom: theme.spacing.sm,
@@ -121,5 +130,50 @@ export const createStyles = (theme: Theme) => StyleSheet.create({
     fontSize: scaleFontSize(14),
     color: theme.colors.textSecondary,
     marginBottom: theme.spacing.xs,
+  },
+  insightsCard: {
+    backgroundColor: `${theme.colors.primary}15`,
+    borderRadius: theme.borderRadius.md,
+    padding: theme.spacing.md,
+    marginBottom: theme.spacing.md,
+    borderWidth: 1,
+    borderColor: `${theme.colors.primary}30`,
+  },
+  insightsTitle: {
+    fontSize: scaleFontSize(16),
+    fontWeight: "700",
+    color: theme.colors.textPrimary,
+    marginBottom: theme.spacing.sm,
+  },
+  insightsRecommendation: {
+    fontSize: scaleFontSize(14),
+    color: theme.colors.textPrimary,
+    lineHeight: 20,
+    marginBottom: theme.spacing.sm,
+  },
+  confidenceContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  confidenceLabel: {
+    fontSize: scaleFontSize(12),
+    color: theme.colors.textSecondary,
+  },
+  confidenceBold: {
+    fontWeight: "700",
+    color: theme.colors.primary,
+    textTransform: "uppercase",
+  },
+  significantBadge: {
+    backgroundColor: theme.colors.primary,
+    paddingVertical: 4,
+    paddingHorizontal: 10,
+    borderRadius: theme.borderRadius.round,
+  },
+  significantText: {
+    fontSize: scaleFontSize(11),
+    fontWeight: "700",
+    color: theme.colors.textOnPrimary,
   },
 });

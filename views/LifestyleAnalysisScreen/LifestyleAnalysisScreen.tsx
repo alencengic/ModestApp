@@ -7,6 +7,7 @@ import {
   Text,
   TouchableOpacity,
 } from "react-native";
+import { useRouter } from "expo-router";
 import { useQuery } from "@tanstack/react-query";
 import {
   getWorkingDayAnalysis,
@@ -16,7 +17,6 @@ import {
 } from "@/storage/database";
 import { createStyles } from "./LifestyleAnalysisScreen.styles";
 import { useTheme } from "@/context/ThemeContext";
-import { BannerAd } from "@/components/ads";
 import { scaleFontSize } from "@/utils/responsive";
 
 const POSITIVE_COLOR = "#3CB371";
@@ -25,6 +25,7 @@ const NEGATIVE_COLOR = "#CD5C5C";
 
 const LifestyleAnalysisScreen: React.FC = () => {
   const { theme } = useTheme();
+  const router = useRouter();
   const styles = createStyles(theme);
 
   // Query for working day analysis
@@ -74,14 +75,15 @@ const LifestyleAnalysisScreen: React.FC = () => {
     <SafeAreaView style={styles.container}>
       <ScrollView>
         <View style={styles.header}>
+          <TouchableOpacity onPress={() => router.push("/(tabs)/mood/analytics")} style={styles.backButton}>
+            <Text style={styles.backButtonText}>← Back</Text>
+          </TouchableOpacity>
           <Text style={styles.headerEmoji}>📊</Text>
           <Text style={styles.headerTitle}>Lifestyle Factors</Text>
           <Text style={styles.headerDescription}>
             Analyze how your daily routine, work schedule, and exercise habits impact your mental well-being and productivity
           </Text>
         </View>
-
-        <BannerAd size="small" position="top" />
 
         {/* Working Days vs Non-Working Days Analysis */}
         {workingDayData && workingDayData.workingDays.count > 0 ? (
@@ -92,6 +94,26 @@ const LifestyleAnalysisScreen: React.FC = () => {
             <Text style={styles.sectionDescription}>
               Compare your mood and productivity on working days versus weekends
             </Text>
+
+            {/* AI Insights */}
+            {workingDayData.insights && (
+              <View style={styles.insightsCard}>
+                <Text style={styles.insightsTitle}>💡 AI Insights</Text>
+                <Text style={styles.insightsRecommendation}>
+                  {workingDayData.insights.recommendation}
+                </Text>
+                <View style={styles.confidenceContainer}>
+                  <Text style={styles.confidenceLabel}>
+                    Confidence: <Text style={styles.confidenceBold}>{workingDayData.insights.confidenceLevel}</Text>
+                  </Text>
+                  {workingDayData.insights.significantDifference && (
+                    <View style={styles.significantBadge}>
+                      <Text style={styles.significantText}>Significant</Text>
+                    </View>
+                  )}
+                </View>
+              </View>
+            )}
 
             <View style={styles.comparisonContainer}>
               {/* Working Days */}
@@ -230,6 +252,26 @@ const LifestyleAnalysisScreen: React.FC = () => {
               See how exercise affects your mood and productivity
             </Text>
 
+            {/* AI Insights */}
+            {trainingDayData.insights && (
+              <View style={styles.insightsCard}>
+                <Text style={styles.insightsTitle}>💡 AI Insights</Text>
+                <Text style={styles.insightsRecommendation}>
+                  {trainingDayData.insights.recommendation}
+                </Text>
+                <View style={styles.confidenceContainer}>
+                  <Text style={styles.confidenceLabel}>
+                    Confidence: <Text style={styles.confidenceBold}>{trainingDayData.insights.confidenceLevel}</Text>
+                  </Text>
+                  {trainingDayData.insights.significantDifference && (
+                    <View style={styles.significantBadge}>
+                      <Text style={styles.significantText}>Significant</Text>
+                    </View>
+                  )}
+                </View>
+              </View>
+            )}
+
             <View style={styles.comparisonContainer}>
               {/* Training Days */}
               <View style={styles.comparisonCard}>
@@ -356,8 +398,6 @@ const LifestyleAnalysisScreen: React.FC = () => {
             </View>
           </View>
         )}
-
-        <BannerAd size="medium" position="bottom" />
       </ScrollView>
     </SafeAreaView>
   );

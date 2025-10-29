@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import {
   SafeAreaView,
   ScrollView,
@@ -9,6 +9,8 @@ import {
   Alert,
   Modal,
   TextInput,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 import { useTheme } from "@/context/ThemeContext";
 import { createStyles } from "./MealsScreen.styles";
@@ -29,11 +31,15 @@ const MEAL_TYPE_OPTIONS: { value: MealType; label: string; emoji: string }[] = [
   { value: "snacks", label: "Snacks", emoji: "🍎" },
 ];
 
+const ITEMS_PER_PAGE = 10;
+
 export default function MealsScreen() {
   const { theme } = useTheme();
   const styles = createStyles(theme);
 
   const [filterType, setFilterType] = useState<MealType>(null);
+  const [mealSearchQuery, setMealSearchQuery] = useState("");
+  const [visibleItems, setVisibleItems] = useState(ITEMS_PER_PAGE);
   const [showModal, setShowModal] = useState(false);
   const [editingMeal, setEditingMeal] = useState<Meal | null>(null);
   const [mealName, setMealName] = useState("");
@@ -41,16 +47,48 @@ export default function MealsScreen() {
   const [selectedFoods, setSelectedFoods] = useState<string[]>([]);
   const [showFoodPicker, setShowFoodPicker] = useState(false);
   const [foodSearchQuery, setFoodSearchQuery] = useState("");
+  const [customFoodInput, setCustomFoodInput] = useState("");
 
   const { data: meals = [], isLoading, refetch } = useGetAllMeals();
   const insertMeal = useInsertMeal();
   const updateMeal = useUpdateMeal();
   const deleteMeal = useDeleteMeal();
 
-  const filteredMeals = meals.filter((meal) => {
-    if (!filterType) return true;
-    return meal.meal_type === filterType;
-  });
+  // Filter and search meals
+  const filteredMeals = useMemo(() => {
+    return meals.filter((meal) => {
+      // Filter by type
+      if (filterType && meal.meal_type !== filterType) return false;
+
+      // Search by meal name or foods
+      if (mealSearchQuery) {
+        const query = mealSearchQuery.toLowerCase();
+        const nameMatch = meal.name.toLowerCase().includes(query);
+        const foodsMatch = getMealFoodsArray(meal).some(food =>
+          food.toLowerCase().includes(query)
+        );
+        return nameMatch || foodsMatch;
+      }
+
+      return true;
+    });
+  }, [meals, filterType, mealSearchQuery]);
+
+  // Reset visible items when filters change
+  React.useEffect(() => {
+    setVisibleItems(ITEMS_PER_PAGE);
+  }, [filterType, mealSearchQuery]);
+
+  // Paginated meals
+  const paginatedMeals = useMemo(() => {
+    return filteredMeals.slice(0, visibleItems);
+  }, [filteredMeals, visibleItems]);
+
+  const hasMore = filteredMeals.length > visibleItems;
+
+  const loadMore = () => {
+    setVisibleItems(prev => Math.min(prev + ITEMS_PER_PAGE, filteredMeals.length));
+  };
 
   const filteredFoods = COMMON_FOODS.filter((food) =>
     food.toLowerCase().includes(foodSearchQuery.toLowerCase())
@@ -80,6 +118,23 @@ export default function MealsScreen() {
     setSelectedFoods([]);
     setShowFoodPicker(false);
     setFoodSearchQuery("");
+    setCustomFoodInput("");
+  };
+
+  const addCustomFood = () => {
+    const trimmedFood = customFoodInput.trim();
+    if (!trimmedFood) {
+      Alert.alert("Error", "Please enter a food name");
+      return;
+    }
+
+    if (selectedFoods.includes(trimmedFood)) {
+      Alert.alert("Info", "This food is already added");
+      return;
+    }
+
+    setSelectedFoods([...selectedFoods, trimmedFood]);
+    setCustomFoodInput("");
   };
 
   const handleSaveMeal = async () => {
@@ -169,6 +224,25 @@ export default function MealsScreen() {
           </View>
         </View>
 
+        {/* Search Bar */}
+        <View style={styles.searchContainer}>
+          <TextInput
+            style={styles.searchInput}
+            value={mealSearchQuery}
+            onChangeText={setMealSearchQuery}
+            placeholder="Search meals by name or food..."
+            placeholderTextColor={theme.colors.textSecondary}
+          />
+          {mealSearchQuery.length > 0 && (
+            <TouchableOpacity
+              style={styles.clearSearchButton}
+              onPress={() => setMealSearchQuery("")}
+            >
+              <Text style={styles.clearSearchText}>✕</Text>
+            </TouchableOpacity>
+          )}
+        </View>
+
         {/* Filter Buttons */}
         <View style={styles.filterCard}>
           <Text style={styles.filterTitle}>Filter by Type</Text>
@@ -207,13 +281,14 @@ export default function MealsScreen() {
           <View style={styles.emptyStateContainer}>
             <Text style={styles.emptyStateIcon}>🍽️</Text>
             <Text style={styles.emptyStateText}>
-              No meals created yet.{"\n"}
-              Create your first meal template to quickly log your food!
+              {mealSearchQuery
+                ? `No meals found matching "${mealSearchQuery}"`
+                : "No meals created yet.\nCreate your first meal template to quickly log your food!"}
             </Text>
           </View>
         ) : (
           <View style={styles.mealsContainer}>
-            {filteredMeals.map((meal) => {
+            {paginatedMeals.map((meal) => {
               const foods = getMealFoodsArray(meal);
               const mealTypeInfo = MEAL_TYPE_OPTIONS.find(
                 (opt) => opt.value === meal.meal_type
@@ -264,6 +339,16 @@ export default function MealsScreen() {
                 </View>
               );
             })}
+            {hasMore && (
+              <TouchableOpacity
+                style={styles.loadMoreButton}
+                onPress={loadMore}
+              >
+                <Text style={styles.loadMoreText}>
+                  Load More ({filteredMeals.length - visibleItems} remaining)
+                </Text>
+              </TouchableOpacity>
+            )}
           </View>
         )}
       </ScrollView>
@@ -275,12 +360,20 @@ export default function MealsScreen() {
         transparent
         onRequestClose={closeModal}
       >
-        <View style={styles.modalOverlay}>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          style={styles.modalOverlay}
+          keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
+        >
           <View style={styles.modalContent}>
-            <ScrollView>
-              <Text style={styles.modalTitle}>
-                {editingMeal ? "Edit Meal" : "Create New Meal"}
-              </Text>
+            <Text style={styles.modalTitle}>
+              {editingMeal ? "Edit Meal" : "Create New Meal"}
+            </Text>
+            <ScrollView
+              keyboardShouldPersistTaps="handled"
+              showsVerticalScrollIndicator={true}
+              nestedScrollEnabled={true}
+            >
 
               {/* Meal Name */}
               <Text style={styles.inputLabel}>Meal Name</Text>
@@ -344,14 +437,34 @@ export default function MealsScreen() {
               {/* Food Picker */}
               {showFoodPicker && (
                 <View style={styles.foodPickerContainer}>
+                  {/* Add Custom Food */}
+                  <View style={styles.customFoodContainer}>
+                    <TextInput
+                      style={[styles.searchInput, { flex: 1 }]}
+                      value={customFoodInput}
+                      onChangeText={setCustomFoodInput}
+                      placeholder="Add custom food..."
+                      placeholderTextColor={theme.colors.textSecondary}
+                      returnKeyType="done"
+                      onSubmitEditing={addCustomFood}
+                    />
+                    <TouchableOpacity
+                      style={styles.addCustomFoodButton}
+                      onPress={addCustomFood}
+                    >
+                      <Text style={styles.addCustomFoodText}>Add</Text>
+                    </TouchableOpacity>
+                  </View>
+
+                  {/* Search Common Foods */}
                   <TextInput
                     style={styles.searchInput}
                     value={foodSearchQuery}
                     onChangeText={setFoodSearchQuery}
-                    placeholder="Search foods..."
+                    placeholder="Search common foods..."
                     placeholderTextColor={theme.colors.textSecondary}
                   />
-                  <ScrollView style={styles.foodList} nestedScrollEnabled>
+                  <ScrollView style={styles.foodList} nestedScrollEnabled keyboardShouldPersistTaps="handled">
                     {filteredFoods.map((food) => {
                       const isSelected = selectedFoods.includes(food);
                       return (
@@ -380,27 +493,27 @@ export default function MealsScreen() {
                   </ScrollView>
                 </View>
               )}
-
-              {/* Action Buttons */}
-              <View style={styles.modalActions}>
-                <TouchableOpacity
-                  style={[styles.modalButton, styles.modalButtonSecondary]}
-                  onPress={closeModal}
-                >
-                  <Text style={styles.modalButtonTextSecondary}>Cancel</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[styles.modalButton, styles.modalButtonPrimary]}
-                  onPress={handleSaveMeal}
-                >
-                  <Text style={styles.modalButtonTextPrimary}>
-                    {editingMeal ? "Update" : "Create"}
-                  </Text>
-                </TouchableOpacity>
-              </View>
             </ScrollView>
+
+            {/* Action Buttons - Fixed at bottom */}
+            <View style={styles.modalActions}>
+              <TouchableOpacity
+                style={[styles.modalButton, styles.modalButtonSecondary]}
+                onPress={closeModal}
+              >
+                <Text style={styles.modalButtonTextSecondary}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.modalButton, styles.modalButtonPrimary]}
+                onPress={handleSaveMeal}
+              >
+                <Text style={styles.modalButtonTextPrimary}>
+                  {editingMeal ? "Update" : "Create"}
+                </Text>
+              </TouchableOpacity>
+            </View>
           </View>
-        </View>
+        </KeyboardAvoidingView>
       </Modal>
     </SafeAreaView>
   );

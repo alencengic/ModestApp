@@ -12,6 +12,15 @@ export const createStyles = (theme: Theme) => StyleSheet.create({
     alignItems: "center",
     backgroundColor: theme.colors.background,
   },
+  backButton: {
+    alignSelf: "flex-start",
+    marginBottom: theme.spacing.md,
+  },
+  backButtonText: {
+    fontSize: 16,
+    color: theme.colors.primary,
+    fontWeight: "600",
+  },
   headerTopRow: {
     flexDirection: "row",
     justifyContent: "space-between",

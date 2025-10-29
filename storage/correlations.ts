@@ -285,11 +285,24 @@ export interface WorkingDayAnalysis {
     averageMood: number;
     averageProductivity: number;
     count: number;
+    moodStdDev?: number;
+    productivityStdDev?: number;
   };
   nonWorkingDays: {
     averageMood: number;
     averageProductivity: number;
     count: number;
+    moodStdDev?: number;
+    productivityStdDev?: number;
+  };
+  insights: {
+    moodDifference: number;
+    moodDifferencePercentage: number;
+    productivityDifference: number;
+    productivityDifferencePercentage: number;
+    confidenceLevel: "low" | "medium" | "high";
+    significantDifference: boolean;
+    recommendation: string;
   };
 }
 
@@ -307,6 +320,8 @@ export const getWorkingDayAnalysis = async (): Promise<WorkingDayAnalysis> => {
   let workingDayMoodCount = 0;
   let nonWorkingDayMoodSum = 0;
   let nonWorkingDayMoodCount = 0;
+  const workingDayMoodScores: number[] = [];
+  const nonWorkingDayMoodScores: number[] = [];
 
   // Process mood ratings
   for (const rating of moodRatings) {
@@ -319,9 +334,11 @@ export const getWorkingDayAnalysis = async (): Promise<WorkingDayAnalysis> => {
     if (isWorking) {
       workingDayMoodSum += moodScore;
       workingDayMoodCount++;
+      workingDayMoodScores.push(moodScore);
     } else {
       nonWorkingDayMoodSum += moodScore;
       nonWorkingDayMoodCount++;
+      nonWorkingDayMoodScores.push(moodScore);
     }
   }
 
@@ -329,6 +346,8 @@ export const getWorkingDayAnalysis = async (): Promise<WorkingDayAnalysis> => {
   let workingDayProdCount = 0;
   let nonWorkingDayProdSum = 0;
   let nonWorkingDayProdCount = 0;
+  const workingDayProdScores: number[] = [];
+  const nonWorkingDayProdScores: number[] = [];
 
   // Process productivity ratings
   for (const rating of productivityRatings) {
@@ -341,22 +360,90 @@ export const getWorkingDayAnalysis = async (): Promise<WorkingDayAnalysis> => {
     if (isWorking) {
       workingDayProdSum += normalizedScore;
       workingDayProdCount++;
+      workingDayProdScores.push(normalizedScore);
     } else {
       nonWorkingDayProdSum += normalizedScore;
       nonWorkingDayProdCount++;
+      nonWorkingDayProdScores.push(normalizedScore);
     }
+  }
+
+  // Calculate averages
+  const workingAvgMood = workingDayMoodCount > 0 ? workingDayMoodSum / workingDayMoodCount : 0;
+  const nonWorkingAvgMood = nonWorkingDayMoodCount > 0 ? nonWorkingDayMoodSum / nonWorkingDayMoodCount : 0;
+  const workingAvgProd = workingDayProdCount > 0 ? workingDayProdSum / workingDayProdCount : 0;
+  const nonWorkingAvgProd = nonWorkingDayProdCount > 0 ? nonWorkingDayProdSum / nonWorkingDayProdCount : 0;
+
+  // Calculate standard deviations
+  const calcStdDev = (scores: number[], avg: number): number => {
+    if (scores.length < 2) return 0;
+    const variance = scores.reduce((sum, score) => sum + Math.pow(score - avg, 2), 0) / scores.length;
+    return Math.sqrt(variance);
+  };
+
+  const workingMoodStdDev = calcStdDev(workingDayMoodScores, workingAvgMood);
+  const nonWorkingMoodStdDev = calcStdDev(nonWorkingDayMoodScores, nonWorkingAvgMood);
+  const workingProdStdDev = calcStdDev(workingDayProdScores, workingAvgProd);
+  const nonWorkingProdStdDev = calcStdDev(nonWorkingDayProdScores, nonWorkingAvgProd);
+
+  // Calculate insights
+  const moodDiff = workingAvgMood - nonWorkingAvgMood;
+  const prodDiff = workingAvgProd - nonWorkingAvgProd;
+
+  // Calculate percentage differences (avoid division by zero)
+  const moodDiffPct = nonWorkingAvgMood !== 0 ? (moodDiff / Math.abs(nonWorkingAvgMood)) * 100 : 0;
+  const prodDiffPct = nonWorkingAvgProd !== 0 ? (prodDiff / Math.abs(nonWorkingAvgProd)) * 100 : 0;
+
+  // Determine confidence level based on sample size
+  const minCount = Math.min(workingDayMoodCount, nonWorkingDayMoodCount, workingDayProdCount, nonWorkingDayProdCount);
+  let confidenceLevel: "low" | "medium" | "high";
+  if (minCount >= 20) confidenceLevel = "high";
+  else if (minCount >= 10) confidenceLevel = "medium";
+  else confidenceLevel = "low";
+
+  // Determine if difference is significant (at least 0.3 difference or 15% change)
+  const significantDifference = Math.abs(moodDiff) > 0.3 || Math.abs(prodDiff) > 0.3 ||
+                                Math.abs(moodDiffPct) > 15 || Math.abs(prodDiffPct) > 15;
+
+  // Generate recommendation
+  let recommendation = "";
+  if (significantDifference) {
+    if (moodDiff > 0 && prodDiff > 0) {
+      recommendation = "Working days appear beneficial for both mood and productivity. Consider maintaining or optimizing your work schedule.";
+    } else if (moodDiff < 0 && prodDiff < 0) {
+      recommendation = "Weekends show better mood and productivity. Consider adding more rest days or reducing work stress.";
+    } else if (moodDiff < 0 && prodDiff > 0) {
+      recommendation = "While productivity is higher on work days, your mood suffers. Consider work-life balance improvements.";
+    } else {
+      recommendation = "Your mood is better on work days but productivity drops on weekends. Finding the right balance could help.";
+    }
+  } else {
+    recommendation = "No significant difference detected between working days and weekends. Your routine appears balanced.";
   }
 
   return {
     workingDays: {
-      averageMood: workingDayMoodCount > 0 ? workingDayMoodSum / workingDayMoodCount : 0,
-      averageProductivity: workingDayProdCount > 0 ? workingDayProdSum / workingDayProdCount : 0,
+      averageMood: workingAvgMood,
+      averageProductivity: workingAvgProd,
       count: Math.max(workingDayMoodCount, workingDayProdCount),
+      moodStdDev: workingMoodStdDev,
+      productivityStdDev: workingProdStdDev,
     },
     nonWorkingDays: {
-      averageMood: nonWorkingDayMoodCount > 0 ? nonWorkingDayMoodSum / nonWorkingDayMoodCount : 0,
-      averageProductivity: nonWorkingDayProdCount > 0 ? nonWorkingDayProdSum / nonWorkingDayProdCount : 0,
+      averageMood: nonWorkingAvgMood,
+      averageProductivity: nonWorkingAvgProd,
       count: Math.max(nonWorkingDayMoodCount, nonWorkingDayProdCount),
+      moodStdDev: nonWorkingMoodStdDev,
+      productivityStdDev: nonWorkingProdStdDev,
+    },
+    insights: {
+      moodDifference: moodDiff,
+      moodDifferencePercentage: moodDiffPct,
+      productivityDifference: prodDiff,
+      productivityDifferencePercentage: prodDiffPct,
+      confidenceLevel,
+      significantDifference,
+      recommendation,
     },
   };
 };
@@ -367,11 +454,24 @@ export interface TrainingDayAnalysis {
     averageMood: number;
     averageProductivity: number;
     count: number;
+    moodStdDev?: number;
+    productivityStdDev?: number;
   };
   nonTrainingDays: {
     averageMood: number;
     averageProductivity: number;
     count: number;
+    moodStdDev?: number;
+    productivityStdDev?: number;
+  };
+  insights: {
+    moodDifference: number;
+    moodDifferencePercentage: number;
+    productivityDifference: number;
+    productivityDifferencePercentage: number;
+    confidenceLevel: "low" | "medium" | "high";
+    significantDifference: boolean;
+    recommendation: string;
   };
 }
 
@@ -389,6 +489,8 @@ export const getTrainingDayAnalysis = async (): Promise<TrainingDayAnalysis> => 
   let trainingDayMoodCount = 0;
   let nonTrainingDayMoodSum = 0;
   let nonTrainingDayMoodCount = 0;
+  const trainingDayMoodScores: number[] = [];
+  const nonTrainingDayMoodScores: number[] = [];
 
   // Process mood ratings
   for (const rating of moodRatings) {
@@ -401,9 +503,11 @@ export const getTrainingDayAnalysis = async (): Promise<TrainingDayAnalysis> => 
     if (isTraining) {
       trainingDayMoodSum += moodScore;
       trainingDayMoodCount++;
+      trainingDayMoodScores.push(moodScore);
     } else {
       nonTrainingDayMoodSum += moodScore;
       nonTrainingDayMoodCount++;
+      nonTrainingDayMoodScores.push(moodScore);
     }
   }
 
@@ -411,6 +515,8 @@ export const getTrainingDayAnalysis = async (): Promise<TrainingDayAnalysis> => 
   let trainingDayProdCount = 0;
   let nonTrainingDayProdSum = 0;
   let nonTrainingDayProdCount = 0;
+  const trainingDayProdScores: number[] = [];
+  const nonTrainingDayProdScores: number[] = [];
 
   // Process productivity ratings
   for (const rating of productivityRatings) {
@@ -423,22 +529,90 @@ export const getTrainingDayAnalysis = async (): Promise<TrainingDayAnalysis> => 
     if (isTraining) {
       trainingDayProdSum += normalizedScore;
       trainingDayProdCount++;
+      trainingDayProdScores.push(normalizedScore);
     } else {
       nonTrainingDayProdSum += normalizedScore;
       nonTrainingDayProdCount++;
+      nonTrainingDayProdScores.push(normalizedScore);
     }
+  }
+
+  // Calculate averages
+  const trainingAvgMood = trainingDayMoodCount > 0 ? trainingDayMoodSum / trainingDayMoodCount : 0;
+  const nonTrainingAvgMood = nonTrainingDayMoodCount > 0 ? nonTrainingDayMoodSum / nonTrainingDayMoodCount : 0;
+  const trainingAvgProd = trainingDayProdCount > 0 ? trainingDayProdSum / trainingDayProdCount : 0;
+  const nonTrainingAvgProd = nonTrainingDayProdCount > 0 ? nonTrainingDayProdSum / nonTrainingDayProdCount : 0;
+
+  // Calculate standard deviations
+  const calcStdDev = (scores: number[], avg: number): number => {
+    if (scores.length < 2) return 0;
+    const variance = scores.reduce((sum, score) => sum + Math.pow(score - avg, 2), 0) / scores.length;
+    return Math.sqrt(variance);
+  };
+
+  const trainingMoodStdDev = calcStdDev(trainingDayMoodScores, trainingAvgMood);
+  const nonTrainingMoodStdDev = calcStdDev(nonTrainingDayMoodScores, nonTrainingAvgMood);
+  const trainingProdStdDev = calcStdDev(trainingDayProdScores, trainingAvgProd);
+  const nonTrainingProdStdDev = calcStdDev(nonTrainingDayProdScores, nonTrainingAvgProd);
+
+  // Calculate insights
+  const moodDiff = trainingAvgMood - nonTrainingAvgMood;
+  const prodDiff = trainingAvgProd - nonTrainingAvgProd;
+
+  // Calculate percentage differences (avoid division by zero)
+  const moodDiffPct = nonTrainingAvgMood !== 0 ? (moodDiff / Math.abs(nonTrainingAvgMood)) * 100 : 0;
+  const prodDiffPct = nonTrainingAvgProd !== 0 ? (prodDiff / Math.abs(nonTrainingAvgProd)) * 100 : 0;
+
+  // Determine confidence level based on sample size
+  const minCount = Math.min(trainingDayMoodCount, nonTrainingDayMoodCount, trainingDayProdCount, nonTrainingDayProdCount);
+  let confidenceLevel: "low" | "medium" | "high";
+  if (minCount >= 20) confidenceLevel = "high";
+  else if (minCount >= 10) confidenceLevel = "medium";
+  else confidenceLevel = "low";
+
+  // Determine if difference is significant (at least 0.3 difference or 15% change)
+  const significantDifference = Math.abs(moodDiff) > 0.3 || Math.abs(prodDiff) > 0.3 ||
+                                Math.abs(moodDiffPct) > 15 || Math.abs(prodDiffPct) > 15;
+
+  // Generate recommendation
+  let recommendation = "";
+  if (significantDifference) {
+    if (moodDiff > 0 && prodDiff > 0) {
+      recommendation = "Training days boost both mood and productivity. Keep up your exercise routine for optimal well-being!";
+    } else if (moodDiff < 0 && prodDiff < 0) {
+      recommendation = "Rest days show better mood and productivity. You might be overtraining. Consider adding more recovery time.";
+    } else if (moodDiff > 0 && prodDiff < 0) {
+      recommendation = "Training improves your mood but reduces productivity. Consider lighter workouts or scheduling them strategically.";
+    } else {
+      recommendation = "Productivity is higher on training days but mood suffers. Check if your training intensity is appropriate.";
+    }
+  } else {
+    recommendation = "Training doesn't show significant impact on your metrics yet. Keep tracking for more insights over time.";
   }
 
   return {
     trainingDays: {
-      averageMood: trainingDayMoodCount > 0 ? trainingDayMoodSum / trainingDayMoodCount : 0,
-      averageProductivity: trainingDayProdCount > 0 ? trainingDayProdSum / trainingDayProdCount : 0,
+      averageMood: trainingAvgMood,
+      averageProductivity: trainingAvgProd,
       count: Math.max(trainingDayMoodCount, trainingDayProdCount),
+      moodStdDev: trainingMoodStdDev,
+      productivityStdDev: trainingProdStdDev,
     },
     nonTrainingDays: {
-      averageMood: nonTrainingDayMoodCount > 0 ? nonTrainingDayMoodSum / nonTrainingDayMoodCount : 0,
-      averageProductivity: nonTrainingDayProdCount > 0 ? nonTrainingDayProdSum / nonTrainingDayProdCount : 0,
+      averageMood: nonTrainingAvgMood,
+      averageProductivity: nonTrainingAvgProd,
       count: Math.max(nonTrainingDayMoodCount, nonTrainingDayProdCount),
+      moodStdDev: nonTrainingMoodStdDev,
+      productivityStdDev: nonTrainingProdStdDev,
+    },
+    insights: {
+      moodDifference: moodDiff,
+      moodDifferencePercentage: moodDiffPct,
+      productivityDifference: prodDiff,
+      productivityDifferencePercentage: prodDiffPct,
+      confidenceLevel,
+      significantDifference,
+      recommendation,
     },
   };
 };

@@ -14,6 +14,7 @@ import {
   Platform,
   Keyboard,
 } from "react-native";
+import { useRouter } from "expo-router";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -24,13 +25,13 @@ import {
 } from "@/storage/database";
 import { createStyles } from "./FoodImpactAnalysisScreen.styles";
 import { useTheme } from "@/context/ThemeContext";
-import { BannerAd } from "@/components/ads";
 import { scaleFontSize } from "@/utils/responsive";
 
 type CorrelationType = "mood" | "productivity";
 
 const FoodImpactAnalysisScreen: React.FC = () => {
   const { theme } = useTheme();
+  const router = useRouter();
   const externalStyles = createStyles(theme);
   const POSITIVE_COLOR = "#3CB371";
   const NEUTRAL_COLOR = "#A9A9A9";
@@ -203,6 +204,9 @@ const FoodImpactAnalysisScreen: React.FC = () => {
     <SafeAreaView style={externalStyles.container}>
       <ScrollView>
         <View style={externalStyles.header}>
+          <TouchableOpacity onPress={() => router.push("/(tabs)/mood/analytics")} style={externalStyles.backButton}>
+            <Text style={externalStyles.backButtonText}>← Back</Text>
+          </TouchableOpacity>
           <View style={externalStyles.headerTopRow}>
             <View style={{ width: 40 }} />
             <Text style={externalStyles.headerEmoji}>🍎</Text>
@@ -220,8 +224,6 @@ const FoodImpactAnalysisScreen: React.FC = () => {
             Discover which foods positively or negatively affect your mood and productivity levels
           </Text>
         </View>
-
-        <BannerAd size="small" position="top" />
 
         <View style={externalStyles.chartWrapper}>
           <Text style={externalStyles.chartSectionTitle}>Time Period</Text>
@@ -512,8 +514,6 @@ const FoodImpactAnalysisScreen: React.FC = () => {
             </View>
           )}
         </View>
-
-        <BannerAd size="medium" position="bottom" />
       </ScrollView>
 
       <Modal

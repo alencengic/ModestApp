@@ -1,4 +1,4 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet, Platform } from "react-native";
 import { Theme } from "@/constants/ColorPalettes";
 
 export const createStyles = (theme: Theme) =>
@@ -32,6 +32,28 @@ export const createStyles = (theme: Theme) =>
       fontSize: 14,
       color: theme.colors.textSecondary,
       lineHeight: 20,
+    },
+    searchContainer: {
+      flexDirection: "row",
+      alignItems: "center",
+      marginHorizontal: theme.spacing.md,
+      marginBottom: theme.spacing.md,
+      position: "relative",
+    },
+    clearSearchButton: {
+      position: "absolute",
+      right: 12,
+      width: 28,
+      height: 28,
+      borderRadius: 14,
+      backgroundColor: theme.colors.border,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    clearSearchText: {
+      fontSize: 16,
+      color: theme.colors.textSecondary,
+      fontWeight: "600",
     },
     filterCard: {
       margin: theme.spacing.md,
@@ -189,6 +211,21 @@ export const createStyles = (theme: Theme) =>
       textAlign: "center",
       lineHeight: 24,
     },
+    loadMoreButton: {
+      marginTop: theme.spacing.md,
+      paddingVertical: theme.spacing.md,
+      paddingHorizontal: theme.spacing.lg,
+      backgroundColor: theme.colors.primary,
+      borderRadius: theme.borderRadius.round,
+      alignItems: "center",
+      alignSelf: "center",
+      minWidth: "80%",
+    },
+    loadMoreText: {
+      fontSize: 14,
+      fontWeight: "600",
+      color: theme.colors.textOnPrimary,
+    },
 
     // Modal styles
     modalOverlay: {
@@ -200,7 +237,9 @@ export const createStyles = (theme: Theme) =>
       backgroundColor: theme.colors.surface,
       borderTopLeftRadius: 20,
       borderTopRightRadius: 20,
-      padding: theme.spacing.xl,
+      paddingTop: theme.spacing.xl,
+      paddingHorizontal: theme.spacing.xl,
+      paddingBottom: 0,
       maxHeight: "90%",
     },
     modalTitle: {
@@ -298,7 +337,24 @@ export const createStyles = (theme: Theme) =>
       backgroundColor: theme.colors.background,
       borderRadius: theme.borderRadius.md,
       padding: theme.spacing.md,
-      maxHeight: 300,
+    },
+    customFoodContainer: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 8,
+      marginBottom: theme.spacing.sm,
+    },
+    addCustomFoodButton: {
+      backgroundColor: theme.colors.primary,
+      paddingVertical: 10,
+      paddingHorizontal: 16,
+      borderRadius: theme.borderRadius.md,
+      justifyContent: "center",
+    },
+    addCustomFoodText: {
+      color: theme.colors.textOnPrimary,
+      fontSize: 14,
+      fontWeight: "600",
     },
     searchInput: {
       backgroundColor: theme.colors.surface,
@@ -311,7 +367,8 @@ export const createStyles = (theme: Theme) =>
       marginBottom: theme.spacing.sm,
     },
     foodList: {
-      maxHeight: 240,
+      maxHeight: 200,
+      minHeight: 150,
     },
     foodOption: {
       flexDirection: "row",
@@ -341,8 +398,12 @@ export const createStyles = (theme: Theme) =>
     modalActions: {
       flexDirection: "row",
       gap: 12,
-      marginTop: theme.spacing.xl,
+      marginTop: theme.spacing.md,
       paddingTop: theme.spacing.md,
+      paddingBottom: Platform.OS === "ios" ? theme.spacing.xl : theme.spacing.md,
+      borderTopWidth: 1,
+      borderTopColor: theme.colors.border,
+      backgroundColor: theme.colors.surface,
     },
     modalButton: {
       flex: 1,

@@ -11,7 +11,7 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { getWeatherMoodCorrelation } from "@/storage/weather_data";
 import { createStyles } from "./WeatherMoodScreen.styles";
-import { BannerAd, VideoAd } from "@/components/ads";
+import { VideoAd } from "@/components/ads";
 import { useTheme } from "@/context/ThemeContext";
 
 interface MoodWeatherData {
@@ -243,8 +243,6 @@ const WeatherMoodScreen: React.FC = () => {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView>
-        <BannerAd size="small" position="top" />
-
         <View style={styles.header}>
           <View style={styles.headerRow}>
             <View style={{ flex: 1 }}>
@@ -561,8 +559,6 @@ const WeatherMoodScreen: React.FC = () => {
             </View>
           ))}
         </View>
-
-        <BannerAd size="medium" position="bottom" />
       </ScrollView>
     </SafeAreaView>
   );

@@ -13,7 +13,6 @@ import { insertOrUpdateMood } from "@/storage/database";
 import { insertOrUpdateProductivity } from "@/storage/productivity_entries";
 import { useMutationInsertFoodIntake } from "@/hooks/queries/useMutationInsertFoodIntake";
 import { useCreateSymptom } from "@/hooks/symptoms";
-import { BannerAd } from "@/components/ads";
 
 import { moodRatingStyles } from "@/views/MoodRating/MoodRating.styles";
 import { productivityRatingStyles } from "@/views/ProductivityRating/ProductivityRating.styles";
@@ -271,7 +270,6 @@ export default function DailyEnterScreen() {
               autoFocus={true}
               scrollViewRef={foodScrollViewRef}
             />
-            <BannerAd size="small" position="inline" />
           </ScrollView>
         </KeyboardAvoidingView>
       ),
