@@ -64,12 +64,12 @@ const OnboardingScreen: React.FC = () => {
 
   const handleSkip = async () => {
     await AsyncStorage.setItem("hasSeenOnboarding", "true");
-    router.replace("/(tabs)");
+    router.replace("/profile-setup");
   };
 
   const handleGetStarted = async () => {
     await AsyncStorage.setItem("hasSeenOnboarding", "true");
-    router.replace("/(tabs)");
+    router.replace("/profile-setup");
   };
 
   const isLastSlide = currentSlide === slides.length - 1;

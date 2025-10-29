@@ -8,11 +8,15 @@ import {
   Switch,
   SafeAreaView,
 } from "react-native";
+import { useRouter } from "expo-router";
 import { useTheme } from "@/context/ThemeContext";
+import { useUserProfile } from "@/context/UserProfileContext";
 import { ThemeMode, ColorPaletteName, COLOR_PALETTES } from "@/constants/ColorPalettes";
 
 export default function SettingsScreen() {
+  const router = useRouter();
   const { theme, themeMode, setThemeMode, colorPalette, setColorPalette, isDark } = useTheme();
+  const { name } = useUserProfile();
   const [isSaving, setIsSaving] = useState(false);
 
   const handleThemeModeChange = async (mode: ThemeMode) => {
@@ -162,11 +166,53 @@ export default function SettingsScreen() {
       fontSize: theme.typography.body.fontSize,
       fontWeight: "600",
     },
+    profileCard: {
+      backgroundColor: theme.colors.surface,
+      borderRadius: theme.borderRadius.lg,
+      padding: theme.spacing.lg,
+      marginBottom: theme.spacing.lg,
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      ...theme.shadows.sm,
+    },
+    profileInfo: {
+      flex: 1,
+    },
+    profileName: {
+      fontSize: 20,
+      fontWeight: "700",
+      color: theme.colors.textPrimary,
+      marginBottom: 4,
+    },
+    profileSubtext: {
+      fontSize: 14,
+      color: theme.colors.textSecondary,
+    },
+    chevron: {
+      fontSize: 20,
+      color: theme.colors.primary,
+      fontWeight: "700",
+    },
   });
 
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView style={styles.scrollView}>
+        {/* User Profile Card */}
+        <View style={styles.section}>
+          <TouchableOpacity
+            style={styles.profileCard}
+            onPress={() => router.push("/(tabs)/settings/user-profile")}
+          >
+            <View style={styles.profileInfo}>
+              <Text style={styles.profileName}>{name || "User"}</Text>
+              <Text style={styles.profileSubtext}>Manage your profile</Text>
+            </View>
+            <Text style={styles.chevron}>›</Text>
+          </TouchableOpacity>
+        </View>
+
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Theme Mode</Text>
           <Text style={styles.sectionDescription}>

@@ -68,6 +68,26 @@ export const openDatabase = async () => {
       created_at TEXT NOT NULL,
       updated_at TEXT NOT NULL
     );
+
+    CREATE TABLE IF NOT EXISTS user_profile (
+      id INTEGER PRIMARY KEY CHECK (id = 1),
+      name TEXT,
+      age INTEGER,
+      weight REAL,
+      weight_unit TEXT DEFAULT 'kg',
+      working_days TEXT,
+      sport_days TEXT,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS weight_history (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      weight REAL NOT NULL,
+      weight_unit TEXT NOT NULL,
+      date TEXT NOT NULL,
+      created_at TEXT NOT NULL
+    );
   `);
 
   // Migration: Add missing columns to weather_data if they don't exist
@@ -101,6 +121,24 @@ export const openDatabase = async () => {
     }
   } catch (error) {
     console.log('Weather data migration error:', error);
+  }
+
+  // Migration: Add missing columns to user_profile if they don't exist
+  try {
+    const profileTableInfo = await db.getAllAsync(`PRAGMA table_info(user_profile)`);
+    const profileColumnNames = profileTableInfo.map((col: any) => col.name);
+
+    if (!profileColumnNames.includes('name')) {
+      console.log('Migrating user_profile: adding name column');
+      await db.execAsync(`ALTER TABLE user_profile ADD COLUMN name TEXT;`);
+    }
+
+    if (!profileColumnNames.includes('age')) {
+      console.log('Migrating user_profile: adding age column');
+      await db.execAsync(`ALTER TABLE user_profile ADD COLUMN age INTEGER;`);
+    }
+  } catch (error) {
+    console.log('User profile migration error:', error);
   }
 
   return db;

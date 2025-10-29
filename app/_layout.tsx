@@ -16,6 +16,7 @@ import { useColorScheme } from "@/hooks/useColorScheme";
 import { useWeatherSync } from "@/hooks/useWeatherSync";
 import { requestNotificationPermissions, scheduleDailyNotifications } from "@/services/notificationService";
 import { ThemeProvider, useTheme } from "@/context/ThemeContext";
+import { UserProfileProvider } from "@/context/UserProfileContext";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -76,6 +77,7 @@ function RootLayoutNav() {
     <NavigationThemeProvider value={isDark ? DarkTheme : DefaultTheme}>
       <Stack>
         <Stack.Screen name="onboarding" options={{ headerShown: false }} />
+        <Stack.Screen name="profile-setup" options={{ headerShown: false }} />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="journal-entry-detail" options={{ headerShown: false }} />
         <Stack.Screen name="+not-found" />
@@ -103,7 +105,9 @@ export default function RootLayout() {
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
-        <RootLayoutNav />
+        <UserProfileProvider>
+          <RootLayoutNav />
+        </UserProfileProvider>
       </ThemeProvider>
     </QueryClientProvider>
   );

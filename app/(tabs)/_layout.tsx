@@ -122,6 +122,16 @@ export default function TabLayout() {
           title: "Symptoms",
         }}
       />
+      <Drawer.Screen
+        name="settings/user-profile"
+        options={{
+          title: "User Profile",
+          drawerIcon: ({ color }) => (
+            <IconSymbol size={24} name="person.fill" color={color} />
+          ),
+          headerShown: true,
+        }}
+      />
     </Drawer>
   );
 }

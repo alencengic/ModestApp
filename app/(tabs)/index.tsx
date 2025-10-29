@@ -12,6 +12,7 @@ import { DateTime } from "luxon";
 import { useState, useCallback } from "react";
 
 import { useTheme } from "@/context/ThemeContext";
+import { useUserProfile } from "@/context/UserProfileContext";
 import { BannerAd } from "@/components/ads";
 import {
   sendTestNotification,
@@ -63,7 +64,16 @@ const quickAccessItems: {
 
 export default function HomeScreen() {
   const { theme } = useTheme();
+  const { name } = useUserProfile();
   const [hasExistingData, setHasExistingData] = useState(false);
+
+  // Get greeting based on time of day
+  const getGreeting = () => {
+    const hour = DateTime.now().hour;
+    if (hour < 12) return "Good Morning";
+    if (hour < 18) return "Good Afternoon";
+    return "Good Evening";
+  };
 
   const styles = StyleSheet.create({
     safeArea: {
@@ -208,7 +218,9 @@ export default function HomeScreen() {
     <SafeAreaView style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.container}>
         <View style={styles.header}>
-          <Text style={styles.headerTitle}>Welcome back</Text>
+          <Text style={styles.headerTitle}>
+            {getGreeting()}{name ? `, ${name}` : ""}
+          </Text>
 
           <TouchableOpacity
             style={styles.startButton}
