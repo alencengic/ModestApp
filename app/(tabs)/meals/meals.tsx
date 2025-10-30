@@ -1,6 +1,5 @@
 import React, { useState, useMemo } from "react";
 import {
-  SafeAreaView,
   ScrollView,
   View,
   Text,
@@ -12,6 +11,7 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useTheme } from "@/context/ThemeContext";
 import { createStyles } from "./MealsScreen.styles";
 import {
@@ -48,6 +48,10 @@ export default function MealsScreen() {
   const [showFoodPicker, setShowFoodPicker] = useState(false);
   const [foodSearchQuery, setFoodSearchQuery] = useState("");
   const [customFoodInput, setCustomFoodInput] = useState("");
+
+  const modalScrollViewRef = React.useRef<ScrollView>(null);
+  const selectedFoodsRef = React.useRef<View>(null);
+  const [selectedFoodsPosition, setSelectedFoodsPosition] = useState(0);
 
   const { data: meals = [], isLoading, refetch } = useGetAllMeals();
   const insertMeal = useInsertMeal();
@@ -135,6 +139,16 @@ export default function MealsScreen() {
 
     setSelectedFoods([...selectedFoods, trimmedFood]);
     setCustomFoodInput("");
+
+    // Scroll to show the selected foods section
+    setTimeout(() => {
+      if (modalScrollViewRef.current && selectedFoodsPosition > 0) {
+        modalScrollViewRef.current.scrollTo({
+          y: Math.max(0, selectedFoodsPosition - 20),
+          animated: true
+        });
+      }
+    }, 100);
   };
 
   const handleSaveMeal = async () => {
@@ -193,6 +207,16 @@ export default function MealsScreen() {
       setSelectedFoods(selectedFoods.filter((f) => f !== food));
     } else {
       setSelectedFoods([...selectedFoods, food]);
+
+      // Scroll to show the selected foods section when adding
+      setTimeout(() => {
+        if (modalScrollViewRef.current && selectedFoodsPosition > 0) {
+          modalScrollViewRef.current.scrollTo({
+            y: Math.max(0, selectedFoodsPosition - 20),
+            animated: true
+          });
+        }
+      }, 100);
     }
   };
 
@@ -360,20 +384,23 @@ export default function MealsScreen() {
         transparent
         onRequestClose={closeModal}
       >
-        <KeyboardAvoidingView
-          behavior={Platform.OS === "ios" ? "padding" : "height"}
-          style={styles.modalOverlay}
-          keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
-        >
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>
-              {editingMeal ? "Edit Meal" : "Create New Meal"}
-            </Text>
-            <ScrollView
-              keyboardShouldPersistTaps="handled"
-              showsVerticalScrollIndicator={true}
-              nestedScrollEnabled={true}
-            >
+        <View style={styles.modalOverlay}>
+          <KeyboardAvoidingView
+            behavior={Platform.OS === "ios" ? "padding" : undefined}
+            style={{ flex: 1 }}
+            keyboardVerticalOffset={Platform.OS === "ios" ? 60 : 0}
+          >
+            <View style={styles.modalContent}>
+              <Text style={styles.modalTitle}>
+                {editingMeal ? "Edit Meal" : "Create New Meal"}
+              </Text>
+              <ScrollView
+                ref={modalScrollViewRef}
+                keyboardShouldPersistTaps="handled"
+                showsVerticalScrollIndicator={true}
+                nestedScrollEnabled={true}
+                contentContainerStyle={{ paddingBottom: 20 }}
+              >
 
               {/* Meal Name */}
               <Text style={styles.inputLabel}>Meal Name</Text>
@@ -410,19 +437,28 @@ export default function MealsScreen() {
               </View>
 
               {/* Selected Foods */}
-              <Text style={styles.inputLabel}>Foods ({selectedFoods.length})</Text>
-              {selectedFoods.length > 0 && (
-                <View style={styles.selectedFoodsContainer}>
-                  {selectedFoods.map((food, index) => (
-                    <View key={index} style={styles.selectedFoodChip}>
-                      <Text style={styles.selectedFoodText}>{food}</Text>
-                      <TouchableOpacity onPress={() => removeFoodFromSelected(food)}>
-                        <Text style={styles.removeFoodButton}>×</Text>
-                      </TouchableOpacity>
-                    </View>
-                  ))}
-                </View>
-              )}
+              <View
+                ref={selectedFoodsRef}
+                collapsable={false}
+                onLayout={(event) => {
+                  const { y } = event.nativeEvent.layout;
+                  setSelectedFoodsPosition(y);
+                }}
+              >
+                <Text style={styles.inputLabel}>Foods ({selectedFoods.length})</Text>
+                {selectedFoods.length > 0 && (
+                  <View style={styles.selectedFoodsContainer}>
+                    {selectedFoods.map((food, index) => (
+                      <View key={index} style={styles.selectedFoodChip}>
+                        <Text style={styles.selectedFoodText}>{food}</Text>
+                        <TouchableOpacity onPress={() => removeFoodFromSelected(food)}>
+                          <Text style={styles.removeFoodButton}>×</Text>
+                        </TouchableOpacity>
+                      </View>
+                    ))}
+                  </View>
+                )}
+              </View>
 
               {/* Add Food Button */}
               <TouchableOpacity
@@ -495,25 +531,26 @@ export default function MealsScreen() {
               )}
             </ScrollView>
 
-            {/* Action Buttons - Fixed at bottom */}
-            <View style={styles.modalActions}>
-              <TouchableOpacity
-                style={[styles.modalButton, styles.modalButtonSecondary]}
-                onPress={closeModal}
-              >
-                <Text style={styles.modalButtonTextSecondary}>Cancel</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.modalButton, styles.modalButtonPrimary]}
-                onPress={handleSaveMeal}
-              >
-                <Text style={styles.modalButtonTextPrimary}>
-                  {editingMeal ? "Update" : "Create"}
-                </Text>
-              </TouchableOpacity>
+              {/* Action Buttons - Fixed at bottom */}
+              <View style={styles.modalActions}>
+                <TouchableOpacity
+                  style={[styles.modalButton, styles.modalButtonSecondary]}
+                  onPress={closeModal}
+                >
+                  <Text style={styles.modalButtonTextSecondary}>Cancel</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.modalButton, styles.modalButtonPrimary]}
+                  onPress={handleSaveMeal}
+                >
+                  <Text style={styles.modalButtonTextPrimary}>
+                    {editingMeal ? "Update" : "Create"}
+                  </Text>
+                </TouchableOpacity>
+              </View>
             </View>
-          </View>
-        </KeyboardAvoidingView>
+          </KeyboardAvoidingView>
+        </View>
       </Modal>
     </SafeAreaView>
   );

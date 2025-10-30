@@ -241,6 +241,7 @@ export const createStyles = (theme: Theme) =>
       paddingHorizontal: theme.spacing.xl,
       paddingBottom: 0,
       maxHeight: "90%",
+      flex: 1,
     },
     modalTitle: {
       fontSize: 24,
@@ -367,8 +368,8 @@ export const createStyles = (theme: Theme) =>
       marginBottom: theme.spacing.sm,
     },
     foodList: {
-      maxHeight: 200,
-      minHeight: 150,
+      maxHeight: 300,
+      minHeight: 200,
     },
     foodOption: {
       flexDirection: "row",
