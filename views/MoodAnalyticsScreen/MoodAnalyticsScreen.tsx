@@ -39,16 +39,6 @@ const MoodAnalyticsScreen: React.FC = () => {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView>
-        <View style={styles.header}>
-          <Text style={styles.headerEmoji}>😊</Text>
-          <Text style={styles.headerTitle}>
-            Mood & Productivity Analytics
-          </Text>
-          <Text style={styles.headerDescription}>
-            Understand how food and lifestyle choices affect your well-being
-          </Text>
-        </View>
-
         <BannerAd size="small" position="top" />
 
         <View style={styles.optionsContainer}>

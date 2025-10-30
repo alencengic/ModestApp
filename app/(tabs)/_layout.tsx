@@ -25,6 +25,7 @@ export default function TabLayout() {
         headerTitleStyle: {
           color: theme.colors.textPrimary,
         },
+        swipeEnabled: true,
       }}
     >
       <Drawer.Screen
@@ -37,39 +38,33 @@ export default function TabLayout() {
         }}
       />
       <Drawer.Screen
-        name="daily/journal"
+        name="daily"
         options={{
           title: "Daily Journal",
           drawerIcon: ({ color }) => (
             <IconSymbol size={24} name="book.closed.fill" color={color} />
           ),
+          headerShown: true,
         }}
       />
       <Drawer.Screen
-        name="trends/trends"
+        name="trends"
         options={{
-          title: "Trends and Analytics",
+          title: "Trends & Analytics",
           drawerIcon: ({ color }) => (
             <IconSymbol size={24} name="chart.bar" color={color} />
           ),
+          headerShown: true,
         }}
       />
       <Drawer.Screen
-        name="mood/analytics"
+        name="mood"
         options={{
           title: "Mood Analytics",
           drawerIcon: ({ color }) => (
             <IconSymbol size={24} name="face.smiling" color={color} />
           ),
-        }}
-      />
-      <Drawer.Screen
-        name="trends/food-analytics"
-        options={{
-          title: "Food Analytics",
-          drawerIcon: ({ color }) => (
-            <IconSymbol size={24} name="fork.knife" color={color} />
-          ),
+          headerShown: true,
         }}
       />
       <Drawer.Screen
@@ -91,11 +86,10 @@ export default function TabLayout() {
         }}
       />
       <Drawer.Screen
-        name="daily/daily"
+        name="symptoms"
         options={{
           drawerItemStyle: { display: "none" },
-          headerShown: true,
-          title: "Daily Entry",
+          headerShown: false,
         }}
       />
       <Drawer.Screen
@@ -103,14 +97,6 @@ export default function TabLayout() {
         options={{
           drawerItemStyle: { display: "none" },
           headerShown: false,
-        }}
-      />
-      <Drawer.Screen
-        name="symptoms/post-meal"
-        options={{
-          drawerItemStyle: { display: "none" },
-          headerShown: true,
-          title: "Symptoms",
         }}
       />
       <Drawer.Screen
@@ -130,22 +116,6 @@ export default function TabLayout() {
           drawerIcon: ({ color }) => (
             <IconSymbol size={24} name="gearshape.fill" color={color} />
           ),
-        }}
-      />
-      <Drawer.Screen
-        name="mood/lifestyle-analysis"
-        options={{
-          drawerItemStyle: { display: "none" },
-          headerShown: true,
-          title: "Lifestyle Factors",
-        }}
-      />
-      <Drawer.Screen
-        name="mood/food-impact-analysis"
-        options={{
-          drawerItemStyle: { display: "none" },
-          headerShown: true,
-          title: "Food Impact Analysis",
         }}
       />
     </Drawer>

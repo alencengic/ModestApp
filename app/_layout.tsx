@@ -77,7 +77,12 @@ function RootLayoutNav() {
 
   return (
     <NavigationThemeProvider value={isDark ? DarkTheme : DefaultTheme}>
-      <Stack>
+      <Stack
+        screenOptions={{
+          gestureEnabled: true,
+          fullScreenGestureEnabled: true,
+        }}
+      >
         <Stack.Screen name="onboarding" options={{ headerShown: false }} />
         <Stack.Screen name="profile-setup" options={{ headerShown: false }} />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />

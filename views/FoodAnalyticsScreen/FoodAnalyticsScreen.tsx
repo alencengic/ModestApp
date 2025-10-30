@@ -2,6 +2,7 @@ import React, { useState, useMemo } from "react";
 import { ScrollView, View, StyleSheet, Text, TouchableOpacity, Modal, Pressable } from "react-native";
 import { List, Card, ActivityIndicator, Icon } from "react-native-paper";
 import { useQuery } from "@tanstack/react-query";
+import { useRouter } from "expo-router";
 import {
   getFoodSymptomCorrelationData,
   SymptomType,
@@ -37,6 +38,7 @@ const ITEMS_PER_PAGE = 10;
 
 export default function FoodAnalyticsScreen() {
   const { theme } = useTheme();
+  const router = useRouter();
   const POSITIVE_COLOR = "#3CB371";
   const NEUTRAL_COLOR = "#A9A9A9";
   const NEGATIVE_COLOR = "#CD5C5C";
@@ -237,8 +239,21 @@ export default function FoodAnalyticsScreen() {
     },
     header: {
       padding: theme.spacing.xl,
-      alignItems: "center",
       backgroundColor: theme.colors.background,
+    },
+    backButton: {
+      paddingVertical: theme.spacing.sm,
+      paddingHorizontal: theme.spacing.md,
+      marginBottom: theme.spacing.md,
+      alignSelf: "flex-start",
+    },
+    backButtonText: {
+      fontSize: 16,
+      color: theme.colors.primary,
+      fontWeight: "600",
+    },
+    headerContent: {
+      alignItems: "center",
     },
     headerEmoji: {
       fontSize: 48,
@@ -667,18 +682,23 @@ export default function FoodAnalyticsScreen() {
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.header}>
-        <View style={styles.headerTopRow}>
-          <View style={{ width: 40 }} />
-          <Text style={styles.headerEmoji}>🍎</Text>
-          <TouchableOpacity
-            style={styles.infoButton}
-            onPress={() => setIsInfoModalVisible(true)}
-          >
-            <Text style={styles.infoButtonText}>ⓘ</Text>
-          </TouchableOpacity>
+        <TouchableOpacity onPress={() => router.push("/(tabs)/trends/trends")} style={styles.backButton}>
+          <Text style={styles.backButtonText}>← Back</Text>
+        </TouchableOpacity>
+        <View style={styles.headerContent}>
+          <View style={styles.headerTopRow}>
+            <View style={{ width: 40 }} />
+            <Text style={styles.headerEmoji}>🍎</Text>
+            <TouchableOpacity
+              style={styles.infoButton}
+              onPress={() => setIsInfoModalVisible(true)}
+            >
+              <Text style={styles.infoButtonText}>ⓘ</Text>
+            </TouchableOpacity>
+          </View>
+          <Text style={styles.headerTitle}>Food Analytics</Text>
+          <Text style={styles.headerSubtitle}>Track symptom correlations</Text>
         </View>
-        <Text style={styles.headerTitle}>Food Analytics</Text>
-        <Text style={styles.headerSubtitle}>Track symptom correlations</Text>
       </View>
 
       {/* Summary Stats */}

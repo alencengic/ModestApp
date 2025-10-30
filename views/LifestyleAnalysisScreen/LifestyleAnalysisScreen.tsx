@@ -29,13 +29,19 @@ const LifestyleAnalysisScreen: React.FC = () => {
   const styles = createStyles(theme);
 
   // Query for working day analysis
-  const { data: workingDayData, isLoading: isLoadingWorking } = useQuery<WorkingDayAnalysis, Error>({
+  const { data: workingDayData, isLoading: isLoadingWorking } = useQuery<
+    WorkingDayAnalysis,
+    Error
+  >({
     queryKey: ["workingDayAnalysis"],
     queryFn: getWorkingDayAnalysis,
   });
 
   // Query for training day analysis
-  const { data: trainingDayData, isLoading: isLoadingTraining } = useQuery<TrainingDayAnalysis, Error>({
+  const { data: trainingDayData, isLoading: isLoadingTraining } = useQuery<
+    TrainingDayAnalysis,
+    Error
+  >({
     queryKey: ["trainingDayAnalysis"],
     queryFn: getTrainingDayAnalysis,
   });
@@ -77,9 +83,8 @@ const LifestyleAnalysisScreen: React.FC = () => {
     const absDiff = Math.abs(diff);
     const metricLabel = metric === "mood" ? "mood" : "productivity";
 
-    // If both scores are high (both > 0.5), emphasize that both are good
     const bothHigh = trainingScore > 0.5 && restScore > 0.5;
-    // If both scores are positive (both > 0), emphasize that both are decent
+
     const bothPositive = trainingScore > 0 && restScore > 0;
 
     if (absDiff < 0.15) {
@@ -156,24 +161,30 @@ const LifestyleAnalysisScreen: React.FC = () => {
     }
   };
 
-  const getDataReliability = (count1: number, count2: number): { level: "low" | "moderate" | "good", message: string } => {
+  const getDataReliability = (
+    count1: number,
+    count2: number
+  ): { level: "low" | "moderate" | "good"; message: string } => {
     const minCount = Math.min(count1, count2);
     const totalCount = count1 + count2;
 
     if (minCount < 5) {
       return {
         level: "low",
-        message: "⚠️ Limited data: Keep tracking for at least 5 days in each category for more reliable insights."
+        message:
+          "⚠️ Limited data: Keep tracking for at least 5 days in each category for more reliable insights.",
       };
     } else if (minCount < 10 || totalCount < 21) {
       return {
         level: "moderate",
-        message: "📊 Building insights: Track for 2-3 more weeks for stronger patterns and recommendations."
+        message:
+          "📊 Building insights: Track for 2-3 more weeks for stronger patterns and recommendations.",
       };
     } else {
       return {
         level: "good",
-        message: "✅ Good data coverage: These insights are based on sufficient tracking data."
+        message:
+          "✅ Good data coverage: These insights are based on sufficient tracking data.",
       };
     }
   };
@@ -193,22 +204,24 @@ const LifestyleAnalysisScreen: React.FC = () => {
     <SafeAreaView style={styles.container}>
       <ScrollView>
         <View style={styles.header}>
-          <TouchableOpacity onPress={() => router.push("/(tabs)/mood/analytics")} style={styles.backButton}>
+          <TouchableOpacity
+            onPress={() => router.push("/(tabs)/mood/analytics")}
+            style={styles.backButton}
+          >
             <Text style={styles.backButtonText}>← Back</Text>
           </TouchableOpacity>
           <Text style={styles.headerEmoji}>📊</Text>
           <Text style={styles.headerTitle}>Lifestyle Factors</Text>
           <Text style={styles.headerDescription}>
-            Analyze how your daily routine, work schedule, and exercise habits impact your mental well-being and productivity
+            Analyze how your daily routine, work schedule, and exercise habits
+            impact your mental well-being and productivity
           </Text>
         </View>
 
         {/* Working Days vs Non-Working Days Analysis */}
         {workingDayData && workingDayData.workingDays.count > 0 ? (
           <View style={styles.chartWrapper}>
-            <Text style={styles.chartSectionTitle}>
-              💼 Work-Life Balance
-            </Text>
+            <Text style={styles.chartSectionTitle}>💼 Work-Life Balance</Text>
             <Text style={styles.sectionDescription}>
               See how your well-being differs between work days and weekends
             </Text>
@@ -224,16 +237,21 @@ const LifestyleAnalysisScreen: React.FC = () => {
                   style={[
                     styles.reliabilityWarning,
                     reliability.level === "low" && styles.reliabilityWarningLow,
-                    reliability.level === "moderate" && styles.reliabilityWarningModerate,
-                    reliability.level === "good" && styles.reliabilityWarningGood,
+                    reliability.level === "moderate" &&
+                      styles.reliabilityWarningModerate,
+                    reliability.level === "good" &&
+                      styles.reliabilityWarningGood,
                   ]}
                 >
                   <Text
                     style={[
                       styles.reliabilityWarningText,
-                      reliability.level === "low" && styles.reliabilityWarningTextLow,
-                      reliability.level === "moderate" && styles.reliabilityWarningTextModerate,
-                      reliability.level === "good" && styles.reliabilityWarningTextGood,
+                      reliability.level === "low" &&
+                        styles.reliabilityWarningTextLow,
+                      reliability.level === "moderate" &&
+                        styles.reliabilityWarningTextModerate,
+                      reliability.level === "good" &&
+                        styles.reliabilityWarningTextGood,
                     ]}
                   >
                     {reliability.message}
@@ -251,7 +269,10 @@ const LifestyleAnalysisScreen: React.FC = () => {
                 </Text>
                 <View style={styles.confidenceContainer}>
                   <Text style={styles.confidenceLabel}>
-                    Confidence: <Text style={styles.confidenceBold}>{workingDayData.insights.confidenceLevel}</Text>
+                    Confidence:{" "}
+                    <Text style={styles.confidenceBold}>
+                      {workingDayData.insights.confidenceLevel}
+                    </Text>
                   </Text>
                   {workingDayData.insights.significantDifference && (
                     <View style={styles.significantBadge}>
@@ -275,7 +296,14 @@ const LifestyleAnalysisScreen: React.FC = () => {
                   <Text style={styles.comparisonMetricValue}>
                     {getScoreEmoji(workingDayData.workingDays.averageMood)}
                   </Text>
-                  <Text style={[styles.comparisonMetricCategory, { color: getColor(workingDayData.workingDays.averageMood) }]}>
+                  <Text
+                    style={[
+                      styles.comparisonMetricCategory,
+                      {
+                        color: getColor(workingDayData.workingDays.averageMood),
+                      },
+                    ]}
+                  >
                     {formatScoreLabel(workingDayData.workingDays.averageMood)}
                   </Text>
                 </View>
@@ -283,10 +311,23 @@ const LifestyleAnalysisScreen: React.FC = () => {
                 <View style={styles.comparisonMetric}>
                   <Text style={styles.comparisonMetricLabel}>Productivity</Text>
                   <Text style={styles.comparisonMetricValue}>
-                    {getScoreEmoji(workingDayData.workingDays.averageProductivity)}
+                    {getScoreEmoji(
+                      workingDayData.workingDays.averageProductivity
+                    )}
                   </Text>
-                  <Text style={[styles.comparisonMetricCategory, { color: getColor(workingDayData.workingDays.averageProductivity) }]}>
-                    {formatScoreLabel(workingDayData.workingDays.averageProductivity)}
+                  <Text
+                    style={[
+                      styles.comparisonMetricCategory,
+                      {
+                        color: getColor(
+                          workingDayData.workingDays.averageProductivity
+                        ),
+                      },
+                    ]}
+                  >
+                    {formatScoreLabel(
+                      workingDayData.workingDays.averageProductivity
+                    )}
                   </Text>
                 </View>
               </View>
@@ -303,18 +344,42 @@ const LifestyleAnalysisScreen: React.FC = () => {
                   <Text style={styles.comparisonMetricValue}>
                     {getScoreEmoji(workingDayData.nonWorkingDays.averageMood)}
                   </Text>
-                  <Text style={[styles.comparisonMetricCategory, { color: getColor(workingDayData.nonWorkingDays.averageMood) }]}>
-                    {formatScoreLabel(workingDayData.nonWorkingDays.averageMood)}
+                  <Text
+                    style={[
+                      styles.comparisonMetricCategory,
+                      {
+                        color: getColor(
+                          workingDayData.nonWorkingDays.averageMood
+                        ),
+                      },
+                    ]}
+                  >
+                    {formatScoreLabel(
+                      workingDayData.nonWorkingDays.averageMood
+                    )}
                   </Text>
                 </View>
 
                 <View style={styles.comparisonMetric}>
                   <Text style={styles.comparisonMetricLabel}>Productivity</Text>
                   <Text style={styles.comparisonMetricValue}>
-                    {getScoreEmoji(workingDayData.nonWorkingDays.averageProductivity)}
+                    {getScoreEmoji(
+                      workingDayData.nonWorkingDays.averageProductivity
+                    )}
                   </Text>
-                  <Text style={[styles.comparisonMetricCategory, { color: getColor(workingDayData.nonWorkingDays.averageProductivity) }]}>
-                    {formatScoreLabel(workingDayData.nonWorkingDays.averageProductivity)}
+                  <Text
+                    style={[
+                      styles.comparisonMetricCategory,
+                      {
+                        color: getColor(
+                          workingDayData.nonWorkingDays.averageProductivity
+                        ),
+                      },
+                    ]}
+                  >
+                    {formatScoreLabel(
+                      workingDayData.nonWorkingDays.averageProductivity
+                    )}
                   </Text>
                 </View>
               </View>
@@ -334,7 +399,7 @@ const LifestyleAnalysisScreen: React.FC = () => {
                       ),
                       fontWeight: "600",
                       fontSize: 15,
-                    }
+                    },
                   ]}
                 >
                   {getWorkImpactDescription(
@@ -355,7 +420,7 @@ const LifestyleAnalysisScreen: React.FC = () => {
                       ),
                       fontWeight: "600",
                       fontSize: 15,
-                    }
+                    },
                   ]}
                 >
                   {getWorkImpactDescription(
@@ -373,7 +438,8 @@ const LifestyleAnalysisScreen: React.FC = () => {
           <View style={styles.chartWrapper}>
             <View style={styles.centered}>
               <Text style={styles.centeredText}>
-                No working day data available yet. Keep tracking to see insights!
+                No working day data available yet. Keep tracking to see
+                insights!
               </Text>
             </View>
           </View>
@@ -400,16 +466,21 @@ const LifestyleAnalysisScreen: React.FC = () => {
                   style={[
                     styles.reliabilityWarning,
                     reliability.level === "low" && styles.reliabilityWarningLow,
-                    reliability.level === "moderate" && styles.reliabilityWarningModerate,
-                    reliability.level === "good" && styles.reliabilityWarningGood,
+                    reliability.level === "moderate" &&
+                      styles.reliabilityWarningModerate,
+                    reliability.level === "good" &&
+                      styles.reliabilityWarningGood,
                   ]}
                 >
                   <Text
                     style={[
                       styles.reliabilityWarningText,
-                      reliability.level === "low" && styles.reliabilityWarningTextLow,
-                      reliability.level === "moderate" && styles.reliabilityWarningTextModerate,
-                      reliability.level === "good" && styles.reliabilityWarningTextGood,
+                      reliability.level === "low" &&
+                        styles.reliabilityWarningTextLow,
+                      reliability.level === "moderate" &&
+                        styles.reliabilityWarningTextModerate,
+                      reliability.level === "good" &&
+                        styles.reliabilityWarningTextGood,
                     ]}
                   >
                     {reliability.message}
@@ -427,7 +498,10 @@ const LifestyleAnalysisScreen: React.FC = () => {
                 </Text>
                 <View style={styles.confidenceContainer}>
                   <Text style={styles.confidenceLabel}>
-                    Confidence: <Text style={styles.confidenceBold}>{trainingDayData.insights.confidenceLevel}</Text>
+                    Confidence:{" "}
+                    <Text style={styles.confidenceBold}>
+                      {trainingDayData.insights.confidenceLevel}
+                    </Text>
                   </Text>
                   {trainingDayData.insights.significantDifference && (
                     <View style={styles.significantBadge}>
@@ -451,7 +525,16 @@ const LifestyleAnalysisScreen: React.FC = () => {
                   <Text style={styles.comparisonMetricValue}>
                     {getScoreEmoji(trainingDayData.trainingDays.averageMood)}
                   </Text>
-                  <Text style={[styles.comparisonMetricCategory, { color: getColor(trainingDayData.trainingDays.averageMood) }]}>
+                  <Text
+                    style={[
+                      styles.comparisonMetricCategory,
+                      {
+                        color: getColor(
+                          trainingDayData.trainingDays.averageMood
+                        ),
+                      },
+                    ]}
+                  >
                     {formatScoreLabel(trainingDayData.trainingDays.averageMood)}
                   </Text>
                 </View>
@@ -459,10 +542,23 @@ const LifestyleAnalysisScreen: React.FC = () => {
                 <View style={styles.comparisonMetric}>
                   <Text style={styles.comparisonMetricLabel}>Productivity</Text>
                   <Text style={styles.comparisonMetricValue}>
-                    {getScoreEmoji(trainingDayData.trainingDays.averageProductivity)}
+                    {getScoreEmoji(
+                      trainingDayData.trainingDays.averageProductivity
+                    )}
                   </Text>
-                  <Text style={[styles.comparisonMetricCategory, { color: getColor(trainingDayData.trainingDays.averageProductivity) }]}>
-                    {formatScoreLabel(trainingDayData.trainingDays.averageProductivity)}
+                  <Text
+                    style={[
+                      styles.comparisonMetricCategory,
+                      {
+                        color: getColor(
+                          trainingDayData.trainingDays.averageProductivity
+                        ),
+                      },
+                    ]}
+                  >
+                    {formatScoreLabel(
+                      trainingDayData.trainingDays.averageProductivity
+                    )}
                   </Text>
                 </View>
               </View>
@@ -479,18 +575,42 @@ const LifestyleAnalysisScreen: React.FC = () => {
                   <Text style={styles.comparisonMetricValue}>
                     {getScoreEmoji(trainingDayData.nonTrainingDays.averageMood)}
                   </Text>
-                  <Text style={[styles.comparisonMetricCategory, { color: getColor(trainingDayData.nonTrainingDays.averageMood) }]}>
-                    {formatScoreLabel(trainingDayData.nonTrainingDays.averageMood)}
+                  <Text
+                    style={[
+                      styles.comparisonMetricCategory,
+                      {
+                        color: getColor(
+                          trainingDayData.nonTrainingDays.averageMood
+                        ),
+                      },
+                    ]}
+                  >
+                    {formatScoreLabel(
+                      trainingDayData.nonTrainingDays.averageMood
+                    )}
                   </Text>
                 </View>
 
                 <View style={styles.comparisonMetric}>
                   <Text style={styles.comparisonMetricLabel}>Productivity</Text>
                   <Text style={styles.comparisonMetricValue}>
-                    {getScoreEmoji(trainingDayData.nonTrainingDays.averageProductivity)}
+                    {getScoreEmoji(
+                      trainingDayData.nonTrainingDays.averageProductivity
+                    )}
                   </Text>
-                  <Text style={[styles.comparisonMetricCategory, { color: getColor(trainingDayData.nonTrainingDays.averageProductivity) }]}>
-                    {formatScoreLabel(trainingDayData.nonTrainingDays.averageProductivity)}
+                  <Text
+                    style={[
+                      styles.comparisonMetricCategory,
+                      {
+                        color: getColor(
+                          trainingDayData.nonTrainingDays.averageProductivity
+                        ),
+                      },
+                    ]}
+                  >
+                    {formatScoreLabel(
+                      trainingDayData.nonTrainingDays.averageProductivity
+                    )}
                   </Text>
                 </View>
               </View>
@@ -498,7 +618,9 @@ const LifestyleAnalysisScreen: React.FC = () => {
 
             {/* Exercise Impact Summary */}
             <View style={styles.differenceSummary}>
-              <Text style={styles.differenceSummaryTitle}>💪 Exercise Impact</Text>
+              <Text style={styles.differenceSummaryTitle}>
+                💪 Exercise Impact
+              </Text>
               <View style={{ marginTop: 12, gap: 8 }}>
                 <Text
                   style={[
@@ -510,7 +632,7 @@ const LifestyleAnalysisScreen: React.FC = () => {
                       ),
                       fontWeight: "600",
                       fontSize: 15,
-                    }
+                    },
                   ]}
                 >
                   {getExerciseImpactDescription(
@@ -531,7 +653,7 @@ const LifestyleAnalysisScreen: React.FC = () => {
                       ),
                       fontWeight: "600",
                       fontSize: 15,
-                    }
+                    },
                   ]}
                 >
                   {getExerciseImpactDescription(
@@ -549,7 +671,8 @@ const LifestyleAnalysisScreen: React.FC = () => {
           <View style={styles.chartWrapper}>
             <View style={styles.centered}>
               <Text style={styles.centeredText}>
-                No training day data available yet. Set your training days in settings and keep tracking!
+                No training day data available yet. Set your training days in
+                settings and keep tracking!
               </Text>
             </View>
           </View>

@@ -381,16 +381,15 @@ export default function MealsScreen() {
       <Modal
         visible={showModal}
         animationType="slide"
-        transparent
+        presentationStyle="pageSheet"
         onRequestClose={closeModal}
       >
-        <View style={styles.modalOverlay}>
-          <KeyboardAvoidingView
-            behavior={Platform.OS === "ios" ? "padding" : undefined}
-            style={{ flex: 1 }}
-            keyboardVerticalOffset={Platform.OS === "ios" ? 60 : 0}
-          >
-            <View style={styles.modalContent}>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : undefined}
+          style={{ flex: 1 }}
+          keyboardVerticalOffset={Platform.OS === "ios" ? 60 : 0}
+        >
+          <View style={styles.modalContent}>
               <Text style={styles.modalTitle}>
                 {editingMeal ? "Edit Meal" : "Create New Meal"}
               </Text>
@@ -549,8 +548,7 @@ export default function MealsScreen() {
                 </TouchableOpacity>
               </View>
             </View>
-          </KeyboardAvoidingView>
-        </View>
+        </KeyboardAvoidingView>
       </Modal>
     </SafeAreaView>
   );

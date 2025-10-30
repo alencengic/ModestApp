@@ -7,29 +7,6 @@ export const createStyles = (theme: Theme) => StyleSheet.create({
     flex: 1,
     backgroundColor: theme.colors.background,
   },
-  header: {
-    padding: theme.spacing.xl,
-    alignItems: "center",
-    backgroundColor: theme.colors.background,
-  },
-  headerEmoji: {
-    fontSize: scaleFontSize(56),
-    marginBottom: theme.spacing.md,
-  },
-  headerTitle: {
-    fontSize: scaleFontSize(26),
-    fontWeight: "700",
-    color: theme.colors.textPrimary,
-    marginBottom: theme.spacing.sm,
-    textAlign: "center",
-  },
-  headerDescription: {
-    fontSize: scaleFontSize(15),
-    color: theme.colors.textSecondary,
-    textAlign: "center",
-    paddingHorizontal: theme.spacing.xl,
-    lineHeight: 22,
-  },
   optionsContainer: {
     paddingHorizontal: theme.spacing.md,
     paddingVertical: theme.spacing.lg,

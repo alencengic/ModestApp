@@ -38,25 +38,6 @@ const DailyJournalScreen: React.FC = () => {
       paddingBottom: theme.spacing.xl,
       backgroundColor: theme.colors.background,
     },
-    header: {
-      padding: theme.spacing.xl,
-      alignItems: "center",
-      backgroundColor: theme.colors.background,
-    },
-    headerEmoji: {
-      fontSize: 48,
-      marginBottom: theme.spacing.sm,
-    },
-    title: {
-      fontSize: 24,
-      fontWeight: "600",
-      color: theme.colors.textPrimary,
-      marginBottom: theme.spacing.xs,
-    },
-    subtitle: {
-      fontSize: 14,
-      color: theme.colors.textSecondary,
-    },
     tabContainer: {
       flexDirection: "row",
       margin: theme.spacing.md,
@@ -300,12 +281,6 @@ const DailyJournalScreen: React.FC = () => {
       keyboardVerticalOffset={Platform.OS === "ios" ? 90 : 0}
     >
       <ScrollView contentContainerStyle={styles.container}>
-        <View style={styles.header}>
-          <Text style={styles.headerEmoji}>📔</Text>
-          <Text style={styles.title}>Daily Journal</Text>
-          <Text style={styles.subtitle}>Express your thoughts and feelings</Text>
-        </View>
-
         <BannerAd size="small" position="top" />
 
       {/* Tab Switcher */}

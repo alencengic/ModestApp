@@ -228,20 +228,12 @@ export const createStyles = (theme: Theme) =>
     },
 
     // Modal styles
-    modalOverlay: {
-      flex: 1,
-      backgroundColor: "rgba(0, 0, 0, 0.5)",
-      justifyContent: "flex-end",
-    },
     modalContent: {
+      flex: 1,
       backgroundColor: theme.colors.surface,
-      borderTopLeftRadius: 20,
-      borderTopRightRadius: 20,
       paddingTop: theme.spacing.xl,
       paddingHorizontal: theme.spacing.xl,
       paddingBottom: 0,
-      maxHeight: "90%",
-      flex: 1,
     },
     modalTitle: {
       fontSize: 24,
