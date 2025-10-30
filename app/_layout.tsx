@@ -52,7 +52,9 @@ function RootLayoutNav() {
   useEffect(() => {
     if (hasSeenOnboarding !== null) {
       // Redirect to onboarding if not seen
-      if (!hasSeenOnboarding && !segments.includes("onboarding")) {
+      const currentPath = segments.join('/');
+      const isOnOnboardingFlow = currentPath.includes('onboarding') || currentPath.includes('profile-setup');
+      if (!hasSeenOnboarding && !isOnOnboardingFlow) {
         router.replace("/onboarding");
       }
     }

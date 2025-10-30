@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from "react";
-import { SafeAreaView, Alert, ScrollView, View, KeyboardAvoidingView, Platform } from "react-native";
+import { Alert, ScrollView, View, KeyboardAvoidingView, Platform } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { DateTime } from "luxon";
 
 import { createDailyEnterScreenStyles } from "./DailyEnterScreen.styles";
@@ -25,11 +26,13 @@ const moodOptions = [
   { value: "Ecstatic", display: "🤩", label: "Ecstatic" },
 ];
 
-const productivityOptions = [1, 2, 3, 4, 5].map((rating) => ({
-  value: rating,
-  display: String(rating),
-  label: String(rating),
-}));
+const productivityOptions = [
+  { value: 1, display: "😴", label: "Very Low" },
+  { value: 2, display: "😐", label: "Low" },
+  { value: 3, display: "🙂", label: "Moderate" },
+  { value: 4, display: "😊", label: "High" },
+  { value: 5, display: "🚀", label: "Very High" },
+];
 
 type MealType = "breakfast" | "lunch" | "dinner" | "snacks";
 

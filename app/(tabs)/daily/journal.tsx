@@ -1,5 +1,6 @@
 import React from "react";
-import { SafeAreaView, ScrollView, View } from "react-native";
+import { ScrollView, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 import { createDailyEnterScreenStyles } from "./DailyEnterScreen.styles";
 import { useTheme } from "@/context/ThemeContext";

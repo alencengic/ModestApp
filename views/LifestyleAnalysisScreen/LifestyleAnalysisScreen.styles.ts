@@ -176,4 +176,36 @@ export const createStyles = (theme: Theme) => StyleSheet.create({
     fontWeight: "700",
     color: theme.colors.textOnPrimary,
   },
+  reliabilityWarning: {
+    borderRadius: theme.borderRadius.md,
+    padding: theme.spacing.md,
+    marginBottom: theme.spacing.md,
+    borderWidth: 1,
+  },
+  reliabilityWarningLow: {
+    backgroundColor: "#FFF3CD",
+    borderColor: "#FFC107",
+  },
+  reliabilityWarningModerate: {
+    backgroundColor: "#D1ECF1",
+    borderColor: "#0DCAF0",
+  },
+  reliabilityWarningGood: {
+    backgroundColor: "#D1E7DD",
+    borderColor: "#198754",
+  },
+  reliabilityWarningText: {
+    fontSize: scaleFontSize(13),
+    lineHeight: 18,
+    fontWeight: "500",
+  },
+  reliabilityWarningTextLow: {
+    color: "#856404",
+  },
+  reliabilityWarningTextModerate: {
+    color: "#055160",
+  },
+  reliabilityWarningTextGood: {
+    color: "#0A3622",
+  },
 });
