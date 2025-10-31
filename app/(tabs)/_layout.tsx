@@ -2,9 +2,11 @@ import React from "react";
 import { Drawer } from "expo-router/drawer";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import { useTheme } from "@/context/ThemeContext";
+import { useTranslation } from "react-i18next";
 
 export default function TabLayout() {
   const { theme } = useTheme();
+  const { t } = useTranslation();
 
   return (
     <Drawer
@@ -31,7 +33,7 @@ export default function TabLayout() {
       <Drawer.Screen
         name="index"
         options={{
-          title: "Home",
+          title: t('navigation.home'),
           drawerIcon: ({ color }) => (
             <IconSymbol size={24} name="house.fill" color={color} />
           ),
@@ -40,7 +42,7 @@ export default function TabLayout() {
       <Drawer.Screen
         name="daily"
         options={{
-          title: "Daily Journal",
+          title: t('navigation.dailyJournal'),
           drawerIcon: ({ color }) => (
             <IconSymbol size={24} name="book.closed.fill" color={color} />
           ),
@@ -50,7 +52,7 @@ export default function TabLayout() {
       <Drawer.Screen
         name="trends"
         options={{
-          title: "Trends & Analytics",
+          title: t('navigation.trendsAnalytics'),
           drawerIcon: ({ color }) => (
             <IconSymbol size={24} name="chart.bar" color={color} />
           ),
@@ -60,7 +62,7 @@ export default function TabLayout() {
       <Drawer.Screen
         name="mood"
         options={{
-          title: "Mood Analytics",
+          title: t('navigation.moodAnalytics'),
           drawerIcon: ({ color }) => (
             <IconSymbol size={24} name="face.smiling" color={color} />
           ),
@@ -70,7 +72,7 @@ export default function TabLayout() {
       <Drawer.Screen
         name="meals/meals"
         options={{
-          title: "My Meals",
+          title: t('navigation.myMeals'),
           drawerIcon: ({ color }) => (
             <IconSymbol size={24} name="list.bullet.clipboard" color={color} />
           ),
@@ -79,7 +81,7 @@ export default function TabLayout() {
       <Drawer.Screen
         name="weather/weather-mood"
         options={{
-          title: "Weather & Mood",
+          title: t('navigation.weatherMood'),
           drawerIcon: ({ color }) => (
             <IconSymbol size={24} name="cloud.sun.fill" color={color} />
           ),
@@ -102,7 +104,7 @@ export default function TabLayout() {
       <Drawer.Screen
         name="settings/user-profile"
         options={{
-          title: "User Profile",
+          title: t('navigation.userProfile'),
           drawerIcon: ({ color }) => (
             <IconSymbol size={24} name="person.fill" color={color} />
           ),
@@ -112,7 +114,7 @@ export default function TabLayout() {
       <Drawer.Screen
         name="settings/settings"
         options={{
-          title: "Settings",
+          title: t('navigation.settings'),
           drawerIcon: ({ color }) => (
             <IconSymbol size={24} name="gearshape.fill" color={color} />
           ),

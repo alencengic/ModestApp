@@ -28,7 +28,6 @@ const LifestyleAnalysisScreen: React.FC = () => {
   const router = useRouter();
   const styles = createStyles(theme);
 
-  // Query for working day analysis
   const { data: workingDayData, isLoading: isLoadingWorking } = useQuery<
     WorkingDayAnalysis,
     Error
@@ -37,7 +36,6 @@ const LifestyleAnalysisScreen: React.FC = () => {
     queryFn: getWorkingDayAnalysis,
   });
 
-  // Query for training day analysis
   const { data: trainingDayData, isLoading: isLoadingTraining } = useQuery<
     TrainingDayAnalysis,
     Error
@@ -97,7 +95,6 @@ const LifestyleAnalysisScreen: React.FC = () => {
     }
 
     if (diff > 0) {
-      // Training days are better
       if (bothHigh) {
         return `💪 Your ${metricLabel} is excellent on both days, but slightly better when you exercise`;
       } else if (diff > 0.3) {
@@ -106,7 +103,6 @@ const LifestyleAnalysisScreen: React.FC = () => {
         return `✨ Exercise improves your ${metricLabel}`;
       }
     } else {
-      // Rest days are better
       if (bothHigh) {
         return `🌟 Your ${metricLabel} is great on both days, though slightly better on rest days`;
       } else if (absDiff > 0.3) {
@@ -126,9 +122,8 @@ const LifestyleAnalysisScreen: React.FC = () => {
     const absDiff = Math.abs(diff);
     const metricLabel = metric === "mood" ? "mood" : "productivity";
 
-    // If both scores are high (both > 0.5), emphasize that both are good
     const bothHigh = workScore > 0.5 && weekendScore > 0.5;
-    // If both scores are positive (both > 0), emphasize that both are decent
+
     const bothPositive = workScore > 0 && weekendScore > 0;
 
     if (absDiff < 0.15) {
@@ -141,7 +136,6 @@ const LifestyleAnalysisScreen: React.FC = () => {
     }
 
     if (diff > 0) {
-      // Work days are better
       if (bothHigh) {
         return `💼 Your ${metricLabel} is excellent throughout the week, but you thrive even more on work days`;
       } else if (diff > 0.3) {
@@ -150,7 +144,6 @@ const LifestyleAnalysisScreen: React.FC = () => {
         return `✨ Your ${metricLabel} is better on work days`;
       }
     } else {
-      // Weekends are better
       if (bothHigh) {
         return `🌴 Your ${metricLabel} is great all week, though you feel slightly better on weekends`;
       } else if (absDiff > 0.3) {
@@ -218,7 +211,6 @@ const LifestyleAnalysisScreen: React.FC = () => {
           </Text>
         </View>
 
-        {/* Working Days vs Non-Working Days Analysis */}
         {workingDayData && workingDayData.workingDays.count > 0 ? (
           <View style={styles.chartWrapper}>
             <Text style={styles.chartSectionTitle}>💼 Work-Life Balance</Text>
@@ -226,7 +218,6 @@ const LifestyleAnalysisScreen: React.FC = () => {
               See how your well-being differs between work days and weekends
             </Text>
 
-            {/* Data Reliability Warning */}
             {(() => {
               const reliability = getDataReliability(
                 workingDayData.workingDays.count,
@@ -260,7 +251,6 @@ const LifestyleAnalysisScreen: React.FC = () => {
               );
             })()}
 
-            {/* AI Insights */}
             {workingDayData.insights && (
               <View style={styles.insightsCard}>
                 <Text style={styles.insightsTitle}>💡 AI Insights</Text>
@@ -284,7 +274,6 @@ const LifestyleAnalysisScreen: React.FC = () => {
             )}
 
             <View style={styles.comparisonContainer}>
-              {/* Working Days */}
               <View style={styles.comparisonCard}>
                 <Text style={styles.comparisonCardTitle}>💼 Work Days</Text>
                 <Text style={styles.comparisonCardCount}>
@@ -332,7 +321,6 @@ const LifestyleAnalysisScreen: React.FC = () => {
                 </View>
               </View>
 
-              {/* Non-Working Days */}
               <View style={styles.comparisonCard}>
                 <Text style={styles.comparisonCardTitle}>🌴 Weekend</Text>
                 <Text style={styles.comparisonCardCount}>
@@ -385,7 +373,6 @@ const LifestyleAnalysisScreen: React.FC = () => {
               </View>
             </View>
 
-            {/* Work Impact Summary */}
             <View style={styles.differenceSummary}>
               <Text style={styles.differenceSummaryTitle}>💼 Work Impact</Text>
               <View style={{ marginTop: 12, gap: 8 }}>
@@ -445,7 +432,6 @@ const LifestyleAnalysisScreen: React.FC = () => {
           </View>
         )}
 
-        {/* Training Days vs Non-Training Days Analysis */}
         {trainingDayData && trainingDayData.trainingDays.count > 0 ? (
           <View style={styles.chartWrapper}>
             <Text style={styles.chartSectionTitle}>
@@ -455,7 +441,6 @@ const LifestyleAnalysisScreen: React.FC = () => {
               Compare your well-being on days when you exercise versus rest days
             </Text>
 
-            {/* Data Reliability Warning */}
             {(() => {
               const reliability = getDataReliability(
                 trainingDayData.trainingDays.count,
@@ -489,7 +474,6 @@ const LifestyleAnalysisScreen: React.FC = () => {
               );
             })()}
 
-            {/* AI Insights */}
             {trainingDayData.insights && (
               <View style={styles.insightsCard}>
                 <Text style={styles.insightsTitle}>💡 AI Insights</Text>
@@ -513,7 +497,6 @@ const LifestyleAnalysisScreen: React.FC = () => {
             )}
 
             <View style={styles.comparisonContainer}>
-              {/* Training Days */}
               <View style={styles.comparisonCard}>
                 <Text style={styles.comparisonCardTitle}>🏃‍♂️ Training Days</Text>
                 <Text style={styles.comparisonCardCount}>
@@ -563,7 +546,6 @@ const LifestyleAnalysisScreen: React.FC = () => {
                 </View>
               </View>
 
-              {/* Non-Training Days */}
               <View style={styles.comparisonCard}>
                 <Text style={styles.comparisonCardTitle}>😴 Rest Days</Text>
                 <Text style={styles.comparisonCardCount}>
@@ -616,7 +598,6 @@ const LifestyleAnalysisScreen: React.FC = () => {
               </View>
             </View>
 
-            {/* Exercise Impact Summary */}
             <View style={styles.differenceSummary}>
               <Text style={styles.differenceSummaryTitle}>
                 💪 Exercise Impact

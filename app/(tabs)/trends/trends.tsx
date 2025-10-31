@@ -13,6 +13,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useQueryFoodIntakeChartData } from "@/hooks/queries/useMutationInsertFoodIntake";
 import { createStyles } from "./TrendsScreen.styles";
 import { useTheme } from "@/context/ThemeContext";
+import { useTranslation } from "react-i18next";
 
 export interface ChartDataItem {
   label: string;
@@ -37,6 +38,7 @@ const CHART_COLORS = [
 
 const TrendsAndAnalyticsScreen: React.FC = () => {
   const { theme } = useTheme();
+  const { t } = useTranslation();
   const styles = createStyles(theme);
   const chartAxisFont: SkFont | null = useFont(
     require("@/assets/fonts/SpaceMono-Regular.ttf"),
@@ -155,13 +157,13 @@ const TrendsAndAnalyticsScreen: React.FC = () => {
   const getRangeLabel = () => {
     switch (range) {
       case "day":
-        return "Today";
+        return t('trendsAnalytics.today');
       case "week":
-        return "This Week";
+        return t('trendsAnalytics.week');
       case "month":
-        return "This Month";
+        return t('trendsAnalytics.month');
       case "custom":
-        return selectedDate.toLocaleDateString();
+        return t('trendsAnalytics.selected') + ': ' + selectedDate.toLocaleDateString();
       default:
         return "";
     }
@@ -170,7 +172,7 @@ const TrendsAndAnalyticsScreen: React.FC = () => {
   if (chartAxisFont === null && !isLoading) {
     return (
       <SafeAreaView style={styles.centered}>
-        <Text>Loading font...</Text>
+        <Text>{t('trendsAnalytics.loadingFont')}</Text>
         <ActivityIndicator />
       </SafeAreaView>
     );
@@ -180,7 +182,7 @@ const TrendsAndAnalyticsScreen: React.FC = () => {
     <SafeAreaView style={styles.container}>
       <ScrollView>
         <View style={styles.filterContainer}>
-          <Text style={styles.filterTitle}>Time Period</Text>
+          <Text style={styles.filterTitle}>{t('trendsAnalytics.timePeriod')}</Text>
           <View style={styles.buttonGroup}>
             <TouchableOpacity
               style={[
@@ -198,7 +200,7 @@ const TrendsAndAnalyticsScreen: React.FC = () => {
                   range === "day" && styles.filterButtonTextActive,
                 ]}
               >
-                Today
+                {t('trendsAnalytics.today')}
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
@@ -217,7 +219,7 @@ const TrendsAndAnalyticsScreen: React.FC = () => {
                   range === "week" && styles.filterButtonTextActive,
                 ]}
               >
-                Week
+                {t('trendsAnalytics.week')}
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
@@ -236,7 +238,7 @@ const TrendsAndAnalyticsScreen: React.FC = () => {
                   range === "month" && styles.filterButtonTextActive,
                 ]}
               >
-                Month
+                {t('trendsAnalytics.month')}
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
@@ -254,7 +256,7 @@ const TrendsAndAnalyticsScreen: React.FC = () => {
                   range === "custom" && styles.filterButtonTextActive,
                 ]}
               >
-                Custom
+                {t('trendsAnalytics.custom')}
               </Text>
             </TouchableOpacity>
           </View>
@@ -275,7 +277,7 @@ const TrendsAndAnalyticsScreen: React.FC = () => {
           {range === "custom" && (
             <View style={styles.selectedDateDisplay}>
               <Text style={styles.selectedDateText}>
-                Selected: {selectedDate.toLocaleDateString('en-US', {
+                {t('trendsAnalytics.selected')}: {selectedDate.toLocaleDateString('en-US', {
                   year: 'numeric',
                   month: 'long',
                   day: 'numeric'
@@ -288,19 +290,19 @@ const TrendsAndAnalyticsScreen: React.FC = () => {
         {/* Summary Stats */}
         {insights && !isLoading && isDataValid && (
           <View style={styles.summaryCard}>
-            <Text style={styles.cardTitle}>Summary</Text>
+            <Text style={styles.cardTitle}>{t('trendsAnalytics.summary')}</Text>
             <View style={styles.summaryGrid}>
               <View style={styles.summaryItem}>
                 <Text style={styles.summaryValue}>{insights.totalEntries}</Text>
-                <Text style={styles.summaryLabel}>Total Entries</Text>
+                <Text style={styles.summaryLabel}>{t('trendsAnalytics.totalEntries')}</Text>
               </View>
               <View style={styles.summaryItem}>
                 <Text style={styles.summaryValue}>{insights.uniqueFoods}</Text>
-                <Text style={styles.summaryLabel}>Unique Foods</Text>
+                <Text style={styles.summaryLabel}>{t('trendsAnalytics.uniqueFoods')}</Text>
               </View>
               <View style={styles.summaryItem}>
                 <Text style={styles.summaryValue}>{insights.diversityScore}%</Text>
-                <Text style={styles.summaryLabel}>Diversity Score</Text>
+                <Text style={styles.summaryLabel}>{t('trendsAnalytics.diversityScore')}</Text>
               </View>
             </View>
           </View>
@@ -309,15 +311,15 @@ const TrendsAndAnalyticsScreen: React.FC = () => {
         {/* Insights & Recommendations */}
         {insights && !isLoading && isDataValid && (
           <View style={styles.insightsCard}>
-            <Text style={styles.cardTitle}>💡 Insights & Tips</Text>
+            <Text style={styles.cardTitle}>{t('trendsAnalytics.insightsTips')}</Text>
 
             {insights.isBalanced ? (
               <View style={styles.insightItem}>
                 <Text style={styles.insightIcon}>✅</Text>
                 <View style={styles.insightText}>
-                  <Text style={styles.insightTitle}>Great food variety!</Text>
+                  <Text style={styles.insightTitle}>{t('trendsAnalytics.greatVariety')}</Text>
                   <Text style={styles.insightDesc}>
-                    Your top food is only {insights.topFoodPercentage}% of your diet. Keep it up!
+                    {t('trendsAnalytics.varietyDescription', { percent: insights.topFoodPercentage })}
                   </Text>
                 </View>
               </View>
@@ -325,9 +327,9 @@ const TrendsAndAnalyticsScreen: React.FC = () => {
               <View style={styles.insightItem}>
                 <Text style={styles.insightIcon}>⚠️</Text>
                 <View style={styles.insightText}>
-                  <Text style={styles.insightTitle}>Try more variety</Text>
+                  <Text style={styles.insightTitle}>{t('trendsAnalytics.tryVariety')}</Text>
                   <Text style={styles.insightDesc}>
-                    {topItem?.label} makes up {insights.topFoodPercentage}% of your diet. Consider diversifying.
+                    {t('trendsAnalytics.tryVarietyDescription', { food: topItem?.label, percent: insights.topFoodPercentage })}
                   </Text>
                 </View>
               </View>
@@ -337,9 +339,9 @@ const TrendsAndAnalyticsScreen: React.FC = () => {
               <View style={styles.insightItem}>
                 <Text style={styles.insightIcon}>🌟</Text>
                 <View style={styles.insightText}>
-                  <Text style={styles.insightTitle}>Excellent diversity!</Text>
+                  <Text style={styles.insightTitle}>{t('trendsAnalytics.excellentDiversity')}</Text>
                   <Text style={styles.insightDesc}>
-                    You're eating {insights.uniqueFoods} different foods. This promotes better nutrition.
+                    {t('trendsAnalytics.excellentDiversityDescription', { count: insights.uniqueFoods })}
                   </Text>
                 </View>
               </View>
@@ -349,9 +351,9 @@ const TrendsAndAnalyticsScreen: React.FC = () => {
               <View style={styles.insightItem}>
                 <Text style={styles.insightIcon}>💡</Text>
                 <View style={styles.insightText}>
-                  <Text style={styles.insightTitle}>Expand your food choices</Text>
+                  <Text style={styles.insightTitle}>{t('trendsAnalytics.expandChoices')}</Text>
                   <Text style={styles.insightDesc}>
-                    Try adding 2-3 new foods this week to improve nutritional balance.
+                    {t('trendsAnalytics.expandChoicesDescription')}
                   </Text>
                 </View>
               </View>
@@ -360,29 +362,28 @@ const TrendsAndAnalyticsScreen: React.FC = () => {
         )}
 
         <View style={styles.chartWrapper}>
-          <Text style={styles.chartTitle}>Food Intake Analysis</Text>
+          <Text style={styles.chartTitle}>{t('trendsAnalytics.title')}</Text>
           <Text style={styles.chartSubtitle}>{getRangeLabel()}</Text>
 
           {isLoading ? (
             <View style={styles.centered}>
               <ActivityIndicator size="large" color="#C88B6B" />
               <Text style={{ marginTop: 16, color: theme.colors.textSecondary }}>
-                Loading chart data...
+                {t('trendsAnalytics.loadingData')}
               </Text>
             </View>
           ) : isError ? (
             <View style={styles.emptyStateContainer}>
               <Text style={styles.emptyStateIcon}>⚠️</Text>
               <Text style={styles.errorText}>
-                Error loading data. Please try again.
+                {t('trendsAnalytics.errorLoading')}
               </Text>
             </View>
           ) : !isDataValid ? (
             <View style={styles.emptyStateContainer}>
               <Text style={styles.emptyStateIcon}>📊</Text>
               <Text style={styles.emptyStateText}>
-                No food intake data available for the selected period.{"\n"}
-                Start tracking your meals to see insights!
+                {t('trendsAnalytics.noData')}
               </Text>
             </View>
           ) : (
@@ -390,7 +391,7 @@ const TrendsAndAnalyticsScreen: React.FC = () => {
               {/* Top 3 Foods Highlight */}
               {insights && insights.top3.length > 0 && (
                 <View style={styles.topFoodsSection}>
-                  <Text style={styles.topFoodsTitle}>🏆 Top Foods</Text>
+                  <Text style={styles.topFoodsTitle}>{t('trendsAnalytics.topFoods')}</Text>
                   <View style={styles.topFoodsContainer}>
                     {insights.top3.map((item, index) => {
                       const percentage = ((item.value / totalItems) * 100).toFixed(1);
@@ -402,7 +403,7 @@ const TrendsAndAnalyticsScreen: React.FC = () => {
                             {item.label}
                           </Text>
                           <Text style={styles.topFoodValue}>
-                            {item.value} entries
+                            {item.value} {t('trendsAnalytics.entries')}
                           </Text>
                           <View style={styles.topFoodBar}>
                             <View
@@ -474,11 +475,11 @@ const TrendsAndAnalyticsScreen: React.FC = () => {
                 <View style={styles.statsContainer}>
                   <View style={styles.statItem}>
                     <Text style={styles.statValue}>{chartData.length}</Text>
-                    <Text style={styles.statLabel}>Foods</Text>
+                    <Text style={styles.statLabel}>{t('trendsAnalytics.foods')}</Text>
                   </View>
                   <View style={styles.statItem}>
                     <Text style={styles.statValue}>{totalItems}</Text>
-                    <Text style={styles.statLabel}>Total Entries</Text>
+                    <Text style={styles.statLabel}>{t('trendsAnalytics.totalEntries')}</Text>
                   </View>
                   {topItem && (
                     <View style={styles.statItem}>
@@ -488,7 +489,7 @@ const TrendsAndAnalyticsScreen: React.FC = () => {
                       >
                         {topItem.label}
                       </Text>
-                      <Text style={styles.statLabel}>Most Frequent</Text>
+                      <Text style={styles.statLabel}>{t('trendsAnalytics.mostFrequent')}</Text>
                     </View>
                   )}
                 </View>

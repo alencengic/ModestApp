@@ -21,7 +21,8 @@ import {
   useDeleteMeal,
 } from "@/hooks/queries/useMeals";
 import { getMealFoodsArray, type Meal, type MealType } from "@/storage/meals";
-import { COMMON_FOODS } from "@/constants/FoodDatabase";
+import { getCommonFoods } from "@/constants/FoodDatabase";
+import { useLanguage } from "@/context/LanguageContext";
 
 const MEAL_TYPE_OPTIONS: { value: MealType; label: string; emoji: string }[] = [
   { value: null, label: "Any", emoji: "🍽️" },
@@ -36,6 +37,8 @@ const ITEMS_PER_PAGE = 10;
 export default function MealsScreen() {
   const { theme } = useTheme();
   const styles = createStyles(theme);
+  const { currentLanguage } = useLanguage();
+  const COMMON_FOODS = getCommonFoods();
 
   const [filterType, setFilterType] = useState<MealType>(null);
   const [mealSearchQuery, setMealSearchQuery] = useState("");

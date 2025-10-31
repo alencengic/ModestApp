@@ -10,51 +10,58 @@ import {
 import { useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useTheme } from "@/context/ThemeContext";
+import { useLanguage, SUPPORTED_LANGUAGES, type LanguageCode } from "@/context/LanguageContext";
+import { useTranslation } from "react-i18next";
 
 const { width, height } = Dimensions.get("window");
 
-const slides = [
+const getSlides = (t: any) => [
+  {
+    id: "0",
+    title: t('onboarding.language'),
+    emoji: "🌍",
+    description: t('onboarding.selectLanguage'),
+    isLanguageSelection: true,
+  },
   {
     id: "1",
-    title: "Welcome to ModestApp",
+    title: t('onboarding.welcome'),
     emoji: "👋",
-    description:
-      "Your personal companion for tracking mood, food, and wellness habits. Start your journey to a healthier, happier you!",
+    description: t('onboarding.welcomeDesc'),
   },
   {
     id: "2",
-    title: "Track Your Mood",
+    title: t('onboarding.trackMood'),
     emoji: "😊",
-    description:
-      "Record your daily mood, productivity, and see how weather affects your emotional well-being.",
+    description: t('onboarding.trackMoodDesc'),
   },
   {
     id: "3",
-    title: "Monitor Food Intake",
+    title: t('onboarding.monitorFood'),
     emoji: "🍎",
-    description:
-      "Log your meals and discover patterns between what you eat and how you feel. Track symptoms and find your ideal diet.",
+    description: t('onboarding.monitorFoodDesc'),
   },
   {
     id: "4",
-    title: "Daily Journal",
+    title: t('onboarding.dailyJournalTitle'),
     emoji: "📔",
-    description:
-      "Express your thoughts and feelings in a private journal. Write, edit, and review your entries anytime.",
+    description: t('onboarding.dailyJournalDesc'),
   },
   {
     id: "5",
-    title: "Insights & Analytics",
+    title: t('onboarding.insights'),
     emoji: "📊",
-    description:
-      "Visualize trends, discover correlations, and gain actionable insights about your health and habits.",
+    description: t('onboarding.insightsDesc'),
   },
 ];
 
 const OnboardingScreen: React.FC = () => {
   const router = useRouter();
   const { theme } = useTheme();
+  const { t } = useTranslation();
+  const { currentLanguage, changeLanguage, languages } = useLanguage();
   const [currentSlide, setCurrentSlide] = useState(0);
+  const slides = getSlides(t);
 
   const handleNext = () => {
     if (currentSlide < slides.length - 1) {
@@ -74,6 +81,11 @@ const OnboardingScreen: React.FC = () => {
 
   const isLastSlide = currentSlide === slides.length - 1;
   const slide = slides[currentSlide];
+
+  const handleLanguageSelect = async (langCode: LanguageCode) => {
+    await changeLanguage(langCode);
+    handleNext();
+  };
 
   const styles = StyleSheet.create({
     container: {
@@ -163,6 +175,46 @@ const OnboardingScreen: React.FC = () => {
       fontSize: 18,
       fontWeight: "600",
     },
+    languageButton: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      backgroundColor: theme.colors.surface,
+      paddingVertical: 16,
+      paddingHorizontal: 20,
+      borderRadius: theme.borderRadius.lg,
+      marginVertical: 8,
+      borderWidth: 2,
+      borderColor: theme.colors.border,
+    },
+    languageButtonActive: {
+      backgroundColor: theme.colors.primary + "20",
+      borderColor: theme.colors.primary,
+    },
+    languageInfo: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 12,
+    },
+    languageFlag: {
+      fontSize: 32,
+    },
+    languageNames: {
+      gap: 4,
+    },
+    languageName: {
+      fontSize: 16,
+      fontWeight: "600",
+      color: theme.colors.textPrimary,
+    },
+    languageNativeName: {
+      fontSize: 14,
+      color: theme.colors.textSecondary,
+    },
+    checkmark: {
+      fontSize: 24,
+      color: theme.colors.primary,
+    },
   });
 
   return (
@@ -170,7 +222,7 @@ const OnboardingScreen: React.FC = () => {
       {/* Skip Button */}
       {!isLastSlide && (
         <TouchableOpacity style={styles.skipButton} onPress={handleSkip}>
-          <Text style={styles.skipText}>Skip</Text>
+          <Text style={styles.skipText}>{t('common.skip')}</Text>
         </TouchableOpacity>
       )}
 
@@ -180,6 +232,33 @@ const OnboardingScreen: React.FC = () => {
           <Text style={styles.emoji}>{slide.emoji}</Text>
           <Text style={styles.title}>{slide.title}</Text>
           <Text style={styles.description}>{slide.description}</Text>
+
+          {/* Language Selection */}
+          {slide.isLanguageSelection && (
+            <View style={{ marginTop: 40, width: "100%" }}>
+              {SUPPORTED_LANGUAGES.map((lang) => (
+                <TouchableOpacity
+                  key={lang.code}
+                  style={[
+                    styles.languageButton,
+                    currentLanguage === lang.code && styles.languageButtonActive,
+                  ]}
+                  onPress={() => handleLanguageSelect(lang.code)}
+                >
+                  <View style={styles.languageInfo}>
+                    <Text style={styles.languageFlag}>{lang.flag}</Text>
+                    <View style={styles.languageNames}>
+                      <Text style={styles.languageName}>{lang.name}</Text>
+                      <Text style={styles.languageNativeName}>{lang.nativeName}</Text>
+                    </View>
+                  </View>
+                  {currentLanguage === lang.code && (
+                    <Text style={styles.checkmark}>✓</Text>
+                  )}
+                </TouchableOpacity>
+              ))}
+            </View>
+          )}
         </View>
 
         {/* Pagination Dots */}
@@ -203,13 +282,13 @@ const OnboardingScreen: React.FC = () => {
             style={styles.getStartedButton}
             onPress={handleGetStarted}
           >
-            <Text style={styles.getStartedText}>Get Started</Text>
+            <Text style={styles.getStartedText}>{t('onboarding.getStarted')}</Text>
           </TouchableOpacity>
-        ) : (
+        ) : !slide.isLanguageSelection ? (
           <TouchableOpacity style={styles.nextButton} onPress={handleNext}>
-            <Text style={styles.nextText}>Next →</Text>
+            <Text style={styles.nextText}>{t('onboarding.continue')} →</Text>
           </TouchableOpacity>
-        )}
+        ) : null}
       </View>
     </SafeAreaView>
   );

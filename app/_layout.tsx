@@ -17,6 +17,8 @@ import { useWeatherSync } from "@/hooks/useWeatherSync";
 import { requestNotificationPermissions, scheduleDailyNotifications } from "@/services/notificationService";
 import { ThemeProvider, useTheme } from "@/context/ThemeContext";
 import { UserProfileProvider } from "@/context/UserProfileContext";
+import { LanguageProvider } from "@/context/LanguageContext";
+import "@/i18n/i18n.config";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -111,11 +113,13 @@ export default function RootLayout() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider>
-        <UserProfileProvider>
-          <RootLayoutNav />
-        </UserProfileProvider>
-      </ThemeProvider>
+      <LanguageProvider>
+        <ThemeProvider>
+          <UserProfileProvider>
+            <RootLayoutNav />
+          </UserProfileProvider>
+        </ThemeProvider>
+      </LanguageProvider>
     </QueryClientProvider>
   );
 }

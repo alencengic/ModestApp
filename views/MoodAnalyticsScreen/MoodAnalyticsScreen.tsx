@@ -11,25 +11,27 @@ import { createStyles } from "./MoodAnalyticsScreen.styles";
 import { useTheme } from "@/context/ThemeContext";
 import { BannerAd } from "@/components/ads";
 import { scaleFontSize } from "@/utils/responsive";
+import { useTranslation } from "react-i18next";
 
 const MoodAnalyticsScreen: React.FC = () => {
   const { theme } = useTheme();
   const router = useRouter();
+  const { t } = useTranslation();
   const styles = createStyles(theme);
 
   const analysisOptions = [
     {
       id: "lifestyle",
-      title: "Lifestyle Factors",
-      description: "Analyze how work schedule and exercise habits impact your well-being",
+      title: t('moodAnalytics.lifestyleFactors'),
+      description: t('moodAnalytics.lifestyleDescription'),
       emoji: "📊",
       route: "/(tabs)/mood/lifestyle-analysis" as any,
       color: theme.colors.primary,
     },
     {
       id: "food",
-      title: "Food Impact Analysis",
-      description: "Discover which foods affect your mood and productivity",
+      title: t('moodAnalytics.foodImpactAnalysis'),
+      description: t('moodAnalytics.foodImpactDescription'),
       emoji: "🍎",
       route: "/(tabs)/mood/food-impact-analysis" as any,
       color: theme.colors.secondary,
@@ -61,17 +63,17 @@ const MoodAnalyticsScreen: React.FC = () => {
         </View>
 
         <View style={styles.infoCard}>
-          <Text style={styles.infoTitle}>About Analytics</Text>
+          <Text style={styles.infoTitle}>{t('moodAnalytics.aboutAnalytics')}</Text>
           <Text style={styles.infoText}>
-            These tools help you identify patterns in your mood and productivity by analyzing your daily entries.
+            {t('moodAnalytics.aboutText')}
           </Text>
           <View style={styles.infoBullets}>
-            <Text style={styles.infoBullet}>• Track lifestyle patterns and their effects</Text>
-            <Text style={styles.infoBullet}>• Identify foods that boost or lower your mood</Text>
-            <Text style={styles.infoBullet}>• Make informed decisions about your health</Text>
+            <Text style={styles.infoBullet}>{t('moodAnalytics.trackPatterns')}</Text>
+            <Text style={styles.infoBullet}>{t('moodAnalytics.identifyFoods')}</Text>
+            <Text style={styles.infoBullet}>{t('moodAnalytics.makeDecisions')}</Text>
           </View>
           <Text style={styles.infoNote}>
-            The more entries you add, the more accurate your insights become.
+            {t('moodAnalytics.moreDataNote')}
           </Text>
         </View>
 

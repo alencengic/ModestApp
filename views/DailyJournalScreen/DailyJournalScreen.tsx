@@ -20,12 +20,14 @@ import {
 } from "@/storage/database";
 import { useTheme } from "@/context/ThemeContext";
 import { BannerAd } from "@/components/ads";
+import { useTranslation } from "react-i18next";
 
 const CHARACTER_LIMIT = 1000;
 
 const DailyJournalScreen: React.FC = () => {
   const router = useRouter();
   const { theme } = useTheme();
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<"write" | "read">("write");
   const [note, setNote] = useState("");
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
@@ -224,12 +226,12 @@ const DailyJournalScreen: React.FC = () => {
     mutationFn: ({ content, date }: { content: string; date: string }) =>
       insertJournalEntry(content, date),
     onSuccess: () => {
-      Alert.alert("Note Saved", "Your journal entry has been saved.");
+      Alert.alert(t('dailyJournal.noteSaved'), t('dailyJournal.noteSavedMessage'));
       setNote("");
       refetch();
     },
     onError: () => {
-      Alert.alert("Save Failed", "An error occurred while saving your note.");
+      Alert.alert(t('dailyJournal.saveFailed'), t('dailyJournal.saveFailedMessage'));
     },
   });
 
@@ -268,7 +270,7 @@ const DailyJournalScreen: React.FC = () => {
 
   const handleSave = () => {
     if (note.trim().length === 0) {
-      Alert.alert("Empty Note", "Please write something before saving.");
+      Alert.alert(t('dailyJournal.emptyNote'), t('dailyJournal.emptyNoteMessage'));
       return;
     }
     mutation.mutate({ content: note, date: selectedDate.toISOString() });
@@ -290,7 +292,7 @@ const DailyJournalScreen: React.FC = () => {
           onPress={() => setActiveTab("write")}
         >
           <Text style={[styles.tabButtonText, activeTab === "write" && styles.tabButtonTextActive]}>
-            ✍️ Write Entry
+            {t('dailyJournal.writeEntry')}
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
@@ -298,7 +300,7 @@ const DailyJournalScreen: React.FC = () => {
           onPress={() => setActiveTab("read")}
         >
           <Text style={[styles.tabButtonText, activeTab === "read" && styles.tabButtonTextActive]}>
-            📚 Read Entries
+            {t('dailyJournal.readEntries')}
           </Text>
         </TouchableOpacity>
       </View>
@@ -307,7 +309,7 @@ const DailyJournalScreen: React.FC = () => {
       {activeTab === "write" && (
         <View style={styles.inputContainer}>
           <View style={styles.dateRow}>
-            <Text style={styles.inputLabel}>Today's Entry</Text>
+            <Text style={styles.inputLabel}>{t('dailyJournal.todaysEntry')}</Text>
             <Text style={styles.dateText}>
               {DateTime.fromJSDate(selectedDate).toLocaleString(DateTime.DATE_MED)}
             </Text>
@@ -316,13 +318,13 @@ const DailyJournalScreen: React.FC = () => {
             style={styles.textInput}
             multiline
             maxLength={CHARACTER_LIMIT}
-            placeholder="Write your thoughts..."
+            placeholder={t('dailyJournal.writePlaceholder')}
             placeholderTextColor={theme.colors.textLight}
             value={note}
             onChangeText={setNote}
           />
           <Text style={styles.counter}>
-            {note.length} / {CHARACTER_LIMIT}
+            {t('dailyJournal.charactersRemaining', { count: note.length, max: CHARACTER_LIMIT })}
           </Text>
           <TouchableOpacity
             style={[styles.saveButton, mutation.isPending && styles.saveButtonDisabled]}
@@ -330,7 +332,7 @@ const DailyJournalScreen: React.FC = () => {
             disabled={mutation.isPending}
           >
             <Text style={styles.saveButtonText}>
-              {mutation.isPending ? "Saving..." : "💾 Save Entry"}
+              {mutation.isPending ? t('common.loading') : `💾 ${t('common.save')} ${t('dailyJournal.title')}`}
             </Text>
           </TouchableOpacity>
         </View>
@@ -340,7 +342,7 @@ const DailyJournalScreen: React.FC = () => {
       {activeTab === "read" && (
         <>
           <View style={styles.filterContainer}>
-            <Text style={styles.filterTitle}>Time Period</Text>
+            <Text style={styles.filterTitle}>{t('dailyJournal.timePeriod')}</Text>
             <View style={styles.buttonGroup}>
               <TouchableOpacity
                 style={[styles.filterButton, range === "day" && styles.filterButtonActive]}
@@ -350,7 +352,7 @@ const DailyJournalScreen: React.FC = () => {
                 }}
               >
                 <Text style={[styles.filterButtonText, range === "day" && styles.filterButtonTextActive]}>
-                  Today
+                  {t('dailyJournal.today')}
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
@@ -361,7 +363,7 @@ const DailyJournalScreen: React.FC = () => {
                 }}
               >
                 <Text style={[styles.filterButtonText, range === "week" && styles.filterButtonTextActive]}>
-                  Week
+                  {t('dailyJournal.week')}
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
@@ -372,7 +374,7 @@ const DailyJournalScreen: React.FC = () => {
                 }}
               >
                 <Text style={[styles.filterButtonText, range === "month" && styles.filterButtonTextActive]}>
-                  Month
+                  {t('dailyJournal.month')}
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
@@ -380,7 +382,7 @@ const DailyJournalScreen: React.FC = () => {
                 onPress={() => setShowDatePicker(true)}
               >
                 <Text style={styles.filterButtonText}>
-                  📅 Pick Date
+                  📅 {t('dailyJournal.day')}
                 </Text>
               </TouchableOpacity>
             </View>
@@ -406,11 +408,11 @@ const DailyJournalScreen: React.FC = () => {
             </View>
           )}
 
-          <Text style={styles.sectionTitle}>Saved Entries</Text>
+          <Text style={styles.sectionTitle}>{t('dailyJournal.readEntries')}</Text>
           {entries.length === 0 ? (
             <View style={styles.emptyState}>
               <Text style={styles.emptyStateIcon}>📖</Text>
-              <Text style={styles.noEntries}>No entries for this period</Text>
+              <Text style={styles.noEntries}>{t('dailyJournal.noEntries')}</Text>
             </View>
           ) : (
             entries.map((entry, index) => (

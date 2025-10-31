@@ -11,12 +11,16 @@ import {
 import { useRouter } from "expo-router";
 import { useTheme } from "@/context/ThemeContext";
 import { useUserProfile } from "@/context/UserProfileContext";
+import { useLanguage, SUPPORTED_LANGUAGES, type LanguageCode } from "@/context/LanguageContext";
+import { useTranslation } from "react-i18next";
 import { ThemeMode, ColorPaletteName, COLOR_PALETTES } from "@/constants/ColorPalettes";
 
 export default function SettingsScreen() {
   const router = useRouter();
   const { theme, themeMode, setThemeMode, colorPalette, setColorPalette, isDark } = useTheme();
   const { name } = useUserProfile();
+  const { t } = useTranslation();
+  const { currentLanguage, changeLanguage } = useLanguage();
   const [isSaving, setIsSaving] = useState(false);
 
   const handleThemeModeChange = async (mode: ThemeMode) => {
@@ -41,18 +45,29 @@ export default function SettingsScreen() {
     }
   };
 
+  const handleLanguageChange = async (lang: LanguageCode) => {
+    setIsSaving(true);
+    try {
+      await changeLanguage(lang);
+    } catch (error) {
+      console.error("Failed to change language:", error);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   const themeModes: { value: ThemeMode; label: string; description: string }[] = [
-    { value: "light", label: "Light", description: "Always use light mode" },
-    { value: "dark", label: "Dark", description: "Always use dark mode" },
-    { value: "auto", label: "Auto", description: "Follow system settings" },
+    { value: "light", label: t('settings.light'), description: t('settings.lightDescription') },
+    { value: "dark", label: t('settings.dark'), description: t('settings.darkDescription') },
+    { value: "auto", label: t('settings.auto'), description: t('settings.autoDescription') },
   ];
 
   const colorPalettes: { value: ColorPaletteName; label: string; description: string }[] = [
-    { value: "bright", label: "Bright", description: "Warm and inviting beige tones" },
-    { value: "ocean", label: "Ocean", description: "Cool and calming blue tones" },
-    { value: "forest", label: "Forest", description: "Fresh and natural green tones" },
-    { value: "sunset", label: "Sunset", description: "Vibrant and energetic orange tones" },
-    { value: "lavender", label: "Lavender", description: "Soft and peaceful purple tones" },
+    { value: "bright", label: t('settings.bright'), description: t('settings.brightDescription') },
+    { value: "ocean", label: t('settings.ocean'), description: t('settings.oceanDescription') },
+    { value: "forest", label: t('settings.forest'), description: t('settings.forestDescription') },
+    { value: "sunset", label: t('settings.sunset'), description: t('settings.sunsetDescription') },
+    { value: "lavender", label: t('settings.lavender'), description: t('settings.lavenderDescription') },
   ];
 
   const styles = StyleSheet.create({
@@ -206,17 +221,56 @@ export default function SettingsScreen() {
             onPress={() => router.push("/(tabs)/settings/user-profile")}
           >
             <View style={styles.profileInfo}>
-              <Text style={styles.profileName}>{name || "User"}</Text>
-              <Text style={styles.profileSubtext}>Manage your profile</Text>
+              <Text style={styles.profileName}>{name || t('navigation.userProfile')}</Text>
+              <Text style={styles.profileSubtext}>{t('settings.manageProfile')}</Text>
             </View>
             <Text style={styles.chevron}>›</Text>
           </TouchableOpacity>
         </View>
 
+        {/* Language Selection */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Theme Mode</Text>
+          <Text style={styles.sectionTitle}>{t('settings.language')}</Text>
           <Text style={styles.sectionDescription}>
-            Choose how the app should display: light, dark, or follow your system settings
+            {t('settings.selectLanguage')}
+          </Text>
+
+          {SUPPORTED_LANGUAGES.map((lang) => (
+            <TouchableOpacity
+              key={lang.code}
+              style={styles.optionContainer}
+              onPress={() => handleLanguageChange(lang.code)}
+              disabled={isSaving}
+            >
+              <View style={styles.option}>
+                <View style={styles.optionContent}>
+                  <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
+                    <Text style={{ fontSize: 24 }}>{lang.flag}</Text>
+                    <View>
+                      <Text style={styles.optionLabel}>{lang.name}</Text>
+                      <Text style={styles.optionDescription}>{lang.nativeName}</Text>
+                    </View>
+                  </View>
+                </View>
+                <View
+                  style={[
+                    styles.radioButton,
+                    currentLanguage === lang.code && styles.radioButtonSelected,
+                  ]}
+                >
+                  {currentLanguage === lang.code && <View style={styles.radioButtonInner} />}
+                </View>
+              </View>
+            </TouchableOpacity>
+          ))}
+
+          <View style={styles.divider} />
+        </View>
+
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>{t('settings.themeMode')}</Text>
+          <Text style={styles.sectionDescription}>
+            {t('settings.themeModeDescription')}
           </Text>
 
           {themeModes.map((mode) => (
@@ -245,9 +299,9 @@ export default function SettingsScreen() {
 
           <View style={styles.divider} />
 
-          <Text style={styles.sectionTitle}>Color Palette</Text>
+          <Text style={styles.sectionTitle}>{t('settings.colorPalette')}</Text>
           <Text style={styles.sectionDescription}>
-            Select your preferred color scheme for the app
+            {t('settings.colorPaletteDescription')}
           </Text>
 
           {colorPalettes.map((palette) => {
@@ -307,15 +361,14 @@ export default function SettingsScreen() {
 
           <View style={styles.divider} />
 
-          <Text style={styles.sectionTitle}>Preview</Text>
+          <Text style={styles.sectionTitle}>{t('settings.preview')}</Text>
           <View style={styles.currentThemePreview}>
-            <Text style={styles.previewTitle}>Theme Preview</Text>
+            <Text style={styles.previewTitle}>{t('settings.themePreview')}</Text>
             <Text style={styles.previewText}>
-              This is how your app will look with the current theme settings. The text, backgrounds,
-              and accents all adapt to your chosen palette.
+              {t('settings.themePreviewText')}
             </Text>
             <TouchableOpacity style={styles.previewButton}>
-              <Text style={styles.previewButtonText}>Sample Button</Text>
+              <Text style={styles.previewButtonText}>{t('settings.sampleButton')}</Text>
             </TouchableOpacity>
           </View>
         </View>

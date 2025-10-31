@@ -1,14 +1,4 @@
-import i18n from '../i18n/i18n.config';
-import { getFoodTranslations } from '../i18n/i18n.config';
-
-// Get foods based on current language
-export const getCommonFoods = () => {
-  const currentLanguage = i18n.language;
-  return getFoodTranslations(currentLanguage);
-};
-
-// For backwards compatibility
-export const COMMON_FOODS = [
+export const FOODS_EN = [
   // Fruits
   "Apple",
   "Apricot",

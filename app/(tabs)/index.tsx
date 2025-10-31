@@ -14,6 +14,7 @@ import { useState, useCallback } from "react";
 import { useTheme } from "@/context/ThemeContext";
 import { useUserProfile } from "@/context/UserProfileContext";
 import { BannerAd } from "@/components/ads";
+import { useTranslation } from "react-i18next";
 import {
   sendTestNotification,
   getScheduledNotifications,
@@ -24,38 +25,38 @@ import { getProductivityByDate } from "@/storage/productivity_entries";
 import { getFoodIntakeByDate } from "@/storage/food_intakes";
 import { scaleFontSize, scale } from "@/utils/responsive";
 
-const quickAccessItems: {
+const getQuickAccessItems = (t: any): {
   title: string;
   icon: string;
   route: Href;
   emoji: string;
-}[] = [
+}[] => [
   {
-    title: "Daily Journal",
+    title: t('navigation.dailyJournal'),
     icon: "book-open-page-variant",
     route: "/daily/journal",
     emoji: "📔",
   },
   {
-    title: "Trends",
+    title: t('navigation.trendsAnalytics'),
     icon: "chart-line",
     route: "/trends/trends",
     emoji: "📊",
   },
   {
-    title: "Mood Analytics",
+    title: t('navigation.moodAnalytics'),
     icon: "emoticon-happy-outline",
     route: "/mood/analytics",
     emoji: "😊",
   },
   {
-    title: "Food Analytics",
+    title: t('trendsAnalytics.title'),
     icon: "food-apple-outline",
     route: "/trends/food-analytics",
     emoji: "🍎",
   },
   {
-    title: "Weather & Mood",
+    title: t('navigation.weatherMood'),
     icon: "weather-sunny",
     route: "/weather/weather-mood",
     emoji: "🌤️",
@@ -65,14 +66,16 @@ const quickAccessItems: {
 export default function HomeScreen() {
   const { theme } = useTheme();
   const { name } = useUserProfile();
+  const { t } = useTranslation();
   const [hasExistingData, setHasExistingData] = useState(false);
+  const quickAccessItems = getQuickAccessItems(t);
 
   // Get greeting based on time of day
   const getGreeting = () => {
     const hour = DateTime.now().hour;
-    if (hour < 12) return "Good Morning";
-    if (hour < 18) return "Good Afternoon";
-    return "Good Evening";
+    if (hour < 12) return t('home.goodMorning');
+    if (hour < 18) return t('home.goodAfternoon');
+    return t('home.goodEvening');
   };
 
   const styles = StyleSheet.create({
@@ -187,8 +190,8 @@ export default function HomeScreen() {
   const handleTestNotification = async () => {
     await sendTestNotification();
     Alert.alert(
-      "Test Scheduled",
-      "You'll receive a test notification in 2 seconds!"
+      t('home.testScheduled'),
+      t('home.testScheduledMessage')
     );
   };
 
@@ -206,11 +209,11 @@ export default function HomeScreen() {
         })
         .join(", ");
       Alert.alert(
-        "Scheduled Notifications",
-        `You have ${scheduled.length} notifications scheduled at: ${times}`
+        t('home.scheduledNotifications'),
+        t('home.scheduledCount', { count: scheduled.length, times })
       );
     } else {
-      Alert.alert("No Notifications", "No scheduled notifications found.");
+      Alert.alert(t('home.noNotifications'), t('home.noNotificationsMessage'));
     }
   };
 
@@ -227,7 +230,7 @@ export default function HomeScreen() {
             onPress={() => router.push("/daily/daily")}
           >
             <Text style={styles.startButtonText}>
-              {hasExistingData ? "Edit Today's Entry" : "Start Today's Entry"}
+              {hasExistingData ? t('home.editEntry') : t('home.startEntry')}
             </Text>
           </TouchableOpacity>
 
@@ -236,20 +239,20 @@ export default function HomeScreen() {
               style={styles.testButton}
               onPress={handleTestNotification}
             >
-              <Text style={styles.testButtonText}>🔔 Test Notification</Text>
+              <Text style={styles.testButtonText}>{t('home.testNotification')}</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.testButton}
               onPress={handleCheckScheduled}
             >
-              <Text style={styles.testButtonText}>📋 Check Schedule</Text>
+              <Text style={styles.testButtonText}>{t('home.checkSchedule')}</Text>
             </TouchableOpacity>
           </View>
         </View>
 
         <BannerAd size="small" position="top" />
 
-        <Text style={styles.sectionTitle}>Quick Access</Text>
+        <Text style={styles.sectionTitle}>{t('home.quickAccess')}</Text>
         <View style={styles.quickAccessContainer}>
           {quickAccessItems.map((item, index) => (
             <Card
