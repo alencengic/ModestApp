@@ -246,6 +246,17 @@ export default {
     errorLoading: "Error loading data. Please try again.",
     noData: "No food intake data available for the selected period.\nStart tracking your meals to see insights!",
     entries: "entries",
+    showMore: "Show {{count}} More Foods",
+    showLess: "Show Less",
+    
+    // Info modal
+    infoTitle: "Understanding Your Food Trends",
+    totalEntriesInfo: "The total number of times you've logged food items during the selected time period. More entries mean better tracking consistency.",
+    uniqueFoodsInfo: "The number of different foods you've eaten. A higher variety indicates a more diverse diet, which is generally healthier.",
+    diversityScoreInfo: "A score from 0-100% that measures how varied your diet is. Higher scores (70%+) indicate excellent food diversity. Lower scores suggest you might benefit from trying new foods.",
+    topFoodsInfo: "Your three most frequently consumed foods, shown with medals. These are your dietary staples - it's good to have favorites, but balance is key.",
+    tips: "💡 Tips for Better Nutrition",
+    tipsInfo: "• Aim for variety - try to eat different colored fruits and vegetables\n• If one food dominates your diet (>40%), try adding alternatives\n• Track consistently for more accurate insights\n• Higher diversity scores correlate with better nutritional balance",
   },
 
   meals: {

@@ -6,6 +6,7 @@ import {
   ActivityIndicator,
   Text,
   TouchableOpacity,
+  Modal,
 } from "react-native";
 import { useFont, SkFont } from "@shopify/react-native-skia";
 import DateTimePicker from "@react-native-community/datetimepicker";
@@ -14,6 +15,7 @@ import { useQueryFoodIntakeChartData } from "@/hooks/queries/useMutationInsertFo
 import { createStyles } from "./TrendsScreen.styles";
 import { useTheme } from "@/context/ThemeContext";
 import { useTranslation } from "react-i18next";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 export interface ChartDataItem {
   label: string;
@@ -50,6 +52,10 @@ const TrendsAndAnalyticsScreen: React.FC = () => {
   );
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const [showAllFoods, setShowAllFoods] = useState(false);
+  const [showInfoModal, setShowInfoModal] = useState(false);
+  
+  const FOODS_TO_SHOW = 10;
 
   const queryOptions = useQueryFoodIntakeChartData(range, selectedDate);
   const {
@@ -113,7 +119,7 @@ const TrendsAndAnalyticsScreen: React.FC = () => {
       .slice(0, 3);
 
     // Calculate if user is eating variety
-    const topFoodPercentage = topItem ? ((topItem.value / totalEntries) * 100).toFixed(0) : 0;
+    const topFoodPercentage = topItem ? ((topItem.value / totalEntries) * 100).toFixed(0) : "0";
     const isBalanced = parseFloat(topFoodPercentage) < 40;
 
     return {
@@ -362,8 +368,31 @@ const TrendsAndAnalyticsScreen: React.FC = () => {
         )}
 
         <View style={styles.chartWrapper}>
-          <Text style={styles.chartTitle}>{t('trendsAnalytics.title')}</Text>
-          <Text style={styles.chartSubtitle}>{getRangeLabel()}</Text>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: theme.spacing.sm }}>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.chartTitle}>{t('trendsAnalytics.title')}</Text>
+              <Text style={styles.chartSubtitle}>{getRangeLabel()}</Text>
+            </View>
+            <TouchableOpacity
+              onPress={() => setShowInfoModal(true)}
+              style={{
+                width: 40,
+                height: 40,
+                borderRadius: 20,
+                backgroundColor: theme.colors.surface,
+                justifyContent: 'center',
+                alignItems: 'center',
+                borderWidth: 1,
+                borderColor: theme.colors.border,
+              }}
+            >
+              <MaterialCommunityIcons
+                name="information-outline"
+                size={24}
+                color={theme.colors.primary}
+              />
+            </TouchableOpacity>
+          </View>
 
           {isLoading ? (
             <View style={styles.centered}>
@@ -410,7 +439,7 @@ const TrendsAndAnalyticsScreen: React.FC = () => {
                               style={[
                                 styles.topFoodBarFill,
                                 {
-                                  width: `${percentage}%`,
+                                  width: `${percentage}%` as any,
                                   backgroundColor: item.color,
                                 },
                               ]}
@@ -424,50 +453,74 @@ const TrendsAndAnalyticsScreen: React.FC = () => {
                 </View>
               )}
 
-              {/* Visual Food Cards */}
+              {/* Visual Food Cards - Limited to top 10 by default */}
               <View style={styles.foodCardsContainer}>
-                {sortedChartData.map((item, index) => {
-                  const percentage = ((item.value / totalItems) * 100).toFixed(1);
-                  const isTopFood = index < 3;
-                  return (
-                    <View key={index} style={[
-                      styles.foodCard,
-                      isTopFood && styles.foodCardHighlight
-                    ]}>
-                      <View
-                        style={[
-                          styles.foodCardBar,
-                          {
-                            backgroundColor: item.color,
-                            width: `${percentage}%`,
-                          },
-                        ]}
-                      />
-                      <View style={styles.foodCardContent}>
-                        <View style={styles.foodCardHeader}>
-                          <View
-                            style={[
-                              styles.foodCardDot,
-                              { backgroundColor: item.color },
-                            ]}
-                          />
-                          <Text style={styles.foodCardLabel} numberOfLines={1}>
-                            {item.label}
-                          </Text>
-                          {isTopFood && (
-                            <Text style={styles.rankBadge}>#{index + 1}</Text>
-                          )}
-                        </View>
-                        <View style={styles.foodCardStats}>
-                          <Text style={styles.foodCardValue}>{item.value}</Text>
-                          <Text style={styles.foodCardPercentage}>
-                            {percentage}%
-                          </Text>
+                {sortedChartData
+                  .slice(0, showAllFoods ? sortedChartData.length : FOODS_TO_SHOW)
+                  .map((item, index) => {
+                    const percentage = ((item.value / totalItems) * 100).toFixed(1);
+                    const isTopFood = index < 3;
+                    return (
+                      <View key={index} style={[
+                        styles.foodCard,
+                        isTopFood && styles.foodCardHighlight
+                      ]}>
+                        <View
+                          style={[
+                            styles.foodCardBar,
+                            {
+                              backgroundColor: item.color,
+                              width: `${percentage}%` as any,
+                            },
+                          ]}
+                        />
+                        <View style={styles.foodCardContent}>
+                          <View style={styles.foodCardHeader}>
+                            <View
+                              style={[
+                                styles.foodCardDot,
+                                { backgroundColor: item.color },
+                              ]}
+                            />
+                            <Text style={styles.foodCardLabel} numberOfLines={1}>
+                              {item.label}
+                            </Text>
+                            {isTopFood && (
+                              <Text style={styles.rankBadge}>#{index + 1}</Text>
+                            )}
+                          </View>
+                          <View style={styles.foodCardStats}>
+                            <Text style={styles.foodCardValue}>{item.value}</Text>
+                            <Text style={styles.foodCardPercentage}>
+                              {percentage}%
+                            </Text>
+                          </View>
                         </View>
                       </View>
-                    </View>
-                  );
-                })}
+                    );
+                  })}
+                
+                {/* Show More/Less Button */}
+                {sortedChartData.length > FOODS_TO_SHOW && (
+                  <TouchableOpacity
+                    onPress={() => setShowAllFoods(!showAllFoods)}
+                    style={{
+                      marginTop: theme.spacing.md,
+                      padding: theme.spacing.md,
+                      backgroundColor: theme.colors.surface,
+                      borderRadius: theme.borderRadius.md,
+                      borderWidth: 1,
+                      borderColor: theme.colors.border,
+                      alignItems: 'center',
+                    }}
+                  >
+                    <Text style={{ color: theme.colors.primary, fontWeight: '600', fontSize: 14 }}>
+                      {showAllFoods
+                        ? t('trendsAnalytics.showLess')
+                        : t('trendsAnalytics.showMore', { count: sortedChartData.length - FOODS_TO_SHOW })}
+                    </Text>
+                  </TouchableOpacity>
+                )}
               </View>
 
               {/* Stats */}
@@ -499,6 +552,167 @@ const TrendsAndAnalyticsScreen: React.FC = () => {
           )}
         </View>
       </ScrollView>
+      
+      {/* Info Modal */}
+      <Modal
+        visible={showInfoModal}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setShowInfoModal(false)}
+      >
+        <View style={{
+          flex: 1,
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          justifyContent: 'flex-end',
+        }}>
+          <View style={{
+            backgroundColor: theme.colors.background,
+            borderTopLeftRadius: theme.borderRadius.xl,
+            borderTopRightRadius: theme.borderRadius.xl,
+            padding: theme.spacing.lg,
+            maxHeight: '80%',
+          }}>
+            <View style={{
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              marginBottom: theme.spacing.lg,
+            }}>
+              <Text style={{
+                fontSize: 20,
+                fontWeight: '700',
+                color: theme.colors.textPrimary,
+              }}>
+                {t('trendsAnalytics.infoTitle')}
+              </Text>
+              <TouchableOpacity onPress={() => setShowInfoModal(false)}>
+                <MaterialCommunityIcons
+                  name="close"
+                  size={28}
+                  color={theme.colors.textSecondary}
+                />
+              </TouchableOpacity>
+            </View>
+            
+            <ScrollView showsVerticalScrollIndicator={false}>
+              {/* Total Entries */}
+              <View style={{ marginBottom: theme.spacing.lg }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: theme.spacing.xs }}>
+                  <MaterialCommunityIcons name="chart-bar" size={20} color={theme.colors.primary} />
+                  <Text style={{
+                    fontSize: 16,
+                    fontWeight: '600',
+                    color: theme.colors.textPrimary,
+                    marginLeft: theme.spacing.sm,
+                  }}>
+                    {t('trendsAnalytics.totalEntries')}
+                  </Text>
+                </View>
+                <Text style={{
+                  fontSize: 14,
+                  color: theme.colors.textSecondary,
+                  lineHeight: 20,
+                }}>
+                  {t('trendsAnalytics.totalEntriesInfo')}
+                </Text>
+              </View>
+              
+              {/* Unique Foods */}
+              <View style={{ marginBottom: theme.spacing.lg }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: theme.spacing.xs }}>
+                  <MaterialCommunityIcons name="food-apple" size={20} color={theme.colors.primary} />
+                  <Text style={{
+                    fontSize: 16,
+                    fontWeight: '600',
+                    color: theme.colors.textPrimary,
+                    marginLeft: theme.spacing.sm,
+                  }}>
+                    {t('trendsAnalytics.uniqueFoods')}
+                  </Text>
+                </View>
+                <Text style={{
+                  fontSize: 14,
+                  color: theme.colors.textSecondary,
+                  lineHeight: 20,
+                }}>
+                  {t('trendsAnalytics.uniqueFoodsInfo')}
+                </Text>
+              </View>
+              
+              {/* Diversity Score */}
+              <View style={{ marginBottom: theme.spacing.lg }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: theme.spacing.xs }}>
+                  <MaterialCommunityIcons name="star-outline" size={20} color={theme.colors.primary} />
+                  <Text style={{
+                    fontSize: 16,
+                    fontWeight: '600',
+                    color: theme.colors.textPrimary,
+                    marginLeft: theme.spacing.sm,
+                  }}>
+                    {t('trendsAnalytics.diversityScore')}
+                  </Text>
+                </View>
+                <Text style={{
+                  fontSize: 14,
+                  color: theme.colors.textSecondary,
+                  lineHeight: 20,
+                }}>
+                  {t('trendsAnalytics.diversityScoreInfo')}
+                </Text>
+              </View>
+              
+              {/* Top Foods */}
+              <View style={{ marginBottom: theme.spacing.lg }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: theme.spacing.xs }}>
+                  <MaterialCommunityIcons name="trophy-outline" size={20} color={theme.colors.primary} />
+                  <Text style={{
+                    fontSize: 16,
+                    fontWeight: '600',
+                    color: theme.colors.textPrimary,
+                    marginLeft: theme.spacing.sm,
+                  }}>
+                    {t('trendsAnalytics.topFoods')}
+                  </Text>
+                </View>
+                <Text style={{
+                  fontSize: 14,
+                  color: theme.colors.textSecondary,
+                  lineHeight: 20,
+                }}>
+                  {t('trendsAnalytics.topFoodsInfo')}
+                </Text>
+              </View>
+              
+              {/* Tips */}
+              <View style={{
+                backgroundColor: theme.colors.surface,
+                padding: theme.spacing.md,
+                borderRadius: theme.borderRadius.md,
+                marginBottom: theme.spacing.md,
+              }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: theme.spacing.sm }}>
+                  <MaterialCommunityIcons name="lightbulb-outline" size={20} color={theme.colors.primary} />
+                  <Text style={{
+                    fontSize: 16,
+                    fontWeight: '600',
+                    color: theme.colors.textPrimary,
+                    marginLeft: theme.spacing.sm,
+                  }}>
+                    {t('trendsAnalytics.tips')}
+                  </Text>
+                </View>
+                <Text style={{
+                  fontSize: 14,
+                  color: theme.colors.textSecondary,
+                  lineHeight: 20,
+                }}>
+                  {t('trendsAnalytics.tipsInfo')}
+                </Text>
+              </View>
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 };
