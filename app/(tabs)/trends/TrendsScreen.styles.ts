@@ -108,6 +108,7 @@ export const createStyles = (theme: Theme) => StyleSheet.create({
     alignItems: "center",
     flex: 1,
     marginRight: 12,
+    minWidth: 0,
   },
   foodCardDot: {
     width: 12,
@@ -211,9 +212,12 @@ export const createStyles = (theme: Theme) => StyleSheet.create({
     paddingTop: 16,
     borderTopWidth: 1,
     borderTopColor: theme.colors.border,
+    flexWrap: "wrap",
+    gap: theme.spacing.sm,
   },
   statItem: {
     alignItems: "center",
+    minWidth: 80,
   },
   statValue: {
     fontSize: 24,
@@ -243,9 +247,11 @@ export const createStyles = (theme: Theme) => StyleSheet.create({
   summaryGrid: {
     flexDirection: "row",
     gap: theme.spacing.sm,
+    flexWrap: "wrap",
   },
   summaryItem: {
     flex: 1,
+    minWidth: 90,
     padding: theme.spacing.md,
     backgroundColor: theme.colors.background,
     borderRadius: theme.borderRadius.md,
@@ -311,9 +317,11 @@ export const createStyles = (theme: Theme) => StyleSheet.create({
   topFoodsContainer: {
     flexDirection: "row",
     gap: theme.spacing.sm,
+    flexWrap: "wrap",
   },
   topFoodCard: {
     flex: 1,
+    minWidth: 100,
     padding: theme.spacing.md,
     backgroundColor: theme.colors.background,
     borderRadius: theme.borderRadius.lg,

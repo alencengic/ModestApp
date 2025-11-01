@@ -364,6 +364,51 @@ export default {
     terrible: "Užasno",
     deleteFoodItem: "Izbriši Namirnicu",
     deleteFoodConfirm: "Jeste li sigurni da želite ukloniti ovu namirnicu?",
+    
+    // Meal symptoms
+    howDoYouFeelAfter: "Kako se osjećate nakon {{meal}}?",
+    everythingNormal: "Sve je bilo normalno",
+    noSymptomsOrIssues: "Nema simptoma ili problema",
+    orProvideDetailsBelow: "ILI UNESITE DETALJE ISPOD",
+    generalWellbeing: "Opća Dobrobit",
+    energyLevel: "Razina Energije",
+    digestiveSymptoms: "Probavni Simptomi",
+    bloating: "Nadutost",
+    bristolStoolScale: "Bristol Ljestvica Stolice",
+    additionalSymptoms: "Dodatni Simptomi",
+    
+    // Energy labels
+    energyVeryLow: "Vrlo Niska",
+    energyLow: "Niska",
+    energyNormal: "Normalna",
+    energyGood: "Dobra",
+    energyEnergized: "Pun Energije",
+    
+    // Bloating levels
+    none: "Nikako",
+    mild: "Blago",
+    severeBloating: "Ozbiljno",
+    
+    // Symptoms
+    diarrhea: "Proljev",
+    nausea: "Mučnina",
+    pain: "Bol",
+    
+    // Bristol scale
+    bristolType1: "Tip 1",
+    bristolType2: "Tip 2",
+    bristolType3: "Tip 3",
+    bristolType4: "Tip 4",
+    bristolType5: "Tip 5",
+    bristolType6: "Tip 6",
+    bristolType7: "Tip 7",
+    bristolDesc1: "Odvojene tvrde grudice",
+    bristolDesc2: "Grudičasto i kao kobasica",
+    bristolDesc3: "Kobasica s pukotinama",
+    bristolDesc4: "Glatko i mekano (Normalno)",
+    bristolDesc5: "Meke grudice",
+    bristolDesc6: "Kašasta konzistencija",
+    bristolDesc7: "Tekuća konzistencija",
   },
 
   settings: {

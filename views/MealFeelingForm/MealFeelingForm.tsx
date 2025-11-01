@@ -63,11 +63,11 @@ export const MealFeelingForm: React.FC<MealFeelingFormProps> = ({
       flexDirection: "row",
       flexWrap: "wrap",
       justifyContent: "center",
-      gap: theme.spacing.sm,
+      gap: theme.spacing.md,
     },
     feelingButton: {
-      width: "30%",
-      aspectRatio: 1,
+      width: 100,
+      height: 100,
       borderRadius: theme.borderRadius.lg,
       justifyContent: "center",
       alignItems: "center",
@@ -81,10 +81,11 @@ export const MealFeelingForm: React.FC<MealFeelingFormProps> = ({
       marginBottom: theme.spacing.xs,
     },
     feelingLabel: {
-      fontSize: 12,
+      fontSize: 11,
       fontWeight: "600",
       color: theme.colors.textPrimary,
       textAlign: "center",
+      lineHeight: 14,
     },
     hint: {
       fontSize: 14,
@@ -119,7 +120,7 @@ export const MealFeelingForm: React.FC<MealFeelingFormProps> = ({
             <View style={styles.feelingIcon}>
               <MaterialCommunityIcons 
                 name={option.icon} 
-                size={36} 
+                size={32} 
                 color={theme.colors.textPrimary} 
               />
             </View>

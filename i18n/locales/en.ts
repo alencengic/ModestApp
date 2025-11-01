@@ -364,6 +364,51 @@ export default {
     terrible: "Terrible",
     deleteFoodItem: "Delete Food Item",
     deleteFoodConfirm: "Are you sure you want to remove this food?",
+    
+    // Meal symptoms
+    howDoYouFeelAfter: "How do you feel after {{meal}}?",
+    everythingNormal: "Everything was normal",
+    noSymptomsOrIssues: "No symptoms or issues",
+    orProvideDetailsBelow: "OR PROVIDE DETAILS BELOW",
+    generalWellbeing: "General Wellbeing",
+    energyLevel: "Energy Level",
+    digestiveSymptoms: "Digestive Symptoms",
+    bloating: "Bloating",
+    bristolStoolScale: "Bristol Stool Scale",
+    additionalSymptoms: "Additional Symptoms",
+    
+    // Energy labels
+    energyVeryLow: "Very Low",
+    energyLow: "Low",
+    energyNormal: "Normal",
+    energyGood: "Good",
+    energyEnergized: "Energized",
+    
+    // Bloating levels
+    none: "None",
+    mild: "Mild",
+    severeBloating: "Severe",
+    
+    // Symptoms
+    diarrhea: "Diarrhea",
+    nausea: "Nausea",
+    pain: "Pain",
+    
+    // Bristol scale
+    bristolType1: "Type 1",
+    bristolType2: "Type 2",
+    bristolType3: "Type 3",
+    bristolType4: "Type 4",
+    bristolType5: "Type 5",
+    bristolType6: "Type 6",
+    bristolType7: "Type 7",
+    bristolDesc1: "Separate hard lumps",
+    bristolDesc2: "Lumpy and sausage-like",
+    bristolDesc3: "Sausage with cracks",
+    bristolDesc4: "Smooth and soft (Normal)",
+    bristolDesc5: "Soft blobs",
+    bristolDesc6: "Mushy consistency",
+    bristolDesc7: "Liquid consistency",
   },
 
   settings: {

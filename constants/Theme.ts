@@ -112,29 +112,40 @@ export const BrightTheme = {
   },
 
   typography: {
+    fontFamily: {
+      regular: "Inter_400Regular",
+      medium: "Inter_500Medium",
+      semiBold: "Inter_600SemiBold",
+      bold: "Inter_700Bold",
+    },
     h1: {
       fontSize: scaleFontSize(32),
       fontWeight: "700" as const,
+      fontFamily: "Inter_700Bold",
       letterSpacing: -0.5,
     },
     h2: {
       fontSize: scaleFontSize(24),
       fontWeight: "700" as const,
+      fontFamily: "Inter_700Bold",
       letterSpacing: -0.3,
     },
     h3: {
       fontSize: scaleFontSize(20),
       fontWeight: "600" as const,
+      fontFamily: "Inter_600SemiBold",
       letterSpacing: -0.2,
     },
     body: {
       fontSize: scaleFontSize(16),
       fontWeight: "400" as const,
+      fontFamily: "Inter_400Regular",
       lineHeight: scaleFontSize(24),
     },
     caption: {
       fontSize: scaleFontSize(14),
       fontWeight: "400" as const,
+      fontFamily: "Inter_400Regular",
       lineHeight: scaleFontSize(20),
     },
   },

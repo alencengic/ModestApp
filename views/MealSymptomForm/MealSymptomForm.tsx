@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { View, Text, TouchableOpacity, StyleSheet, Modal, ScrollView, Pressable } from "react-native";
 import { useTheme } from "@/context/ThemeContext";
+import { useTranslation } from "react-i18next";
 
 export interface MealSymptomData {
   bloating: "None" | "Mild" | "Moderate" | "Severe";
@@ -10,24 +11,6 @@ export interface MealSymptomData {
   nausea: boolean;
   pain: boolean;
 }
-
-const ENERGY_LABELS = {
-  1: "Very Low",
-  2: "Low",
-  3: "Normal",
-  4: "Good",
-  5: "Energized"
-};
-
-const BRISTOL_SCALE_INFO = {
-  1: { label: "Type 1", desc: "Separate hard lumps" },
-  2: { label: "Type 2", desc: "Lumpy and sausage-like" },
-  3: { label: "Type 3", desc: "Sausage with cracks" },
-  4: { label: "Type 4", desc: "Smooth and soft (Normal)" },
-  5: { label: "Type 5", desc: "Soft blobs" },
-  6: { label: "Type 6", desc: "Mushy consistency" },
-  7: { label: "Type 7", desc: "Liquid consistency" }
-};
 
 interface MealSymptomFormProps {
   mealName: string;
@@ -43,6 +26,49 @@ export const MealSymptomForm: React.FC<MealSymptomFormProps> = ({
   onChange,
 }) => {
   const { theme } = useTheme();
+  const { t } = useTranslation();
+  
+  const getEnergyLabel = (level: 1 | 2 | 3 | 4 | 5) => {
+    const labels = {
+      1: t('daily.energyVeryLow'),
+      2: t('daily.energyLow'),
+      3: t('daily.energyNormal'),
+      4: t('daily.energyGood'),
+      5: t('daily.energyEnergized'),
+    };
+    return labels[level];
+  };
+  
+  const getBristolScaleInfo = (type: 1 | 2 | 3 | 4 | 5 | 6 | 7) => {
+    const info = {
+      1: { label: t('daily.bristolType1'), desc: t('daily.bristolDesc1') },
+      2: { label: t('daily.bristolType2'), desc: t('daily.bristolDesc2') },
+      3: { label: t('daily.bristolType3'), desc: t('daily.bristolDesc3') },
+      4: { label: t('daily.bristolType4'), desc: t('daily.bristolDesc4') },
+      5: { label: t('daily.bristolType5'), desc: t('daily.bristolDesc5') },
+      6: { label: t('daily.bristolType6'), desc: t('daily.bristolDesc6') },
+      7: { label: t('daily.bristolType7'), desc: t('daily.bristolDesc7') },
+    };
+    return info[type];
+  };
+  
+  const bloatingOptions: Array<"None" | "Mild" | "Moderate" | "Severe"> = [
+    "None",
+    "Mild",
+    "Moderate",
+    "Severe",
+  ];
+  
+  const getBloatingLabel = (option: "None" | "Mild" | "Moderate" | "Severe") => {
+    const labels = {
+      "None": t('daily.none'),
+      "Mild": t('daily.mild'),
+      "Moderate": t('daily.moderate'),
+      "Severe": t('daily.severeBloating'),
+    };
+    return labels[option];
+  };
+  
   const [everythingNormal, setEverythingNormal] = useState(true);
   const [bloating, setBloating] = useState<"None" | "Mild" | "Moderate" | "Severe">(
     symptomData?.bloating || "None"
@@ -88,13 +114,6 @@ export const MealSymptomForm: React.FC<MealSymptomFormProps> = ({
       pain,
     });
   }, [bloating, energy, stool, diarrhea, nausea, pain]);
-
-  const bloatingOptions: Array<"None" | "Mild" | "Moderate" | "Severe"> = [
-    "None",
-    "Mild",
-    "Moderate",
-    "Severe",
-  ];
 
   const getBloatingColor = (option: string) => {
     switch (option) {
@@ -256,16 +275,16 @@ export const MealSymptomForm: React.FC<MealSymptomFormProps> = ({
     buttonRow: {
       flexDirection: "row",
       flexWrap: "wrap",
-      gap: theme.spacing.sm,
+      gap: theme.spacing.md,
+      justifyContent: "center",
     },
     buttonWrapper: {
       alignItems: "center",
-      flex: 1,
-      maxWidth: "18%",
+      width: 60,
     },
     button: {
-      width: 44,
-      height: 44,
+      width: 60,
+      height: 60,
       borderRadius: theme.borderRadius.md,
       backgroundColor: theme.colors.background,
       borderWidth: 2,
@@ -274,22 +293,23 @@ export const MealSymptomForm: React.FC<MealSymptomFormProps> = ({
       justifyContent: "center",
     },
     buttonSmall: {
-      width: 38,
-      height: 38,
+      width: 48,
+      height: 48,
     },
     selectedButton: {
       borderWidth: 3,
     },
     buttonText: {
-      fontSize: 16,
+      fontSize: 18,
       fontWeight: "600",
       color: theme.colors.textPrimary,
     },
     buttonLabel: {
-      fontSize: 11,
+      fontSize: 10,
       color: theme.colors.textSecondary,
-      marginTop: theme.spacing.xs,
+      marginTop: 6,
       textAlign: "center",
+      lineHeight: 13,
     },
     selectedButtonText: {
       fontWeight: "700",
@@ -300,8 +320,8 @@ export const MealSymptomForm: React.FC<MealSymptomFormProps> = ({
     toggleGrid: {
       flexDirection: "row",
       flexWrap: "wrap",
-      gap: theme.spacing.sm,
-      justifyContent: "flex-start",
+      gap: theme.spacing.md,
+      justifyContent: "center",
     },
     modalOverlay: {
       flex: 1,
@@ -364,7 +384,7 @@ export const MealSymptomForm: React.FC<MealSymptomFormProps> = ({
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>
-          How do you feel after {mealName.toLowerCase()}?
+          {t('daily.howDoYouFeelAfter', { meal: mealName.toLowerCase() })}
         </Text>
 
         {mealItems.length > 0 && (
@@ -392,7 +412,7 @@ export const MealSymptomForm: React.FC<MealSymptomFormProps> = ({
                     everythingNormal && styles.normalToggleTitleActive,
                   ]}
                 >
-                  Everything was normal
+                  {t('daily.everythingNormal')}
                 </Text>
                 <Text
                   style={[
@@ -400,7 +420,7 @@ export const MealSymptomForm: React.FC<MealSymptomFormProps> = ({
                     everythingNormal && styles.normalToggleSubtitleActive,
                   ]}
                 >
-                  No symptoms or issues
+                  {t('daily.noSymptomsOrIssues')}
                 </Text>
               </View>
             </View>
@@ -418,7 +438,7 @@ export const MealSymptomForm: React.FC<MealSymptomFormProps> = ({
         </TouchableOpacity>
 
         {!everythingNormal && (
-          <Text style={styles.dividerText}>OR PROVIDE DETAILS BELOW</Text>
+          <Text style={styles.dividerText}>{t('daily.orProvideDetailsBelow')}</Text>
         )}
       </View>
 
@@ -428,11 +448,11 @@ export const MealSymptomForm: React.FC<MealSymptomFormProps> = ({
           {/* General Wellbeing */}
           <View style={styles.card}>
         <View style={styles.cardHeader}>
-          <Text style={styles.label}>General Wellbeing</Text>
+          <Text style={styles.label}>{t('daily.generalWellbeing')}</Text>
         </View>
 
         {/* Energy Level */}
-        <Text style={styles.subtitle}>Energy Level</Text>
+        <Text style={styles.subtitle}>{t('daily.energyLevel')}</Text>
         <View style={styles.buttonRow}>
           {[1, 2, 3, 4, 5].map((level) => (
             <View key={level} style={styles.buttonWrapper}>
@@ -454,7 +474,7 @@ export const MealSymptomForm: React.FC<MealSymptomFormProps> = ({
                 </Text>
               </TouchableOpacity>
               <Text style={styles.buttonLabel}>
-                {ENERGY_LABELS[level as keyof typeof ENERGY_LABELS]}
+                {getEnergyLabel(level as 1 | 2 | 3 | 4 | 5)}
               </Text>
             </View>
           ))}
@@ -464,11 +484,11 @@ export const MealSymptomForm: React.FC<MealSymptomFormProps> = ({
       {/* Digestive Symptoms */}
       <View style={styles.card}>
         <View style={styles.cardHeader}>
-          <Text style={styles.label}>Digestive Symptoms</Text>
+          <Text style={styles.label}>{t('daily.digestiveSymptoms')}</Text>
         </View>
 
         {/* Bloating */}
-        <Text style={styles.subtitle}>Bloating</Text>
+        <Text style={styles.subtitle}>{t('daily.bloating')}</Text>
         <View style={styles.buttonRow}>
           {bloatingOptions.map((option, index) => (
             <View key={option} style={styles.buttonWrapper}>
@@ -489,7 +509,7 @@ export const MealSymptomForm: React.FC<MealSymptomFormProps> = ({
                   {index + 1}
                 </Text>
               </TouchableOpacity>
-              <Text style={styles.buttonLabel}>{option}</Text>
+              <Text style={styles.buttonLabel}>{getBloatingLabel(option)}</Text>
             </View>
           ))}
         </View>
@@ -497,7 +517,7 @@ export const MealSymptomForm: React.FC<MealSymptomFormProps> = ({
         {/* Bristol Stool Scale */}
         <View style={styles.toggleSection}>
           <View style={styles.cardHeader}>
-            <Text style={styles.subtitle}>Bristol Stool Scale</Text>
+            <Text style={styles.subtitle}>{t('daily.bristolStoolScale')}</Text>
             <TouchableOpacity
               style={styles.infoButton}
               onPress={() => setShowBristolInfo(true)}
@@ -530,19 +550,19 @@ export const MealSymptomForm: React.FC<MealSymptomFormProps> = ({
           </View>
           {stool && (
             <Text style={[styles.subtitle, { marginTop: theme.spacing.sm }]}>
-              {BRISTOL_SCALE_INFO[stool].desc}
+              {getBristolScaleInfo(stool).desc}
             </Text>
           )}
         </View>
 
         {/* Additional Symptoms */}
         <View style={styles.toggleSection}>
-          <Text style={styles.subtitle}>Additional Symptoms</Text>
+          <Text style={styles.subtitle}>{t('daily.additionalSymptoms')}</Text>
           <View style={styles.toggleGrid}>
             {[
-              { label: "Diarrhea", value: diarrhea, setter: setDiarrhea },
-              { label: "Nausea", value: nausea, setter: setNausea },
-              { label: "Pain", value: pain, setter: setPain },
+              { label: t('daily.diarrhea'), value: diarrhea, setter: setDiarrhea },
+              { label: t('daily.nausea'), value: nausea, setter: setNausea },
+              { label: t('daily.pain'), value: pain, setter: setPain },
             ].map(({ label, value, setter }) => (
               <View key={label} style={styles.buttonWrapper}>
                 <TouchableOpacity
@@ -581,7 +601,7 @@ export const MealSymptomForm: React.FC<MealSymptomFormProps> = ({
         <View style={styles.modalOverlay}>
           <View style={styles.modalContainer}>
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Bristol Stool Scale</Text>
+              <Text style={styles.modalTitle}>{t('daily.bristolStoolScale')}</Text>
               <TouchableOpacity
                 style={styles.modalCloseButton}
                 onPress={() => setShowBristolInfo(false)}
@@ -590,18 +610,21 @@ export const MealSymptomForm: React.FC<MealSymptomFormProps> = ({
               </TouchableOpacity>
             </View>
             <ScrollView style={styles.modalContent}>
-              {Object.entries(BRISTOL_SCALE_INFO).map(([key, value], index) => (
-                <View
-                  key={key}
-                  style={[
-                    styles.bristolItem,
-                    index === 6 && styles.bristolItemLast
-                  ]}
-                >
-                  <Text style={styles.bristolLabel}>{value.label}</Text>
-                  <Text style={styles.bristolDesc}>{value.desc}</Text>
-                </View>
-              ))}
+              {[1, 2, 3, 4, 5, 6, 7].map((type, index) => {
+                const info = getBristolScaleInfo(type as 1 | 2 | 3 | 4 | 5 | 6 | 7);
+                return (
+                  <View
+                    key={type}
+                    style={[
+                      styles.bristolItem,
+                      index === 6 && styles.bristolItemLast
+                    ]}
+                  >
+                    <Text style={styles.bristolLabel}>{info.label}</Text>
+                    <Text style={styles.bristolDesc}>{info.desc}</Text>
+                  </View>
+                );
+              })}
             </ScrollView>
           </View>
         </View>
