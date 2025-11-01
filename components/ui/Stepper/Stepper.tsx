@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from "react-nati
 import { useRouter } from "expo-router";
 import { useTheme } from "@/context/ThemeContext";
 import { scaleFontSize, scale } from "@/utils/responsive";
+import { useTranslation } from "react-i18next";
 
 export interface StepConfig {
   title: string;
@@ -24,6 +25,7 @@ export const Stepper: React.FC<StepperProps> = ({
 }) => {
   const router = useRouter();
   const { theme } = useTheme();
+  const { t } = useTranslation();
   const [currentStep, setCurrentStep] = useState(0);
   const [isCompleting, setIsCompleting] = useState(false);
 
@@ -272,7 +274,7 @@ export const Stepper: React.FC<StepperProps> = ({
 
       {/* Step Counter Text */}
       <Text style={styles.stepCounter}>
-        Step {currentStep + 1} of {steps.length}
+        {t('daily.step')} {currentStep + 1} {t('daily.of')} {steps.length}
       </Text>
 
       {/* Step Title */}
@@ -290,14 +292,14 @@ export const Stepper: React.FC<StepperProps> = ({
             style={[styles.button, styles.backButton]}
             onPress={handleCancel}
           >
-            <Text style={styles.buttonText}>Cancel</Text>
+            <Text style={styles.buttonText}>{t('daily.cancel')}</Text>
           </TouchableOpacity>
         ) : (
           <TouchableOpacity
             style={[styles.button, styles.backButton]}
             onPress={handleBack}
           >
-            <Text style={styles.buttonText}>Back</Text>
+            <Text style={styles.buttonText}>{t('daily.back')}</Text>
           </TouchableOpacity>
         )}
 
@@ -308,7 +310,7 @@ export const Stepper: React.FC<StepperProps> = ({
             disabled={isCompleting}
           >
             <Text style={styles.skipButtonText}>
-              {isCompleting ? "Saving..." : "Skip & Save"}
+              {isCompleting ? t('daily.saving') : t('daily.skipAndSave')}
             </Text>
           </TouchableOpacity>
         )}
@@ -319,7 +321,7 @@ export const Stepper: React.FC<StepperProps> = ({
           disabled={isCompleting}
         >
           <Text style={styles.nextButtonText}>
-            {isLastStep ? (isCompleting ? "Saving..." : "Save All") : "Next"}
+            {isLastStep ? (isCompleting ? t('daily.saving') : t('daily.saveAll')) : t('daily.next')}
           </Text>
         </TouchableOpacity>
       </View>

@@ -343,6 +343,25 @@ export default {
     entryUpdated: "Unos Ažuriran",
     entryUpdatedMessage: "Vaš dnevni unos je uspješno ažuriran.",
     savingEntry: "Spremanje unosa...",
+    feeling: "Osjećaj",
+    symptoms: "Simptomi",
+    
+    // Stepper navigation
+    step: "Korak",
+    of: "od",
+    back: "Natrag",
+    next: "Dalje",
+    cancel: "Odustani",
+    saveAll: "Spremi Sve",
+    saving: "Spremanje...",
+    skipAndSave: "Preskoči i Spremi",
+    
+    // Meal feeling
+    howDidYouFeel: "Kako ste se osjećali nakon jela?",
+    selectFeeling: "Odaberite kako ste se osjećali nakon ovog obroka",
+    great: "Odlično",
+    bad: "Loše",
+    terrible: "Užasno",
     deleteFoodItem: "Izbriši Namirnicu",
     deleteFoodConfirm: "Jeste li sigurni da želite ukloniti ovu namirnicu?",
   },

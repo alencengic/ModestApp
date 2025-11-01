@@ -1,6 +1,8 @@
 import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { useTheme } from "@/context/ThemeContext";
+import { useTranslation } from "react-i18next";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 type FeelingType = "great" | "good" | "okay" | "bad" | "terrible";
 
@@ -11,14 +13,6 @@ interface MealFeelingFormProps {
   onChange: (feeling: FeelingType) => void;
 }
 
-const FEELING_OPTIONS: { value: FeelingType; emoji: string; label: string; color: string }[] = [
-  { value: "great", emoji: "😄", label: "Great", color: "#A8B896" },
-  { value: "good", emoji: "🙂", label: "Good", color: "#D4CBBB" },
-  { value: "okay", emoji: "😐", label: "Okay", color: "#E8C4B0" },
-  { value: "bad", emoji: "😕", label: "Bad", color: "#E8B4A0" },
-  { value: "terrible", emoji: "😢", label: "Terrible", color: "#C88B6B" },
-];
-
 export const MealFeelingForm: React.FC<MealFeelingFormProps> = ({
   mealName,
   mealItems,
@@ -26,6 +20,15 @@ export const MealFeelingForm: React.FC<MealFeelingFormProps> = ({
   onChange,
 }) => {
   const { theme } = useTheme();
+  const { t } = useTranslation();
+
+  const FEELING_OPTIONS: { value: FeelingType; icon: keyof typeof MaterialCommunityIcons.glyphMap; labelKey: string; color: string }[] = [
+    { value: "great", icon: "emoticon-excited-outline", labelKey: "daily.great", color: "#A8B896" },
+    { value: "good", icon: "emoticon-happy-outline", labelKey: "daily.good", color: "#D4CBBB" },
+    { value: "okay", icon: "emoticon-neutral-outline", labelKey: "daily.okay", color: "#E8C4B0" },
+    { value: "bad", icon: "emoticon-sad-outline", labelKey: "daily.bad", color: "#E8B4A0" },
+    { value: "terrible", icon: "emoticon-cry-outline", labelKey: "daily.terrible", color: "#C88B6B" },
+  ];
 
   const styles = StyleSheet.create({
     container: {
@@ -74,8 +77,7 @@ export const MealFeelingForm: React.FC<MealFeelingFormProps> = ({
       borderWidth: 3,
       borderColor: theme.colors.primary,
     },
-    feelingEmoji: {
-      fontSize: 32,
+    feelingIcon: {
       marginBottom: theme.spacing.xs,
     },
     feelingLabel: {
@@ -94,7 +96,7 @@ export const MealFeelingForm: React.FC<MealFeelingFormProps> = ({
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>How did you feel after eating?</Text>
+      <Text style={styles.title}>{t('daily.howDidYouFeel')}</Text>
 
       {mealItems.length > 0 && (
         <View style={styles.mealSummary}>
@@ -114,14 +116,20 @@ export const MealFeelingForm: React.FC<MealFeelingFormProps> = ({
             ]}
             onPress={() => onChange(option.value)}
           >
-            <Text style={styles.feelingEmoji}>{option.emoji}</Text>
-            <Text style={styles.feelingLabel}>{option.label}</Text>
+            <View style={styles.feelingIcon}>
+              <MaterialCommunityIcons 
+                name={option.icon} 
+                size={36} 
+                color={theme.colors.textPrimary} 
+              />
+            </View>
+            <Text style={styles.feelingLabel}>{t(option.labelKey)}</Text>
           </TouchableOpacity>
         ))}
       </View>
 
       {!feeling && (
-        <Text style={styles.hint}>Select how you felt after this meal</Text>
+        <Text style={styles.hint}>{t('daily.selectFeeling')}</Text>
       )}
     </View>
   );

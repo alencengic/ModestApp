@@ -343,6 +343,25 @@ export default {
     entryUpdated: "Entry Updated",
     entryUpdatedMessage: "Your daily entry has been updated successfully.",
     savingEntry: "Saving entry...",
+    feeling: "Feeling",
+    symptoms: "Symptoms",
+    
+    // Stepper navigation
+    step: "Step",
+    of: "of",
+    back: "Back",
+    next: "Next",
+    cancel: "Cancel",
+    saveAll: "Save All",
+    saving: "Saving...",
+    skipAndSave: "Skip & Save",
+    
+    // Meal feeling
+    howDidYouFeel: "How did you feel after eating?",
+    selectFeeling: "Select how you felt after this meal",
+    great: "Great",
+    bad: "Bad",
+    terrible: "Terrible",
     deleteFoodItem: "Delete Food Item",
     deleteFoodConfirm: "Are you sure you want to remove this food?",
   },
