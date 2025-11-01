@@ -345,13 +345,14 @@ const DailyJournalScreen: React.FC = () => {
             <Text style={styles.filterTitle}>{t('dailyJournal.timePeriod')}</Text>
             <View style={styles.buttonGroup}>
               <TouchableOpacity
-                style={[styles.filterButton, range === "day" && styles.filterButtonActive]}
+                style={[styles.filterButton, range === "day" && !showDatePicker && styles.filterButtonActive]}
                 onPress={() => {
                   setRange("day");
                   setReadDate(new Date());
+                  setShowDatePicker(false);
                 }}
               >
-                <Text style={[styles.filterButtonText, range === "day" && styles.filterButtonTextActive]}>
+                <Text style={[styles.filterButtonText, range === "day" && !showDatePicker && styles.filterButtonTextActive]}>
                   {t('dailyJournal.today')}
                 </Text>
               </TouchableOpacity>
@@ -360,6 +361,7 @@ const DailyJournalScreen: React.FC = () => {
                 onPress={() => {
                   setRange("week");
                   setReadDate(new Date());
+                  setShowDatePicker(false);
                 }}
               >
                 <Text style={[styles.filterButtonText, range === "week" && styles.filterButtonTextActive]}>
@@ -371,6 +373,7 @@ const DailyJournalScreen: React.FC = () => {
                 onPress={() => {
                   setRange("month");
                   setReadDate(new Date());
+                  setShowDatePicker(false);
                 }}
               >
                 <Text style={[styles.filterButtonText, range === "month" && styles.filterButtonTextActive]}>
@@ -378,17 +381,20 @@ const DailyJournalScreen: React.FC = () => {
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
-                style={styles.filterButton}
-                onPress={() => setShowDatePicker(true)}
+                style={[styles.filterButton, showDatePicker && styles.filterButtonActive]}
+                onPress={() => {
+                  setShowDatePicker(true);
+                  setRange("day");
+                }}
               >
-                <Text style={styles.filterButtonText}>
+                <Text style={[styles.filterButtonText, showDatePicker && styles.filterButtonTextActive]}>
                   📅 {t('dailyJournal.day')}
                 </Text>
               </TouchableOpacity>
             </View>
           </View>
 
-          {showDatePicker && (
+          {showDatePicker && range === "day" && (
             <View style={styles.datePickerContainer}>
               <DateTimePicker
                 value={readDate}

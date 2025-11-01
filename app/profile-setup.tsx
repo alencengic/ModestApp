@@ -11,23 +11,25 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useTranslation } from "react-i18next";
 import { useTheme } from "@/context/ThemeContext";
 import { useUserProfile } from "@/context/UserProfileContext";
 import type { DayOfWeek, WeightUnit } from "@/storage/userProfile";
 
 const DAYS_OF_WEEK: { value: DayOfWeek; label: string }[] = [
-  { value: "monday", label: "Mon" },
-  { value: "tuesday", label: "Tue" },
-  { value: "wednesday", label: "Wed" },
-  { value: "thursday", label: "Thu" },
-  { value: "friday", label: "Fri" },
-  { value: "saturday", label: "Sat" },
-  { value: "sunday", label: "Sun" },
+  { value: "monday", label: "profileSetup.mon" },
+  { value: "tuesday", label: "profileSetup.tue" },
+  { value: "wednesday", label: "profileSetup.wed" },
+  { value: "thursday", label: "profileSetup.thu" },
+  { value: "friday", label: "profileSetup.fri" },
+  { value: "saturday", label: "profileSetup.sat" },
+  { value: "sunday", label: "profileSetup.sun" },
 ];
 
 const ProfileSetupScreen: React.FC = () => {
   const router = useRouter();
   const { theme } = useTheme();
+  const { t } = useTranslation();
   const { updateProfile } = useUserProfile();
 
   const [name, setName] = useState("");
@@ -63,21 +65,21 @@ const ProfileSetupScreen: React.FC = () => {
     try {
       // Validate name (mandatory)
       if (!name.trim()) {
-        Alert.alert("Name Required", "Please enter your name");
+        Alert.alert(t("profileSetup.nameRequired"), t("profileSetup.nameRequiredMessage"));
         return;
       }
 
       // Validate age (optional, but must be valid if provided)
       const ageNum = age.trim() ? parseInt(age) : null;
       if (ageNum !== null && (isNaN(ageNum) || ageNum < 1 || ageNum > 150)) {
-        Alert.alert("Invalid Age", "Please enter a valid age (1-150)");
+        Alert.alert(t("profileSetup.invalidAge"), t("profileSetup.invalidAgeMessage"));
         return;
       }
 
       // Validate weight (optional, but must be valid if provided)
       const weightNum = weight.trim() ? parseFloat(weight) : null;
       if (weightNum !== null && (isNaN(weightNum) || weightNum <= 0 || weightNum > 500)) {
-        Alert.alert("Invalid Weight", "Please enter a valid weight");
+        Alert.alert(t("profileSetup.invalidWeight"), t("profileSetup.invalidWeightMessage"));
         return;
       }
 
@@ -93,7 +95,7 @@ const ProfileSetupScreen: React.FC = () => {
       await AsyncStorage.setItem("hasCompletedProfileSetup", "true");
       router.replace("/(tabs)");
     } catch (error) {
-      Alert.alert("Error", "Failed to save profile. Please try again.");
+      Alert.alert(t("profileSetup.error"), t("profileSetup.errorMessage"));
     }
   };
 
@@ -261,23 +263,23 @@ const ProfileSetupScreen: React.FC = () => {
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.header}>
           <Text style={styles.emoji}>⚙️</Text>
-          <Text style={styles.title}>Personalize Your Experience</Text>
+          <Text style={styles.title}>{t("profileSetup.title")}</Text>
           <Text style={styles.subtitle}>
-            Help us tailor insights to your lifestyle. You can change these anytime in Settings.
+            {t("profileSetup.subtitle")}
           </Text>
         </View>
 
         {/* Name Section */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Your Name *</Text>
+          <Text style={styles.sectionTitle}>{t("profileSetup.nameTitle")}</Text>
           <Text style={styles.sectionDescription}>
-            We'll use this to personalize your experience.
+            {t("profileSetup.nameDescription")}
           </Text>
           <TextInput
             style={styles.input}
             value={name}
             onChangeText={setName}
-            placeholder="Enter your name"
+            placeholder={t("profileSetup.namePlaceholder")}
             placeholderTextColor={theme.colors.textSecondary}
             autoCapitalize="words"
           />
@@ -285,15 +287,15 @@ const ProfileSetupScreen: React.FC = () => {
 
         {/* Age Section */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Age (Optional)</Text>
+          <Text style={styles.sectionTitle}>{t("profileSetup.ageTitle")}</Text>
           <Text style={styles.sectionDescription}>
-            Helps provide age-appropriate health insights.
+            {t("profileSetup.ageDescription")}
           </Text>
           <TextInput
             style={styles.input}
             value={age}
             onChangeText={setAge}
-            placeholder="Enter your age"
+            placeholder={t("profileSetup.agePlaceholder")}
             placeholderTextColor={theme.colors.textSecondary}
             keyboardType="number-pad"
           />
@@ -301,9 +303,9 @@ const ProfileSetupScreen: React.FC = () => {
 
         {/* Weight Section */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Current Weight (Optional)</Text>
+          <Text style={styles.sectionTitle}>{t("profileSetup.weightTitle")}</Text>
           <Text style={styles.sectionDescription}>
-            Your weight helps us provide more accurate health insights and calculations.
+            {t("profileSetup.weightDescription")}
           </Text>
           <View style={styles.weightContainer}>
             <View style={styles.weightInputContainer}>
@@ -311,7 +313,7 @@ const ProfileSetupScreen: React.FC = () => {
                 style={styles.input}
                 value={weight}
                 onChangeText={setWeight}
-                placeholder="Enter weight"
+                placeholder={t("profileSetup.weightPlaceholder")}
                 placeholderTextColor={theme.colors.textSecondary}
                 keyboardType="decimal-pad"
               />
@@ -331,7 +333,7 @@ const ProfileSetupScreen: React.FC = () => {
                   weightUnit === "kg" && styles.unitButtonTextActive,
                 ]}
               >
-                kg
+                {t("profileSetup.kg")}
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
@@ -347,7 +349,7 @@ const ProfileSetupScreen: React.FC = () => {
                   weightUnit === "lbs" && styles.unitButtonTextActive,
                 ]}
               >
-                lbs
+                {t("profileSetup.lbs")}
               </Text>
             </TouchableOpacity>
           </View>
@@ -355,9 +357,9 @@ const ProfileSetupScreen: React.FC = () => {
 
         {/* Working Days Section */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Working Days</Text>
+          <Text style={styles.sectionTitle}>{t("profileSetup.workingDaysTitle")}</Text>
           <Text style={styles.sectionDescription}>
-            Select the days you typically work. This helps identify patterns between work and wellbeing.
+            {t("profileSetup.workingDaysDescription")}
           </Text>
           <View style={styles.daysContainer}>
             {DAYS_OF_WEEK.map((day) => (
@@ -375,7 +377,7 @@ const ProfileSetupScreen: React.FC = () => {
                     workingDays.includes(day.value) && styles.dayButtonTextActive,
                   ]}
                 >
-                  {day.label}
+                  {t(day.label)}
                 </Text>
               </TouchableOpacity>
             ))}
@@ -383,7 +385,7 @@ const ProfileSetupScreen: React.FC = () => {
           {weekendDays.length > 0 && (
             <View style={styles.weekendInfo}>
               <Text style={styles.weekendInfoText}>
-                Weekend: {weekendDays.map((d) => d.label).join(", ")}
+                {t("profileSetup.weekend")} {weekendDays.map((d) => t(d.label)).join(", ")}
               </Text>
             </View>
           )}
@@ -391,9 +393,9 @@ const ProfileSetupScreen: React.FC = () => {
 
         {/* Sport/Training Days Section */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Sport/Training Days</Text>
+          <Text style={styles.sectionTitle}>{t("profileSetup.sportDaysTitle")}</Text>
           <Text style={styles.sectionDescription}>
-            Select days when you exercise or train. We'll factor this into your wellness analysis.
+            {t("profileSetup.sportDaysDescription")}
           </Text>
           <View style={styles.daysContainer}>
             {DAYS_OF_WEEK.map((day) => (
@@ -411,7 +413,7 @@ const ProfileSetupScreen: React.FC = () => {
                     sportDays.includes(day.value) && styles.dayButtonTextActive,
                   ]}
                 >
-                  {day.label}
+                  {t(day.label)}
                 </Text>
               </TouchableOpacity>
             ))}
@@ -421,10 +423,10 @@ const ProfileSetupScreen: React.FC = () => {
         {/* Action Buttons */}
         <View style={styles.buttons}>
           <TouchableOpacity style={styles.saveButton} onPress={handleSaveAndContinue}>
-            <Text style={styles.saveButtonText}>Save & Continue</Text>
+            <Text style={styles.saveButtonText}>{t("profileSetup.saveAndContinue")}</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.skipButton} onPress={handleSkip}>
-            <Text style={styles.skipButtonText}>Skip for Now</Text>
+            <Text style={styles.skipButtonText}>{t("profileSetup.skipForNow")}</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>

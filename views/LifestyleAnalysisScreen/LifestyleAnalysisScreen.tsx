@@ -9,6 +9,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { useQuery } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import {
   getWorkingDayAnalysis,
   getTrainingDayAnalysis,
@@ -26,6 +27,7 @@ const NEGATIVE_COLOR = "#CD5C5C";
 const LifestyleAnalysisScreen: React.FC = () => {
   const { theme } = useTheme();
   const router = useRouter();
+  const { t } = useTranslation();
   const styles = createStyles(theme);
 
   const { data: workingDayData, isLoading: isLoadingWorking } = useQuery<
@@ -51,11 +53,11 @@ const LifestyleAnalysisScreen: React.FC = () => {
   };
 
   const formatScoreLabel = (score: number): string => {
-    if (score > 0.5) return "Great";
-    if (score > 0) return "Good";
-    if (score === 0) return "Neutral";
-    if (score > -0.5) return "Fair";
-    return "Poor";
+    if (score > 0.5) return t("lifestyleAnalysis.scoreGreat");
+    if (score > 0) return t("lifestyleAnalysis.scoreGood");
+    if (score === 0) return t("lifestyleAnalysis.scoreNeutral");
+    if (score > -0.5) return t("lifestyleAnalysis.scoreFair");
+    return t("lifestyleAnalysis.scorePoor");
   };
 
   const getScoreEmoji = (score: number): string => {
@@ -79,7 +81,7 @@ const LifestyleAnalysisScreen: React.FC = () => {
     restScore: number
   ): string => {
     const absDiff = Math.abs(diff);
-    const metricLabel = metric === "mood" ? "mood" : "productivity";
+    const metricLabel = metric === "mood" ? t("lifestyleAnalysis.mood") : t("lifestyleAnalysis.productivity");
 
     const bothHigh = trainingScore > 0.5 && restScore > 0.5;
 
@@ -87,28 +89,28 @@ const LifestyleAnalysisScreen: React.FC = () => {
 
     if (absDiff < 0.15) {
       if (bothHigh) {
-        return `✨ Your ${metricLabel} stays consistently great whether you exercise or not!`;
+        return t("lifestyleAnalysis.exerciseConsistentlyGreat", { metric: metricLabel });
       } else if (bothPositive) {
-        return `Your ${metricLabel} remains stable on both training and rest days`;
+        return t("lifestyleAnalysis.exerciseStable", { metric: metricLabel });
       }
-      return `Exercise has minimal impact on your ${metricLabel}`;
+      return t("lifestyleAnalysis.exerciseMinimalImpact", { metric: metricLabel });
     }
 
     if (diff > 0) {
       if (bothHigh) {
-        return `💪 Your ${metricLabel} is excellent on both days, but slightly better when you exercise`;
+        return t("lifestyleAnalysis.exerciseExcellentBoth", { metric: metricLabel });
       } else if (diff > 0.3) {
-        return `💪 Exercise significantly boosts your ${metricLabel}!`;
+        return t("lifestyleAnalysis.exerciseSignificantBoost", { metric: metricLabel });
       } else {
-        return `✨ Exercise improves your ${metricLabel}`;
+        return t("lifestyleAnalysis.exerciseImproves", { metric: metricLabel });
       }
     } else {
       if (bothHigh) {
-        return `🌟 Your ${metricLabel} is great on both days, though slightly better on rest days`;
+        return t("lifestyleAnalysis.exerciseGreatBothRest", { metric: metricLabel });
       } else if (absDiff > 0.3) {
-        return `⚠️ Your ${metricLabel} tends to be lower on training days - consider adjusting workout intensity`;
+        return t("lifestyleAnalysis.exerciseLowerTraining", { metric: metricLabel });
       } else {
-        return `Your ${metricLabel} is slightly lower on training days`;
+        return t("lifestyleAnalysis.exerciseSlightlyLower", { metric: metricLabel });
       }
     }
   };
@@ -120,7 +122,7 @@ const LifestyleAnalysisScreen: React.FC = () => {
     weekendScore: number
   ): string => {
     const absDiff = Math.abs(diff);
-    const metricLabel = metric === "mood" ? "mood" : "productivity";
+    const metricLabel = metric === "mood" ? t("lifestyleAnalysis.mood") : t("lifestyleAnalysis.productivity");
 
     const bothHigh = workScore > 0.5 && weekendScore > 0.5;
 
@@ -128,28 +130,28 @@ const LifestyleAnalysisScreen: React.FC = () => {
 
     if (absDiff < 0.15) {
       if (bothHigh) {
-        return `✨ Your ${metricLabel} stays consistently great throughout the week!`;
+        return t("lifestyleAnalysis.workConsistentlyGreat", { metric: metricLabel });
       } else if (bothPositive) {
-        return `Your ${metricLabel} remains stable on both work days and weekends`;
+        return t("lifestyleAnalysis.workStable", { metric: metricLabel });
       }
-      return `Work has minimal impact on your ${metricLabel}`;
+      return t("lifestyleAnalysis.workMinimalImpact", { metric: metricLabel });
     }
 
     if (diff > 0) {
       if (bothHigh) {
-        return `💼 Your ${metricLabel} is excellent throughout the week, but you thrive even more on work days`;
+        return t("lifestyleAnalysis.workExcellentThrive", { metric: metricLabel });
       } else if (diff > 0.3) {
-        return `💼 You thrive on work days! Your ${metricLabel} is significantly higher`;
+        return t("lifestyleAnalysis.workThriveSignificant", { metric: metricLabel });
       } else {
-        return `✨ Your ${metricLabel} is better on work days`;
+        return t("lifestyleAnalysis.workBetterWorkDays", { metric: metricLabel });
       }
     } else {
       if (bothHigh) {
-        return `🌴 Your ${metricLabel} is great all week, though you feel slightly better on weekends`;
+        return t("lifestyleAnalysis.workGreatWeekends", { metric: metricLabel });
       } else if (absDiff > 0.3) {
-        return `🌴 You recharge on weekends - your ${metricLabel} is notably better than on work days`;
+        return t("lifestyleAnalysis.workRechargeWeekends", { metric: metricLabel });
       } else {
-        return `Your ${metricLabel} is slightly better on weekends`;
+        return t("lifestyleAnalysis.workSlightlyBetterWeekends", { metric: metricLabel });
       }
     }
   };
@@ -164,20 +166,17 @@ const LifestyleAnalysisScreen: React.FC = () => {
     if (minCount < 5) {
       return {
         level: "low",
-        message:
-          "⚠️ Limited data: Keep tracking for at least 5 days in each category for more reliable insights.",
+        message: t("lifestyleAnalysis.limitedDataMessage"),
       };
     } else if (minCount < 10 || totalCount < 21) {
       return {
         level: "moderate",
-        message:
-          "📊 Building insights: Track for 2-3 more weeks for stronger patterns and recommendations.",
+        message: t("lifestyleAnalysis.buildingInsights"),
       };
     } else {
       return {
         level: "good",
-        message:
-          "✅ Good data coverage: These insights are based on sufficient tracking data.",
+        message: t("lifestyleAnalysis.goodDataCoverage"),
       };
     }
   };
@@ -187,7 +186,7 @@ const LifestyleAnalysisScreen: React.FC = () => {
       <SafeAreaView style={styles.container}>
         <View style={styles.centered}>
           <ActivityIndicator size="large" color={theme.colors.primary} />
-          <Text style={styles.centeredText}>Loading lifestyle data...</Text>
+          <Text style={styles.centeredText}>{t("lifestyleAnalysis.loadingLifestyleData")}</Text>
         </View>
       </SafeAreaView>
     );
@@ -201,21 +200,20 @@ const LifestyleAnalysisScreen: React.FC = () => {
             onPress={() => router.push("/(tabs)/mood/analytics")}
             style={styles.backButton}
           >
-            <Text style={styles.backButtonText}>← Back</Text>
+            <Text style={styles.backButtonText}>{t("lifestyleAnalysis.back")}</Text>
           </TouchableOpacity>
           <Text style={styles.headerEmoji}>📊</Text>
-          <Text style={styles.headerTitle}>Lifestyle Factors</Text>
+          <Text style={styles.headerTitle}>{t("lifestyleAnalysis.title")}</Text>
           <Text style={styles.headerDescription}>
-            Analyze how your daily routine, work schedule, and exercise habits
-            impact your mental well-being and productivity
+            {t("lifestyleAnalysis.subtitle")}
           </Text>
         </View>
 
         {workingDayData && workingDayData.workingDays.count > 0 ? (
           <View style={styles.chartWrapper}>
-            <Text style={styles.chartSectionTitle}>💼 Work-Life Balance</Text>
+            <Text style={styles.chartSectionTitle}>{t("lifestyleAnalysis.workLifeBalance")}</Text>
             <Text style={styles.sectionDescription}>
-              See how your well-being differs between work days and weekends
+              {t("lifestyleAnalysis.workLifeBalanceDesc")}
             </Text>
 
             {(() => {
@@ -253,20 +251,20 @@ const LifestyleAnalysisScreen: React.FC = () => {
 
             {workingDayData.insights && (
               <View style={styles.insightsCard}>
-                <Text style={styles.insightsTitle}>💡 AI Insights</Text>
+                <Text style={styles.insightsTitle}>{t("lifestyleAnalysis.aiInsights")}</Text>
                 <Text style={styles.insightsRecommendation}>
                   {workingDayData.insights.recommendation}
                 </Text>
                 <View style={styles.confidenceContainer}>
                   <Text style={styles.confidenceLabel}>
-                    Confidence:{" "}
+                    {t("lifestyleAnalysis.confidence")}{" "}
                     <Text style={styles.confidenceBold}>
                       {workingDayData.insights.confidenceLevel}
                     </Text>
                   </Text>
                   {workingDayData.insights.significantDifference && (
                     <View style={styles.significantBadge}>
-                      <Text style={styles.significantText}>Significant</Text>
+                      <Text style={styles.significantText}>{t("lifestyleAnalysis.significant")}</Text>
                     </View>
                   )}
                 </View>
@@ -275,13 +273,13 @@ const LifestyleAnalysisScreen: React.FC = () => {
 
             <View style={styles.comparisonContainer}>
               <View style={styles.comparisonCard}>
-                <Text style={styles.comparisonCardTitle}>💼 Work Days</Text>
+                <Text style={styles.comparisonCardTitle}>{t("lifestyleAnalysis.workDaysLabel")}</Text>
                 <Text style={styles.comparisonCardCount}>
-                  {workingDayData.workingDays.count} days tracked
+                  {t("lifestyleAnalysis.daysTracked", { count: workingDayData.workingDays.count })}
                 </Text>
 
                 <View style={styles.comparisonMetric}>
-                  <Text style={styles.comparisonMetricLabel}>Mood</Text>
+                  <Text style={styles.comparisonMetricLabel}>{t("lifestyleAnalysis.mood")}</Text>
                   <Text style={styles.comparisonMetricValue}>
                     {getScoreEmoji(workingDayData.workingDays.averageMood)}
                   </Text>
@@ -322,13 +320,13 @@ const LifestyleAnalysisScreen: React.FC = () => {
               </View>
 
               <View style={styles.comparisonCard}>
-                <Text style={styles.comparisonCardTitle}>🌴 Weekend</Text>
+                <Text style={styles.comparisonCardTitle}>{t("lifestyleAnalysis.weekendLabel")}</Text>
                 <Text style={styles.comparisonCardCount}>
-                  {workingDayData.nonWorkingDays.count} days tracked
+                  {t("lifestyleAnalysis.daysTracked", { count: workingDayData.nonWorkingDays.count })}
                 </Text>
 
                 <View style={styles.comparisonMetric}>
-                  <Text style={styles.comparisonMetricLabel}>Mood</Text>
+                  <Text style={styles.comparisonMetricLabel}>{t("lifestyleAnalysis.mood")}</Text>
                   <Text style={styles.comparisonMetricValue}>
                     {getScoreEmoji(workingDayData.nonWorkingDays.averageMood)}
                   </Text>
@@ -349,7 +347,7 @@ const LifestyleAnalysisScreen: React.FC = () => {
                 </View>
 
                 <View style={styles.comparisonMetric}>
-                  <Text style={styles.comparisonMetricLabel}>Productivity</Text>
+                  <Text style={styles.comparisonMetricLabel}>{t("lifestyleAnalysis.productivity")}</Text>
                   <Text style={styles.comparisonMetricValue}>
                     {getScoreEmoji(
                       workingDayData.nonWorkingDays.averageProductivity
@@ -374,7 +372,7 @@ const LifestyleAnalysisScreen: React.FC = () => {
             </View>
 
             <View style={styles.differenceSummary}>
-              <Text style={styles.differenceSummaryTitle}>💼 Work Impact</Text>
+              <Text style={styles.differenceSummaryTitle}>{t("lifestyleAnalysis.workImpact")}</Text>
               <View style={{ marginTop: 12, gap: 8 }}>
                 <Text
                   style={[
@@ -425,8 +423,7 @@ const LifestyleAnalysisScreen: React.FC = () => {
           <View style={styles.chartWrapper}>
             <View style={styles.centered}>
               <Text style={styles.centeredText}>
-                No working day data available yet. Keep tracking to see
-                insights!
+                {t("lifestyleAnalysis.noWorkingData")}
               </Text>
             </View>
           </View>
@@ -435,10 +432,10 @@ const LifestyleAnalysisScreen: React.FC = () => {
         {trainingDayData && trainingDayData.trainingDays.count > 0 ? (
           <View style={styles.chartWrapper}>
             <Text style={styles.chartSectionTitle}>
-              💪 Exercise & Training Impact
+              {t("lifestyleAnalysis.exerciseTraining")}
             </Text>
             <Text style={styles.sectionDescription}>
-              Compare your well-being on days when you exercise versus rest days
+              {t("lifestyleAnalysis.exerciseTrainingDesc")}
             </Text>
 
             {(() => {
@@ -476,20 +473,20 @@ const LifestyleAnalysisScreen: React.FC = () => {
 
             {trainingDayData.insights && (
               <View style={styles.insightsCard}>
-                <Text style={styles.insightsTitle}>💡 AI Insights</Text>
+                <Text style={styles.insightsTitle}>{t("lifestyleAnalysis.aiInsights")}</Text>
                 <Text style={styles.insightsRecommendation}>
                   {trainingDayData.insights.recommendation}
                 </Text>
                 <View style={styles.confidenceContainer}>
                   <Text style={styles.confidenceLabel}>
-                    Confidence:{" "}
+                    {t("lifestyleAnalysis.confidence")}{" "}
                     <Text style={styles.confidenceBold}>
                       {trainingDayData.insights.confidenceLevel}
                     </Text>
                   </Text>
                   {trainingDayData.insights.significantDifference && (
                     <View style={styles.significantBadge}>
-                      <Text style={styles.significantText}>Significant</Text>
+                      <Text style={styles.significantText}>{t("lifestyleAnalysis.significant")}</Text>
                     </View>
                   )}
                 </View>
@@ -498,13 +495,13 @@ const LifestyleAnalysisScreen: React.FC = () => {
 
             <View style={styles.comparisonContainer}>
               <View style={styles.comparisonCard}>
-                <Text style={styles.comparisonCardTitle}>🏃‍♂️ Training Days</Text>
+                <Text style={styles.comparisonCardTitle}>{t("lifestyleAnalysis.trainingDays")}</Text>
                 <Text style={styles.comparisonCardCount}>
-                  {trainingDayData.trainingDays.count} days tracked
+                  {t("lifestyleAnalysis.daysTracked", { count: trainingDayData.trainingDays.count })}
                 </Text>
 
                 <View style={styles.comparisonMetric}>
-                  <Text style={styles.comparisonMetricLabel}>Mood</Text>
+                  <Text style={styles.comparisonMetricLabel}>{t("lifestyleAnalysis.mood")}</Text>
                   <Text style={styles.comparisonMetricValue}>
                     {getScoreEmoji(trainingDayData.trainingDays.averageMood)}
                   </Text>
@@ -523,7 +520,7 @@ const LifestyleAnalysisScreen: React.FC = () => {
                 </View>
 
                 <View style={styles.comparisonMetric}>
-                  <Text style={styles.comparisonMetricLabel}>Productivity</Text>
+                  <Text style={styles.comparisonMetricLabel}>{t("lifestyleAnalysis.productivity")}</Text>
                   <Text style={styles.comparisonMetricValue}>
                     {getScoreEmoji(
                       trainingDayData.trainingDays.averageProductivity
@@ -547,13 +544,13 @@ const LifestyleAnalysisScreen: React.FC = () => {
               </View>
 
               <View style={styles.comparisonCard}>
-                <Text style={styles.comparisonCardTitle}>😴 Rest Days</Text>
+                <Text style={styles.comparisonCardTitle}>{t("lifestyleAnalysis.restDays")}</Text>
                 <Text style={styles.comparisonCardCount}>
-                  {trainingDayData.nonTrainingDays.count} days tracked
+                  {t("lifestyleAnalysis.daysTracked", { count: trainingDayData.nonTrainingDays.count })}
                 </Text>
 
                 <View style={styles.comparisonMetric}>
-                  <Text style={styles.comparisonMetricLabel}>Mood</Text>
+                  <Text style={styles.comparisonMetricLabel}>{t("lifestyleAnalysis.mood")}</Text>
                   <Text style={styles.comparisonMetricValue}>
                     {getScoreEmoji(trainingDayData.nonTrainingDays.averageMood)}
                   </Text>
@@ -574,7 +571,7 @@ const LifestyleAnalysisScreen: React.FC = () => {
                 </View>
 
                 <View style={styles.comparisonMetric}>
-                  <Text style={styles.comparisonMetricLabel}>Productivity</Text>
+                  <Text style={styles.comparisonMetricLabel}>{t("lifestyleAnalysis.productivity")}</Text>
                   <Text style={styles.comparisonMetricValue}>
                     {getScoreEmoji(
                       trainingDayData.nonTrainingDays.averageProductivity
@@ -600,7 +597,7 @@ const LifestyleAnalysisScreen: React.FC = () => {
 
             <View style={styles.differenceSummary}>
               <Text style={styles.differenceSummaryTitle}>
-                💪 Exercise Impact
+                {t("lifestyleAnalysis.exerciseImpact")}
               </Text>
               <View style={{ marginTop: 12, gap: 8 }}>
                 <Text
@@ -652,8 +649,7 @@ const LifestyleAnalysisScreen: React.FC = () => {
           <View style={styles.chartWrapper}>
             <View style={styles.centered}>
               <Text style={styles.centeredText}>
-                No training day data available yet. Set your training days in
-                settings and keep tracking!
+                {t("lifestyleAnalysis.noTrainingData")}
               </Text>
             </View>
           </View>

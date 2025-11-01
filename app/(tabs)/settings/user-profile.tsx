@@ -11,21 +11,23 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useTheme } from "@/context/ThemeContext";
 import { useUserProfile } from "@/context/UserProfileContext";
+import { useTranslation } from "react-i18next";
 import type { DayOfWeek, WeightUnit } from "@/storage/userProfile";
 
 const DAYS_OF_WEEK: { value: DayOfWeek; label: string }[] = [
-  { value: "monday", label: "Mon" },
-  { value: "tuesday", label: "Tue" },
-  { value: "wednesday", label: "Wed" },
-  { value: "thursday", label: "Thu" },
-  { value: "friday", label: "Fri" },
-  { value: "saturday", label: "Sat" },
-  { value: "sunday", label: "Sun" },
+  { value: "monday", label: "userProfile.mon" },
+  { value: "tuesday", label: "userProfile.tue" },
+  { value: "wednesday", label: "userProfile.wed" },
+  { value: "thursday", label: "userProfile.thu" },
+  { value: "friday", label: "userProfile.fri" },
+  { value: "saturday", label: "userProfile.sat" },
+  { value: "sunday", label: "userProfile.sun" },
 ];
 
 export default function UserProfileSettings() {
   const { theme } = useTheme();
   const { profile, updateProfile, loading } = useUserProfile();
+  const { t } = useTranslation();
 
   const [name, setName] = useState("");
   const [age, setAge] = useState("");
@@ -74,21 +76,21 @@ export default function UserProfileSettings() {
     try {
       // Validate name (mandatory)
       if (!name.trim()) {
-        Alert.alert("Name Required", "Please enter your name");
+        Alert.alert(t("userProfile.nameRequired"), t("userProfile.nameRequiredMessage"));
         return;
       }
 
       // Validate age (optional)
       const ageNum = age.trim() ? parseInt(age) : null;
       if (ageNum !== null && (isNaN(ageNum) || ageNum < 1 || ageNum > 150)) {
-        Alert.alert("Invalid Age", "Please enter a valid age (1-150)");
+        Alert.alert(t("userProfile.invalidAge"), t("userProfile.invalidAgeMessage"));
         return;
       }
 
       // Validate weight (optional)
       const weightNum = weight.trim() ? parseFloat(weight) : null;
       if (weightNum !== null && (isNaN(weightNum) || weightNum <= 0 || weightNum > 500)) {
-        Alert.alert("Invalid Weight", "Please enter a valid weight");
+        Alert.alert(t("userProfile.invalidWeight"), t("userProfile.invalidWeightMessage"));
         return;
       }
 
@@ -103,9 +105,9 @@ export default function UserProfileSettings() {
         sport_days: sportDays,
       });
 
-      Alert.alert("Success", "Profile updated successfully");
+      Alert.alert(t("userProfile.success"), t("userProfile.profileUpdated"));
     } catch (error) {
-      Alert.alert("Error", "Failed to save profile. Please try again.");
+      Alert.alert(t("userProfile.error"), t("userProfile.saveFailed"));
     } finally {
       setIsSaving(false);
     }
@@ -253,7 +255,7 @@ export default function UserProfileSettings() {
     return (
       <SafeAreaView style={styles.container}>
         <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-          <Text style={{ color: theme.colors.textSecondary }}>Loading profile...</Text>
+          <Text style={{ color: theme.colors.textSecondary }}>{t("userProfile.loadingProfile")}</Text>
         </View>
       </SafeAreaView>
     );
@@ -263,20 +265,20 @@ export default function UserProfileSettings() {
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.header}>
-          <Text style={styles.title}>User Profile</Text>
+          <Text style={styles.title}>{t("userProfile.title")}</Text>
           <Text style={styles.subtitle}>
-            Manage your personal information and preferences
+            {t("userProfile.subtitle")}
           </Text>
         </View>
 
         {/* Name Section */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Name *</Text>
+          <Text style={styles.sectionTitle}>{t("userProfile.name")}</Text>
           <TextInput
             style={styles.input}
             value={name}
             onChangeText={setName}
-            placeholder="Enter your name"
+            placeholder={t("userProfile.enterName")}
             placeholderTextColor={theme.colors.textSecondary}
             autoCapitalize="words"
           />
@@ -284,12 +286,12 @@ export default function UserProfileSettings() {
 
         {/* Age Section */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Age</Text>
+          <Text style={styles.sectionTitle}>{t("userProfile.age")}</Text>
           <TextInput
             style={styles.input}
             value={age}
             onChangeText={setAge}
-            placeholder="Enter your age"
+            placeholder={t("userProfile.enterAge")}
             placeholderTextColor={theme.colors.textSecondary}
             keyboardType="number-pad"
           />
@@ -297,14 +299,14 @@ export default function UserProfileSettings() {
 
         {/* Weight Section */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Weight</Text>
+          <Text style={styles.sectionTitle}>{t("userProfile.weight")}</Text>
           <View style={styles.weightContainer}>
             <View style={styles.weightInputContainer}>
               <TextInput
                 style={styles.input}
                 value={weight}
                 onChangeText={setWeight}
-                placeholder="Enter weight"
+                placeholder={t("userProfile.enterWeight")}
                 placeholderTextColor={theme.colors.textSecondary}
                 keyboardType="decimal-pad"
               />
@@ -348,9 +350,9 @@ export default function UserProfileSettings() {
 
         {/* Working Days Section */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Working Days</Text>
+          <Text style={styles.sectionTitle}>{t("userProfile.workingDays")}</Text>
           <Text style={styles.sectionDescription}>
-            Select your typical working days
+            {t("userProfile.selectWorkingDays")}
           </Text>
           <View style={styles.daysContainer}>
             {DAYS_OF_WEEK.map((day) => (
@@ -368,7 +370,7 @@ export default function UserProfileSettings() {
                     workingDays.includes(day.value) && styles.dayButtonTextActive,
                   ]}
                 >
-                  {day.label}
+                  {t(day.label)}
                 </Text>
               </TouchableOpacity>
             ))}
@@ -376,7 +378,7 @@ export default function UserProfileSettings() {
           {weekendDays.length > 0 && (
             <View style={styles.weekendInfo}>
               <Text style={styles.weekendInfoText}>
-                Weekend: {weekendDays.map((d) => d.label).join(", ")}
+                {t("userProfile.weekend", { days: weekendDays.map((d) => t(d.label)).join(", ") })}
               </Text>
             </View>
           )}
@@ -384,9 +386,9 @@ export default function UserProfileSettings() {
 
         {/* Sport/Training Days Section */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Sport/Training Days</Text>
+          <Text style={styles.sectionTitle}>{t("userProfile.sportTrainingDays")}</Text>
           <Text style={styles.sectionDescription}>
-            Select days when you exercise or train
+            {t("userProfile.selectSportDays")}
           </Text>
           <View style={styles.daysContainer}>
             {DAYS_OF_WEEK.map((day) => (
@@ -404,7 +406,7 @@ export default function UserProfileSettings() {
                     sportDays.includes(day.value) && styles.dayButtonTextActive,
                   ]}
                 >
-                  {day.label}
+                  {t(day.label)}
                 </Text>
               </TouchableOpacity>
             ))}
@@ -418,7 +420,7 @@ export default function UserProfileSettings() {
           disabled={isSaving}
         >
           <Text style={styles.saveButtonText}>
-            {isSaving ? "Saving..." : "Save Changes"}
+            {isSaving ? t("userProfile.saving") : t("userProfile.saveChanges")}
           </Text>
         </TouchableOpacity>
       </ScrollView>

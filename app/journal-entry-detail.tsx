@@ -19,6 +19,7 @@ import {
   deleteJournalEntry,
 } from "@/storage/journal_entries";
 import { useTheme } from "@/context/ThemeContext";
+import { useTranslation } from "react-i18next";
 
 const CHARACTER_LIMIT = 1000;
 
@@ -27,6 +28,7 @@ const JournalEntryDetailScreen: React.FC = () => {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const queryClient = useQueryClient();
+  const { t } = useTranslation();
 
   const [isEditing, setIsEditing] = useState(false);
   const [editedContent, setEditedContent] = useState("");
@@ -44,13 +46,13 @@ const JournalEntryDetailScreen: React.FC = () => {
     mutationFn: ({ id, content }: { id: number; content: string }) =>
       updateJournalEntry(id, content),
     onSuccess: () => {
-      Alert.alert("Success", "Entry updated successfully");
+      Alert.alert(t("journalEntryDetail.success"), t("journalEntryDetail.entryUpdated"));
       setIsEditing(false);
       queryClient.invalidateQueries({ queryKey: ["journalEntry", id] });
       queryClient.invalidateQueries({ queryKey: ["journalEntries"] });
     },
     onError: () => {
-      Alert.alert("Error", "Failed to update entry");
+      Alert.alert(t("journalEntryDetail.error"), t("journalEntryDetail.updateFailed"));
     },
   });
 
@@ -58,12 +60,12 @@ const JournalEntryDetailScreen: React.FC = () => {
     mutationFn: (id: number) => deleteJournalEntry(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["journalEntries"] });
-      Alert.alert("Deleted", "Entry deleted successfully", [
+      Alert.alert(t("journalEntryDetail.deleted"), t("journalEntryDetail.entryDeleted"), [
         { text: "OK", onPress: () => router.back() },
       ]);
     },
     onError: () => {
-      Alert.alert("Error", "Failed to delete entry");
+      Alert.alert(t("journalEntryDetail.error"), t("journalEntryDetail.deleteFailed"));
     },
   });
 
@@ -74,7 +76,7 @@ const JournalEntryDetailScreen: React.FC = () => {
 
   const handleSave = () => {
     if (editedContent.trim().length === 0) {
-      Alert.alert("Empty Note", "Please write something before saving.");
+      Alert.alert(t("journalEntryDetail.emptyNote"), t("journalEntryDetail.emptyNoteMessage"));
       return;
     }
     const entryId = parseInt(id || "0", 10);
@@ -88,12 +90,12 @@ const JournalEntryDetailScreen: React.FC = () => {
 
   const handleDelete = () => {
     Alert.alert(
-      "Delete Entry",
-      "Are you sure you want to delete this entry? This action cannot be undone.",
+      t("journalEntryDetail.deleteConfirmTitle"),
+      t("journalEntryDetail.deleteConfirmMessage"),
       [
-        { text: "Cancel", style: "cancel" },
+        { text: t("journalEntryDetail.cancel"), style: "cancel" },
         {
-          text: "Delete",
+          text: t("journalEntryDetail.delete"),
           style: "destructive",
           onPress: () => {
             const entryId = parseInt(id || "0", 10);
@@ -254,7 +256,7 @@ const JournalEntryDetailScreen: React.FC = () => {
       <SafeAreaView style={styles.container}>
         <View style={styles.centered}>
           <ActivityIndicator size="large" color={theme.colors.primary} />
-          <Text style={styles.loadingText}>Loading entry...</Text>
+          <Text style={styles.loadingText}>{t("journalEntryDetail.loadingEntry")}</Text>
         </View>
       </SafeAreaView>
     );
@@ -264,9 +266,9 @@ const JournalEntryDetailScreen: React.FC = () => {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.centered}>
-          <Text style={styles.errorText}>Entry not found</Text>
+          <Text style={styles.errorText}>{t("journalEntryDetail.entryNotFound")}</Text>
           <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-            <Text style={styles.backButtonText}>← Go Back</Text>
+            <Text style={styles.backButtonText}>{t("journalEntryDetail.goBack")}</Text>
           </TouchableOpacity>
         </View>
       </SafeAreaView>
@@ -279,14 +281,14 @@ const JournalEntryDetailScreen: React.FC = () => {
         {/* Header */}
         <View style={styles.header}>
           <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-            <Text style={styles.backButtonText}>← Back</Text>
+            <Text style={styles.backButtonText}>{t("journalEntryDetail.back")}</Text>
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>Journal Entry</Text>
+          <Text style={styles.headerTitle}>{t("journalEntryDetail.journalEntry")}</Text>
         </View>
 
         {/* Date */}
         <View style={styles.dateContainer}>
-          <Text style={styles.dateLabel}>Date:</Text>
+          <Text style={styles.dateLabel}>{t("journalEntryDetail.date")}</Text>
           <Text style={styles.dateText}>
             {DateTime.fromISO(entry.date).toLocaleString(DateTime.DATETIME_MED)}
           </Text>
@@ -300,7 +302,7 @@ const JournalEntryDetailScreen: React.FC = () => {
                 style={styles.textInput}
                 multiline
                 maxLength={CHARACTER_LIMIT}
-                placeholder="Write your thoughts..."
+                placeholder={t("dailyJournal.writePlaceholder")}
                 placeholderTextColor={theme.colors.textLight}
                 value={editedContent}
                 onChangeText={setEditedContent}
@@ -323,7 +325,7 @@ const JournalEntryDetailScreen: React.FC = () => {
                 style={[styles.button, styles.cancelButton]}
                 onPress={handleCancel}
               >
-                <Text style={styles.cancelButtonText}>Cancel</Text>
+                <Text style={styles.cancelButtonText}>{t("journalEntryDetail.cancel")}</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={[
@@ -335,7 +337,7 @@ const JournalEntryDetailScreen: React.FC = () => {
                 disabled={updateMutation.isPending}
               >
                 <Text style={styles.saveButtonText}>
-                  {updateMutation.isPending ? "Saving..." : "💾 Save Changes"}
+                  {updateMutation.isPending ? t("journalEntryDetail.saving") : t("journalEntryDetail.saveChanges")}
                 </Text>
               </TouchableOpacity>
             </View>
@@ -345,7 +347,7 @@ const JournalEntryDetailScreen: React.FC = () => {
                 style={[styles.button, styles.editButton]}
                 onPress={handleEdit}
               >
-                <Text style={styles.editButtonText}>✏️ Edit</Text>
+                <Text style={styles.editButtonText}>{t("journalEntryDetail.edit")}</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={[
@@ -357,7 +359,7 @@ const JournalEntryDetailScreen: React.FC = () => {
                 disabled={deleteMutation.isPending}
               >
                 <Text style={styles.deleteButtonText}>
-                  {deleteMutation.isPending ? "Deleting..." : "🗑️ Delete"}
+                  {deleteMutation.isPending ? t("journalEntryDetail.deleting") : t("journalEntryDetail.delete")}
                 </Text>
               </TouchableOpacity>
             </View>

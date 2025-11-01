@@ -23,13 +23,14 @@ import {
 import { getMealFoodsArray, type Meal, type MealType } from "@/storage/meals";
 import { getCommonFoods } from "@/constants/FoodDatabase";
 import { useLanguage } from "@/context/LanguageContext";
+import { useTranslation } from "react-i18next";
 
 const MEAL_TYPE_OPTIONS: { value: MealType; label: string; emoji: string }[] = [
-  { value: null, label: "Any", emoji: "🍽️" },
-  { value: "breakfast", label: "Breakfast", emoji: "☀️" },
-  { value: "lunch", label: "Lunch", emoji: "🌤️" },
-  { value: "dinner", label: "Dinner", emoji: "🌙" },
-  { value: "snacks", label: "Snacks", emoji: "🍎" },
+  { value: null, label: "meals.any", emoji: "🍽️" },
+  { value: "breakfast", label: "meals.breakfast", emoji: "☀️" },
+  { value: "lunch", label: "meals.lunch", emoji: "🌤️" },
+  { value: "dinner", label: "meals.dinner", emoji: "🌙" },
+  { value: "snacks", label: "meals.snacks", emoji: "🍎" },
 ];
 
 const ITEMS_PER_PAGE = 10;
@@ -38,6 +39,7 @@ export default function MealsScreen() {
   const { theme } = useTheme();
   const styles = createStyles(theme);
   const { currentLanguage } = useLanguage();
+  const { t } = useTranslation();
   const COMMON_FOODS = getCommonFoods();
 
   const [filterType, setFilterType] = useState<MealType>(null);
@@ -131,12 +133,12 @@ export default function MealsScreen() {
   const addCustomFood = () => {
     const trimmedFood = customFoodInput.trim();
     if (!trimmedFood) {
-      Alert.alert("Error", "Please enter a food name");
+      Alert.alert(t("meals.error"), t("meals.enterFoodName"));
       return;
     }
 
     if (selectedFoods.includes(trimmedFood)) {
-      Alert.alert("Info", "This food is already added");
+      Alert.alert(t("meals.info"), t("meals.foodAlreadyAdded"));
       return;
     }
 
@@ -156,12 +158,12 @@ export default function MealsScreen() {
 
   const handleSaveMeal = async () => {
     if (!mealName.trim()) {
-      Alert.alert("Error", "Please enter a meal name");
+      Alert.alert(t("meals.error"), t("meals.emptyMealName"));
       return;
     }
 
     if (selectedFoods.length === 0) {
-      Alert.alert("Error", "Please add at least one food item");
+      Alert.alert(t("meals.error"), t("meals.emptyFoodList"));
       return;
     }
 
@@ -184,21 +186,21 @@ export default function MealsScreen() {
       }
       closeModal();
     } catch (error) {
-      Alert.alert("Error", "Failed to save meal");
+      Alert.alert(t("meals.error"), t("meals.failedToSave"));
     }
   };
 
   const handleDeleteMeal = (meal: Meal) => {
-    Alert.alert("Delete Meal", `Are you sure you want to delete "${meal.name}"?`, [
-      { text: "Cancel", style: "cancel" },
+    Alert.alert(t("meals.deleteMeal"), t("meals.deleteMealMessage", { name: meal.name }), [
+      { text: t("meals.cancel"), style: "cancel" },
       {
-        text: "Delete",
+        text: t("meals.delete"),
         style: "destructive",
         onPress: async () => {
           try {
             await deleteMeal.mutateAsync(meal.id);
           } catch (error) {
-            Alert.alert("Error", "Failed to delete meal");
+            Alert.alert(t("meals.error"), t("meals.failedToDelete"));
           }
         },
       },
@@ -232,7 +234,7 @@ export default function MealsScreen() {
       <SafeAreaView style={styles.container}>
         <View style={styles.centered}>
           <ActivityIndicator size="large" color={theme.colors.primary} />
-          <Text style={styles.loadingText}>Loading meals...</Text>
+          <Text style={styles.loadingText}>{t("meals.loadingMeals")}</Text>
         </View>
       </SafeAreaView>
     );
@@ -244,9 +246,9 @@ export default function MealsScreen() {
         {/* Header */}
         <View style={styles.header}>
           <View>
-            <Text style={styles.headerTitle}>My Meals</Text>
+            <Text style={styles.headerTitle}>{t("meals.title")}</Text>
             <Text style={styles.headerSubtitle}>
-              Create reusable meals to quickly log your food intake
+              {t("meals.subtitle")}
             </Text>
           </View>
         </View>
@@ -257,7 +259,7 @@ export default function MealsScreen() {
             style={styles.searchInput}
             value={mealSearchQuery}
             onChangeText={setMealSearchQuery}
-            placeholder="Search meals by name or food..."
+            placeholder={t("meals.searchPlaceholder")}
             placeholderTextColor={theme.colors.textSecondary}
           />
           {mealSearchQuery.length > 0 && (
@@ -272,7 +274,7 @@ export default function MealsScreen() {
 
         {/* Filter Buttons */}
         <View style={styles.filterCard}>
-          <Text style={styles.filterTitle}>Filter by Type</Text>
+          <Text style={styles.filterTitle}>{t("meals.filterByType")}</Text>
           <View style={styles.filterButtons}>
             {MEAL_TYPE_OPTIONS.map((option) => (
               <TouchableOpacity
@@ -289,7 +291,7 @@ export default function MealsScreen() {
                     filterType === option.value && styles.filterButtonTextActive,
                   ]}
                 >
-                  {option.emoji} {option.label}
+                  {option.emoji} {t(option.label)}
                 </Text>
               </TouchableOpacity>
             ))}
@@ -299,7 +301,7 @@ export default function MealsScreen() {
         {/* Create New Meal Button */}
         <View style={styles.createButtonContainer}>
           <TouchableOpacity style={styles.createButton} onPress={openCreateModal}>
-            <Text style={styles.createButtonText}>+ Create New Meal</Text>
+            <Text style={styles.createButtonText}>{t("meals.createNewMeal")}</Text>
           </TouchableOpacity>
         </View>
 
@@ -309,8 +311,8 @@ export default function MealsScreen() {
             <Text style={styles.emptyStateIcon}>🍽️</Text>
             <Text style={styles.emptyStateText}>
               {mealSearchQuery
-                ? `No meals found matching "${mealSearchQuery}"`
-                : "No meals created yet.\nCreate your first meal template to quickly log your food!"}
+                ? t("meals.noMealsFound", { query: mealSearchQuery })
+                : t("meals.noMealsYet")}
             </Text>
           </View>
         ) : (
@@ -333,7 +335,7 @@ export default function MealsScreen() {
                     {mealTypeInfo && mealTypeInfo.value && (
                       <View style={styles.mealTypeBadge}>
                         <Text style={styles.mealTypeBadgeText}>
-                          {mealTypeInfo.label}
+                          {t(mealTypeInfo.label)}
                         </Text>
                       </View>
                     )}
@@ -341,7 +343,7 @@ export default function MealsScreen() {
 
                   <View style={styles.foodItemsContainer}>
                     {foods.map((food, index) => (
-                      <View key={index} style={styles.foodChip}>
+                      <View key={`${meal.id}-food-${index}`} style={styles.foodChip}>
                         <Text style={styles.foodChipText}>{food}</Text>
                       </View>
                     ))}
@@ -352,14 +354,14 @@ export default function MealsScreen() {
                       style={styles.actionButton}
                       onPress={() => openEditModal(meal)}
                     >
-                      <Text style={styles.actionButtonText}>Edit</Text>
+                      <Text style={styles.actionButtonText}>{t("meals.edit")}</Text>
                     </TouchableOpacity>
                     <TouchableOpacity
                       style={[styles.actionButton, styles.actionButtonDanger]}
                       onPress={() => handleDeleteMeal(meal)}
                     >
                       <Text style={[styles.actionButtonText, styles.actionButtonTextDanger]}>
-                        Delete
+                        {t("meals.delete")}
                       </Text>
                     </TouchableOpacity>
                   </View>
@@ -372,7 +374,7 @@ export default function MealsScreen() {
                 onPress={loadMore}
               >
                 <Text style={styles.loadMoreText}>
-                  Load More ({filteredMeals.length - visibleItems} remaining)
+                  {t("meals.loadMore", { count: filteredMeals.length - visibleItems })}
                 </Text>
               </TouchableOpacity>
             )}
@@ -394,7 +396,7 @@ export default function MealsScreen() {
         >
           <View style={styles.modalContent}>
               <Text style={styles.modalTitle}>
-                {editingMeal ? "Edit Meal" : "Create New Meal"}
+                {editingMeal ? t("meals.editMeal") : t("meals.createMeal")}
               </Text>
               <ScrollView
                 ref={modalScrollViewRef}
@@ -405,17 +407,17 @@ export default function MealsScreen() {
               >
 
               {/* Meal Name */}
-              <Text style={styles.inputLabel}>Meal Name</Text>
+              <Text style={styles.inputLabel}>{t("meals.mealName")}</Text>
               <TextInput
                 style={styles.textInput}
                 value={mealName}
                 onChangeText={setMealName}
-                placeholder="e.g., My Favorite Breakfast"
+                placeholder={t("meals.mealNamePlaceholder")}
                 placeholderTextColor={theme.colors.textSecondary}
               />
 
               {/* Meal Type */}
-              <Text style={styles.inputLabel}>Meal Type (Optional)</Text>
+              <Text style={styles.inputLabel}>{t("meals.mealType")}</Text>
               <View style={styles.typeSelector}>
                 {MEAL_TYPE_OPTIONS.map((option) => (
                   <TouchableOpacity
@@ -432,7 +434,7 @@ export default function MealsScreen() {
                         selectedType === option.value && styles.typeButtonTextActive,
                       ]}
                     >
-                      {option.emoji} {option.label}
+                      {option.emoji} {t(option.label)}
                     </Text>
                   </TouchableOpacity>
                 ))}
@@ -447,11 +449,11 @@ export default function MealsScreen() {
                   setSelectedFoodsPosition(y);
                 }}
               >
-                <Text style={styles.inputLabel}>Foods ({selectedFoods.length})</Text>
+                <Text style={styles.inputLabel}>{t("meals.foods", { count: selectedFoods.length })}</Text>
                 {selectedFoods.length > 0 && (
                   <View style={styles.selectedFoodsContainer}>
                     {selectedFoods.map((food, index) => (
-                      <View key={index} style={styles.selectedFoodChip}>
+                      <View key={`selected-${food}-${index}`} style={styles.selectedFoodChip}>
                         <Text style={styles.selectedFoodText}>{food}</Text>
                         <TouchableOpacity onPress={() => removeFoodFromSelected(food)}>
                           <Text style={styles.removeFoodButton}>×</Text>
@@ -468,7 +470,7 @@ export default function MealsScreen() {
                 onPress={() => setShowFoodPicker(!showFoodPicker)}
               >
                 <Text style={styles.addFoodButtonText}>
-                  {showFoodPicker ? "- Hide Food List" : "+ Add Foods"}
+                  {showFoodPicker ? t("meals.hideFoodList") : t("meals.addFoods")}
                 </Text>
               </TouchableOpacity>
 
@@ -481,7 +483,7 @@ export default function MealsScreen() {
                       style={[styles.searchInput, { flex: 1 }]}
                       value={customFoodInput}
                       onChangeText={setCustomFoodInput}
-                      placeholder="Add custom food..."
+                      placeholder={t("meals.addCustomFood")}
                       placeholderTextColor={theme.colors.textSecondary}
                       returnKeyType="done"
                       onSubmitEditing={addCustomFood}
@@ -490,7 +492,7 @@ export default function MealsScreen() {
                       style={styles.addCustomFoodButton}
                       onPress={addCustomFood}
                     >
-                      <Text style={styles.addCustomFoodText}>Add</Text>
+                      <Text style={styles.addCustomFoodText}>{t("meals.add")}</Text>
                     </TouchableOpacity>
                   </View>
 
@@ -499,15 +501,15 @@ export default function MealsScreen() {
                     style={styles.searchInput}
                     value={foodSearchQuery}
                     onChangeText={setFoodSearchQuery}
-                    placeholder="Search common foods..."
+                    placeholder={t("meals.searchCommonFoods")}
                     placeholderTextColor={theme.colors.textSecondary}
                   />
                   <ScrollView style={styles.foodList} nestedScrollEnabled keyboardShouldPersistTaps="handled">
-                    {filteredFoods.map((food) => {
+                    {filteredFoods.map((food, index) => {
                       const isSelected = selectedFoods.includes(food);
                       return (
                         <TouchableOpacity
-                          key={food}
+                          key={`${food}-${index}`}
                           style={[
                             styles.foodOption,
                             isSelected && styles.foodOptionSelected,
@@ -539,14 +541,14 @@ export default function MealsScreen() {
                   style={[styles.modalButton, styles.modalButtonSecondary]}
                   onPress={closeModal}
                 >
-                  <Text style={styles.modalButtonTextSecondary}>Cancel</Text>
+                  <Text style={styles.modalButtonTextSecondary}>{t("meals.cancel")}</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={[styles.modalButton, styles.modalButtonPrimary]}
                   onPress={handleSaveMeal}
                 >
                   <Text style={styles.modalButtonTextPrimary}>
-                    {editingMeal ? "Update" : "Create"}
+                    {editingMeal ? t("meals.update") : t("meals.create")}
                   </Text>
                 </TouchableOpacity>
               </View>

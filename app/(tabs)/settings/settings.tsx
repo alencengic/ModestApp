@@ -247,7 +247,9 @@ export default function SettingsScreen() {
                   <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
                     <Text style={{ fontSize: 24 }}>{lang.flag}</Text>
                     <View>
-                      <Text style={styles.optionLabel}>{lang.name}</Text>
+                      <Text style={styles.optionLabel}>
+                        {lang.code === 'en' ? t('settings.english') : t('settings.croatian')}
+                      </Text>
                       <Text style={styles.optionDescription}>{lang.nativeName}</Text>
                     </View>
                   </View>
