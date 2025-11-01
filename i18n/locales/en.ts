@@ -690,4 +690,14 @@ export default {
     error: "Error",
     saveFailed: "Failed to save profile. Please try again.",
   },
+
+  notifications: {
+    channelName: "Daily Reminders",
+    testTitle: "Test Notification 🔔",
+    testBody: "This is a test notification. Your daily reminders are working!",
+    afternoonTitle: "Time to log your day! 📝",
+    afternoonBody: "Take a moment to record your mood, meals, and how you're feeling.",
+    eveningTitle: "Evening check-in 🌙",
+    eveningBody: "Don't forget to log your evening mood and meals!",
+  },
 };

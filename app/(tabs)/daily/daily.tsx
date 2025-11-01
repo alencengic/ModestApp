@@ -4,7 +4,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { DateTime } from "luxon";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
-import { createDailyEnterScreenStyles } from "./DailyEnterScreen.styles";
+import { createDailyEnterScreenStyles } from "./_DailyEnterScreen.styles";
 import { useTheme } from "@/context/ThemeContext";
 import { Stepper, StepConfig } from "@/components/ui/Stepper";
 import { RatingComponent } from "@/components/RatingComponent";

@@ -690,4 +690,14 @@ export default {
     error: "Greška",
     saveFailed: "Nije uspjelo spremanje profila. Molimo pokušajte ponovno.",
   },
+
+  notifications: {
+    channelName: "Dnevni Podsjetnici",
+    testTitle: "Testna Obavijest 🔔",
+    testBody: "Ovo je testna obavijest. Vaši dnevni podsjetnici rade!",
+    afternoonTitle: "Vrijeme za bilježenje dana! 📝",
+    afternoonBody: "Odvojite trenutak za bilježenje raspoloženja, obroka i kako se osjećate.",
+    eveningTitle: "Večernja provjera 🌙",
+    eveningBody: "Ne zaboravite zabilježiti večernje raspoloženje i obroke!",
+  },
 };

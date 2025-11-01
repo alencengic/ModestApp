@@ -11,7 +11,7 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { getWeatherMoodCorrelation } from "@/storage/weather_data";
-import { createStyles } from "./WeatherMoodScreen.styles";
+import { createStyles } from "./_WeatherMoodScreen.styles";
 import { VideoAd } from "@/components/ads";
 import { useTheme } from "@/context/ThemeContext";
 
