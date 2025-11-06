@@ -47,10 +47,6 @@ export default {
     insights: "Uvidi i Analitika",
     insightsDesc: "Vizualizirajte trendove, otkrijte korelacije i dobijte praktične uvide o vašem zdravlju i navikama.",
     welcomeDesc: "Vaš osobni pratitelj za praćenje raspoloženja, hrane i navika wellness. Započnite svoje putovanje ka zdravijem i sretnij em sebi!",
-    
-    // Language names
-    english: "Engleski",
-    croatian: "Hrvatski",
   },
 
   home: {
@@ -92,34 +88,6 @@ export default {
     day: "Dan",
   },
 
-  journalEntryDetail: {
-    loadingEntry: "Učitavanje unosa...",
-    entryNotFound: "Unos nije pronađen",
-    goBack: "← Natrag",
-    back: "← Natrag",
-    journalEntry: "Dnevnički Unos",
-    date: "Datum:",
-    edit: "✏️ Uredi",
-    delete: "🗑️ Obriši",
-    cancel: "Odustani",
-    saveChanges: "💾 Spremi Promjene",
-    saving: "Spremanje...",
-    deleting: "Brisanje...",
-    
-    // Alerts
-    success: "Uspjeh",
-    entryUpdated: "Unos uspješno ažuriran",
-    error: "Greška",
-    updateFailed: "Neuspjelo ažuriranje unosa",
-    deleteFailed: "Neuspjelo brisanje unosa",
-    deleted: "Obrisano",
-    entryDeleted: "Unos uspješno obrisan",
-    deleteConfirmTitle: "Obriši Unos",
-    deleteConfirmMessage: "Jeste li sigurni da želite obrisati ovaj unos? Ova radnja se ne može poništiti.",
-    emptyNote: "Prazna Bilješka",
-    emptyNoteMessage: "Molimo napišite nešto prije spremanja.",
-  },
-
   moodAnalytics: {
     title: "Analitika Raspoloženja i Produktivnosti",
     subtitle: "Razumijte kako hrana i životni stil utječu na vaše blagostanje",
@@ -138,7 +106,6 @@ export default {
   lifestyleAnalysis: {
     title: "Faktori Životnog Stila",
     subtitle: "Kako posao i vježbanje utječu na vaše blagostanje",
-    back: "← Natrag",
     workSchedule: "Utjecaj Radnog Rasporeda",
     exerciseHabits: "Utjecaj Vježbanja",
     mood: "Raspoloženje",
@@ -165,55 +132,6 @@ export default {
     neutralImpact: "Vaše {{metric}} se čini neutralno bez obzira na {{condition}}.",
     positiveImpact: "📈 Vaše {{metric}} obično je {{difference}} {{scenario}}.",
     negativeImpact: "📉 Vaše {{metric}} obično je {{difference}} {{scenario}}.",
-    
-    // Additional labels
-    workLifeBalance: "💼 Ravnoteža Posla i Života",
-    workLifeBalanceDesc: "Pogledajte kako se vaše blagostanje razlikuje između radnih dana i vikenda",
-    workDaysLabel: "💼 Radni Dani",
-    weekendLabel: "🌴 Vikend",
-    daysTracked: "{{count}} dana praćeno",
-    noWorkingData: "Još nema dostupnih podataka o radnim danima. Nastavite pratiti da vidite uvide!",
-    exerciseTraining: "💪 Utjecaj Vježbanja i Treninga",
-    exerciseTrainingDesc: "Usporedite svoje blagostanje na dane kada vježbate s danima odmora",
-    noTrainingData: "Još nema dostupnih podataka o danima treninga. Postavite dane treninga u postavkama i nastavite pratiti!",
-    workImpact: "💼 Utjecaj Posla",
-    exerciseImpact: "💪 Utjecaj Vježbanja",
-    aiInsights: "💡 AI Uvidi",
-    confidence: "Pouzdanost:",
-    significant: "Značajno",
-    scoreGreat: "Odlično",
-    scoreGood: "Dobro",
-    scoreNeutral: "Neutralno",
-    scoreFair: "Primjereno",
-    scorePoor: "Loše",
-    
-    // Exercise impact descriptions
-    exerciseConsistentlyGreat: "✨ Vaše {{metric}} ostaje dosljedno odlično bez obzira vježbate li ili ne!",
-    exerciseStable: "Vaše {{metric}} ostaje stabilno i na dane treninga i na dane odmora",
-    exerciseMinimalImpact: "Vježbanje ima minimalan utjecaj na vaše {{metric}}",
-    exerciseExcellentBoth: "💪 Vaše {{metric}} je izvrsno oba dana, ali malo bolje kada vježbate",
-    exerciseSignificantBoost: "💪 Vježbanje značajno poboljšava vaše {{metric}}!",
-    exerciseImproves: "✨ Vježbanje poboljšava vaše {{metric}}",
-    exerciseGreatBothRest: "🌟 Vaše {{metric}} je odlično oba dana, iako malo bolje na dane odmora",
-    exerciseLowerTraining: "⚠️ Vaše {{metric}} obično je niže na dane treninga - razmislite o prilagodbi intenziteta vježbanja",
-    exerciseSlightlyLower: "Vaše {{metric}} je malo niže na dane treninga",
-    
-    // Work impact descriptions
-    workConsistentlyGreat: "✨ Vaše {{metric}} ostaje dosljedno odlično tijekom cijelog tjedna!",
-    workStable: "Vaše {{metric}} ostaje stabilno i na radne dane i vikendom",
-    workMinimalImpact: "Posao ima minimalan utjecaj na vaše {{metric}}",
-    workExcellentThrive: "💼 Vaše {{metric}} je izvrsno tijekom cijelog tjedna, ali još više napredujete na radne dane",
-    workThriveSignificant: "💼 Napredujete na radnim danima! Vaše {{metric}} je značajno veće",
-    workBetterWorkDays: "✨ Vaše {{metric}} je bolje na radne dane",
-    workGreatWeekends: "🌴 Vaše {{metric}} je odlično cijeli tjedan, iako se malo bolje osjećate vikendom",
-    workRechargeWeekends: "🌴 Punite baterije vikendom - vaše {{metric}} je primjetno bolje nego radnim danima",
-    workSlightlyBetterWeekends: "Vaše {{metric}} je malo bolje vikendom",
-    
-    // Data reliability
-    limitedDataMessage: "⚠️ Ograničeni podaci: Nastavite pratiti barem 5 dana u svakoj kategoriji za pouzdanije uvide.",
-    buildingInsights: "📊 Izgradnja uvida: Pratite još 2-3 tjedna za jače obrasce i preporuke.",
-    goodDataCoverage: "✅ Dobra pokrivenost podataka: Ovi uvidi temelje se na dovoljnim podacima praćenja.",
-    loadingLifestyleData: "Učitavanje podataka o životnom stilu...",
   },
 
   trendsAnalytics: {
@@ -227,36 +145,25 @@ export default {
     selected: "Odabrano",
     summary: "Sažetak",
     totalEntries: "Ukupno Unosa",
-    uniqueFoods: "Jedinstvene Namirnice",
+    uniqueFoods: "Jedinstvenih Namirnica",
     diversityScore: "Ocjena Raznolikosti",
     insightsTips: "💡 Uvidi i Savjeti",
-    greatVariety: "Izvrsna raznolikost hrane!",
-    varietyDescription: "Vaša glavna hrana je samo {{percent}}% vaše prehrane. Nastavite tako!",
+    greatVariety: "Odlična raznolikost hrane!",
+    varietyDescription: "Vaša najčešća hrana je samo {{percent}}% vaše prehrane. Nastavite tako!",
     tryVariety: "Pokušajte s više raznolikosti",
-    tryVarietyDescription: "{{food}} čini {{percent}}% vaše prehrane. Razmislite o raznolikosti.",
+    tryVarietyDescription: "{{food}} čini {{percent}}% vaše prehrane. Razmislite o diversifikaciji.",
     excellentDiversity: "Izvrsna raznolikost!",
-    excellentDiversityDescription: "Jedete {{count}} različitih namirnica. To potiče bolju prehranu.",
+    excellentDiversityDescription: "Jedete {{count}} različitih namirnica. To promiče bolju prehranu.",
     expandChoices: "Proširite izbor hrane",
-    expandChoicesDescription: "Pokušajte dodati 2-3 nove namirnice ovaj tjedan za bolju prehrambenu ravnotežu.",
+    expandChoicesDescription: "Pokušajte dodati 2-3 nove namirnice ovaj tjedan za poboljšanje prehrambene ravnoteže.",
     topFoods: "🏆 Top Namirnice",
     foods: "Namirnice",
     mostFrequent: "Najčešće",
     loadingFont: "Učitavanje fonta...",
     loadingData: "Učitavanje podataka grafikona...",
-    errorLoading: "Greška pri učitavanju podataka. Pokušajte ponovno.",
-    noData: "Nema dostupnih podataka o unosu hrane za odabrano razdoblje.\nPočnite pratiti svoje obroke kako biste vidjeli uvide!",
+    errorLoading: "Greška pri učitavanju podataka. Molimo pokušajte ponovno.",
+    noData: "Nema dostupnih podataka o unosu hrane za odabrani period.\nPočnite pratiti obroke da vidite uvide!",
     entries: "unosa",
-    showMore: "Prikaži još {{count}} Namirnica",
-    showLess: "Prikaži Manje",
-    
-    // Info modal
-    infoTitle: "Razumijevanje Vaših Prehrambenih Trendova",
-    totalEntriesInfo: "Ukupan broj puta kada ste zabilježili namirnice tijekom odabranog vremenskog razdoblja. Više unosa znači bolju dosljednost praćenja.",
-    uniqueFoodsInfo: "Broj različitih namirnica koje ste pojeli. Veća raznolikost ukazuje na raznoliku prehranu, što je općenito zdravije.",
-    diversityScoreInfo: "Ocjena od 0-100% koja mjeri koliko je vaša prehrana raznolika. Više ocjene (70%+) ukazuju na izvrsnu raznolikost hrane. Niže ocjene sugeriraju da bi vam koristilo isprobati nove namirnice.",
-    topFoodsInfo: "Vaše tri najčešće konzumirane namirnice, prikazane s medaljama. To su vaši prehrambeni stubovi - dobro je imati favorite, ali ravnoteža je ključna.",
-    tips: "💡 Savjeti za Bolju Prehranu",
-    tipsInfo: "• Težite raznolikosti - pokušajte jesti različito obojeno voće i povrće\n• Ako jedna namirnica dominira vašom prehranom (>40%), pokušajte dodati alternative\n• Pratite dosljedno za preciznije uvide\n• Više ocjene raznolikosti koreliraju s boljom prehrambenom ravnotežom",
   },
 
   meals: {
@@ -278,39 +185,25 @@ export default {
     snacks: "Grickalice",
 
     // Modal
-    createMeal: "Kreiraj Novi Obrok",
+    createMeal: "Kreiraj Obrok",
     editMeal: "Uredi Obrok",
     mealName: "Naziv Obroka",
-    mealNamePlaceholder: "npr., Moj Omiljeni Doručak",
+    mealNamePlaceholder: "npr., Proteinski Smoothie",
     mealType: "Vrsta Obroka (Opcionalno)",
-    foods: "Namirnice ({{count}})",
     selectedFoods: "Odabrane Namirnice",
-    addFoods: "+ Dodaj Namirnice",
-    hideFoodList: "- Sakrij Popis Namirnica",
     addFood: "+ Dodaj Namirnicu",
     selectFood: "Odaberi Namirnicu",
     searchFoods: "Pretražite namirnice...",
-    searchCommonFoods: "Pretražite uobičajene namirnice...",
-    addCustomFood: "Dodaj prilagođenu namirnicu...",
     noFoodsFound: "Nema pronađenih namirnica",
     customFood: "Prilagođena Namirnica",
     customFoodPlaceholder: "Unesite naziv namirnice...",
     add: "Dodaj",
-    cancel: "Odustani",
-    create: "Kreiraj",
-    update: "Ažuriraj",
-    edit: "Uredi",
-    delete: "Izbriši",
+    addThisFood: "Ova namirnica je već dodana",
+    enterFoodName: "Molimo unesite naziv namirnice",
 
     // Validation
-    error: "Greška",
     emptyMealName: "Molimo unesite naziv obroka",
     emptyFoodList: "Molimo dodajte barem jednu namirnicu",
-    enterFoodName: "Molimo unesite naziv namirnice",
-    foodAlreadyAdded: "Ova namirnica je već dodana",
-    failedToSave: "Neuspjelo spremanje obroka",
-    failedToDelete: "Neuspjelo brisanje obroka",
-    info: "Informacija",
 
     // Success messages
     mealCreated: "Obrok uspješno kreiran!",
@@ -319,7 +212,6 @@ export default {
 
     // Delete confirmation
     deleteMeal: "Izbriši Obrok",
-    deleteMealMessage: "Jeste li sigurni da želite izbrisati \"{{name}}\"?",
     deleteMealConfirm: "Jeste li sigurni da želite izbrisati ovaj obrok?",
   },
 
@@ -354,79 +246,13 @@ export default {
     entryUpdated: "Unos Ažuriran",
     entryUpdatedMessage: "Vaš dnevni unos je uspješno ažuriran.",
     savingEntry: "Spremanje unosa...",
-    feeling: "Osjećaj",
-    symptoms: "Simptomi",
-    
-    // Stepper navigation
-    step: "Korak",
-    of: "od",
-    back: "Natrag",
-    next: "Dalje",
-    cancel: "Odustani",
-    saveAll: "Spremi Sve",
-    saving: "Spremanje...",
-    skipAndSave: "Preskoči i Spremi",
-    
-    // Meal feeling
-    howDidYouFeel: "Kako ste se osjećali nakon jela?",
-    selectFeeling: "Odaberite kako ste se osjećali nakon ovog obroka",
-    great: "Odlično",
-    bad: "Loše",
-    terrible: "Užasno",
     deleteFoodItem: "Izbriši Namirnicu",
     deleteFoodConfirm: "Jeste li sigurni da želite ukloniti ovu namirnicu?",
-    
-    // Meal symptoms
-    howDoYouFeelAfter: "Kako se osjećate nakon {{meal}}?",
-    everythingNormal: "Sve je bilo normalno",
-    noSymptomsOrIssues: "Nema simptoma ili problema",
-    orProvideDetailsBelow: "ILI UNESITE DETALJE ISPOD",
-    generalWellbeing: "Opća Dobrobit",
-    energyLevel: "Razina Energije",
-    digestiveSymptoms: "Probavni Simptomi",
-    bloating: "Nadutost",
-    bristolStoolScale: "Bristol Ljestvica Stolice",
-    additionalSymptoms: "Dodatni Simptomi",
-    
-    // Energy labels
-    energyVeryLow: "Vrlo Niska",
-    energyLow: "Niska",
-    energyNormal: "Normalna",
-    energyGood: "Dobra",
-    energyEnergized: "Pun Energije",
-    
-    // Bloating levels
-    none: "Nikako",
-    mild: "Blago",
-    severeBloating: "Ozbiljno",
-    
-    // Symptoms
-    diarrhea: "Proljev",
-    nausea: "Mučnina",
-    pain: "Bol",
-    
-    // Bristol scale
-    bristolType1: "Tip 1",
-    bristolType2: "Tip 2",
-    bristolType3: "Tip 3",
-    bristolType4: "Tip 4",
-    bristolType5: "Tip 5",
-    bristolType6: "Tip 6",
-    bristolType7: "Tip 7",
-    bristolDesc1: "Odvojene tvrde grudice",
-    bristolDesc2: "Grudičasto i kao kobasica",
-    bristolDesc3: "Kobasica s pukotinama",
-    bristolDesc4: "Glatko i mekano (Normalno)",
-    bristolDesc5: "Meke grudice",
-    bristolDesc6: "Kašasta konzistencija",
-    bristolDesc7: "Tekuća konzistencija",
   },
 
   settings: {
     language: "Jezik",
     selectLanguage: "Odaberi Jezik",
-    english: "Engleski",
-    croatian: "Hrvatski",
     theme: "Tema",
     themeMode: "Način Teme",
     themeModeDescription: "Odaberite kako aplikacija treba prikazati: svijetlo, tamno ili slijedite postavke sustava",
@@ -471,239 +297,5 @@ export default {
     moderate: "🙂 Umjereno",
     high: "😊 Visoko",
     veryHigh: "🚀 Vrlo Visoko",
-  },
-
-  foodImpactAnalysis: {
-    title: "Analiza Utjecaja Hrane",
-    subtitle: "Otkrijte koja hrana pozitivno ili negativno utječe na vaše raspoloženje i produktivnost",
-    back: "← Natrag",
-    timePeriod: "Vremensko Razdoblje",
-    allTime: "Svo Vrijeme",
-    thisWeek: "Ovaj Tjedan",
-    thisMonth: "Ovaj Mjesec",
-    custom: "Prilagođeno",
-    selected: "Odabrano",
-    correlationType: "Tip Korelacije",
-    mood: "Raspoloženje",
-    productivity: "Produktivnost",
-    exploreFood: "Istraži Određenu Namirnicu",
-    selectFood: "Odaberite namirnicu...",
-    clearSelection: "Očisti Odabir",
-    topPositiveFoods: "Top Pozitivne Namirnice",
-    topNegativeFoods: "Top Negativne Namirnice",
-    noPositiveData: "Nema dovoljno podataka za pozitivne namirnice.",
-    noNegativeData: "Nema dovoljno podataka za negativne namirnice.",
-    noDetailedData: "Nema detaljnih podataka o korelaciji za {{food}}.",
-    searchFoods: "Pretražite namirnice...",
-    noFoodsFound: "Nema pronađenih namirnica",
-    loadingData: "Učitavanje podataka o korelaciji hrane...",
-    errorLoading: "Greška pri učitavanju podataka. {{message}}",
-    logged: "📊 Evidentirano:",
-    times: "puta",
-    
-    // Impact descriptions
-    noImpact: "Nema jasnog utjecaja",
-    strongPositive: "Jak pozitivan učinak",
-    moderatePositive: "Umjeren pozitivan učinak",
-    slightPositive: "Blagi pozitivan učinak",
-    strongNegative: "Jak negativan učinak",
-    moderateNegative: "Umjeren negativan učinak",
-    slightNegative: "Blagi negativan učinak",
-    
-    // Info modal
-    infoTitle: "Kako Funkcionira Analiza Hrane",
-    infoDescription: "Ova analiza pokazuje koje namirnice koreliraju s boljim ili lošijim raspoloženjem i produktivnošću na temelju vaših osobnih podataka.",
-    infoPositive: "Pozitivno (> 0.2):",
-    infoPositiveDesc: "Povezano s boljim raspoloženjem/produktivnošću",
-    infoNeutral: "Neutralno (-0.2 do 0.2):",
-    infoNeutralDesc: "Nema značajne korelacije",
-    infoNegative: "Negativno (< -0.2):",
-    infoNegativeDesc: "Povezano s lošijim raspoloženjem/produktivnošću",
-    infoHowItWorks: "Kako funkcionira:",
-    infoHowItWorksDesc: "Aplikacija analizira vaše unose hrane i ocjene raspoloženja/produktivnosti za izračun prosječnih rezultata. Viši rezultati ukazuju na pozitivnu korelaciju, dok niži rezultati sugeriraju negativan utjecaj.",
-    infoNote: "Napomena: Ove korelacije temelje se na vašim osobnim podacima. Više unosa vodi do točnijih uvida.",
-  },
-
-  weatherMood: {
-    title: "Vrijeme i Raspoloženje",
-    subtitle: "Otkrijte kako vrijeme utječe na vaše raspoloženje",
-    loadingData: "Učitavanje podataka o korelaciji...",
-    errorLoading: "Greška pri učitavanju podataka. Molimo pokušajte ponovno.",
-    noData: "Još nema dostupnih podataka o korelaciji.",
-    noDataDesc: "Počnite pratiti svoje raspoloženje da vidite vremenske obrasce!",
-    
-    // Filter
-    filterByMood: "Filtriraj po Raspoloženju",
-    all: "Sve",
-    showingEntries: "Prikazuje se {{count}} unosa za {{mood}}",
-    
-    // Overview
-    overview: "Pregled",
-    totalEntries: "Ukupno Unosa",
-    positiveMood: "Pozitivno Raspoloženje",
-    
-    // Insights
-    weatherInsights: "Uvidi o Vremenu",
-    temperatureRange: "Raspon Temperature",
-    yourHappyTemp: "Vaša Sretna Temperatura",
-    avgTemp: "Pros. Temp",
-    avgHumidity: "Pros. Vlažnost",
-    bestWeather: "✨ Najbolje Vrijeme za Vaše Raspoloženje:",
-    positiveEntries: "pozitivnih unosa",
-    
-    // Recommendations
-    personalizedTips: "💡 Personalizirani Savjeti",
-    planActivities: "Planirajte aktivnosti na {{condition}} dane",
-    feelBest: "Najbolje se osjećate tijekom {{condition}} vremena",
-    idealTemp: "Vaša idealna temperatura je oko {{temp}}°C",
-    stayComfortable: "Pokušajte ostati ugodno unutar ovog raspona",
-    greatConsistency: "Odlična dosljednost raspoloženja!",
-    positivePercentage: "{{percentage}}% vaših unosa pokazuje pozitivno raspoloženje",
-    
-    // Patterns
-    moodWeatherPatterns: "Obrasci Raspoloženja i Vremena",
-    topMoodPatterns: "Top Obrasci Raspoloženja",
-    topMoodPatternsDesc: "Vaša najčešća raspoloženja s korelacijama vremena",
-    avgTempLabel: "Pros. Temp",
-    weatherLabel: "Vrijeme",
-    commonWeather: "Uobičajeno Vrijeme",
-    entries: "unosa",
-    
-    // Recent entries
-    recentEntries: "Nedavni Unosi",
-    moodLabel: "Raspoloženje:",
-    weatherCondition: "Vrijeme:",
-    temperature: "Temperatura:",
-    humidity: "Vlažnost:",
-    showMore: "Prikaži još {{count}} unosa",
-    showLess: "Prikaži Manje",
-    
-    // Info modal
-    infoTitle: "Uvidi o Vremenu i Raspoloženju",
-    infoWhatShows: "Što Pokazuje:",
-    infoWhatShowsDesc: "Ovaj zaslon korelira vaše evidentirane unose raspoloženja s vremenskim podacima u vrijeme evidentiranja.",
-    infoPatterns: "Obrasci Raspoloženja i Vremena:",
-    infoPatternsDesc: "• Pokazuje koja raspoloženja se najčešće javljaju\n• Prosječna temperatura pri svakom raspoloženju\n• Najčešći vremenski uvjeti za svako raspoloženje",
-    infoKeyInsights: "Ključni Uvidi:",
-    infoKeyInsightsDesc: "• Prosječni vremenski uvjeti u svim unosima\n• Vremenski uvjeti povezani s pozitivnim raspoloženjima\n• Trendovi temperature i vlažnosti",
-    infoHowToUse: "Kako Koristiti:",
-    infoHowToUseDesc: "Pratite svoje raspoloženje svakodnevno kako biste izgradili sveobuhvatnu bazu podataka. S vremenom ćete otkriti obrasce koji vam pomažu razumjeti kako vrijeme utječe na vaše blagostanje.",
-    gotIt: "Razumijem!",
-  },
-
-  profileSetup: {
-    title: "Personalizirajte Svoje Iskustvo",
-    subtitle: "Pomozite nam prilagoditi uvide vašem životnom stilu. Možete promijeniti ovo bilo kada u Postavkama.",
-    
-    // Name section
-    nameTitle: "Vaše Ime *",
-    nameDescription: "Koristit ćemo ovo za personalizaciju vašeg iskustva.",
-    namePlaceholder: "Unesite svoje ime",
-    
-    // Age section
-    ageTitle: "Dob (Opcionalno)",
-    ageDescription: "Pomaže pružiti zdravstvene uvide prilagođene dobi.",
-    agePlaceholder: "Unesite svoju dob",
-    
-    // Weight section
-    weightTitle: "Trenutna Težina (Opcionalno)",
-    weightDescription: "Vaša težina nam pomaže pružiti točnije zdravstvene uvide i izračune.",
-    weightPlaceholder: "Unesite težinu",
-    kg: "kg",
-    lbs: "lbs",
-    
-    // Working days section
-    workingDaysTitle: "Radni Dani",
-    workingDaysDescription: "Odaberite dane kada obično radite. Ovo pomaže identificirati obrasce između posla i blagostanja.",
-    weekend: "Vikend:",
-    
-    // Sport days section
-    sportDaysTitle: "Dani Sporta/Treninga",
-    sportDaysDescription: "Odaberite dane kada vježbate ili trenirate. To ćemo uzeti u obzir u vašoj wellness analizi.",
-    
-    // Days of week
-    mon: "Pon",
-    tue: "Uto",
-    wed: "Sri",
-    thu: "Čet",
-    fri: "Pet",
-    sat: "Sub",
-    sun: "Ned",
-    
-    // Buttons
-    saveAndContinue: "Spremi i Nastavi",
-    skipForNow: "Preskoči Za Sada",
-    
-    // Validation
-    nameRequired: "Ime je Obavezno",
-    nameRequiredMessage: "Molimo unesite svoje ime",
-    invalidAge: "Nevažeća Dob",
-    invalidAgeMessage: "Molimo unesite važeću dob (1-150)",
-    invalidWeight: "Nevažeća Težina",
-    invalidWeightMessage: "Molimo unesite važeću težinu",
-    error: "Greška",
-    errorMessage: "Nije uspjelo spremanje profila. Molimo pokušajte ponovno.",
-  },
-
-  userProfile: {
-    title: "Korisnički Profil",
-    subtitle: "Upravljajte svojim osobnim podacima i postavkama",
-    loadingProfile: "Učitavanje profila...",
-    
-    // Sections
-    name: "Ime *",
-    age: "Dob",
-    weight: "Težina",
-    workingDays: "Radni Dani",
-    sportTrainingDays: "Dani Treninga/Sporta",
-    
-    // Placeholders
-    enterName: "Unesite svoje ime",
-    enterAge: "Unesite svoju dob",
-    enterWeight: "Unesite težinu",
-    
-    // Descriptions
-    selectWorkingDays: "Odaberite svoje tipične radne dane",
-    selectSportDays: "Odaberite dane kada vježbate ili trenirate",
-    
-    // Days
-    mon: "Pon",
-    tue: "Uto",
-    wed: "Sri",
-    thu: "Čet",
-    fri: "Pet",
-    sat: "Sub",
-    sun: "Ned",
-    weekend: "Vikend: {{days}}",
-    
-    // Buttons
-    saveChanges: "Spremi Promjene",
-    saving: "Spremanje...",
-    
-    // Validation
-    nameRequired: "Ime je Obavezno",
-    nameRequiredMessage: "Molimo unesite svoje ime",
-    invalidAge: "Nevažeća Dob",
-    invalidAgeMessage: "Molimo unesite važeću dob (1-150)",
-    invalidWeight: "Nevažeća Težina",
-    invalidWeightMessage: "Molimo unesite važeću težinu",
-    
-    // Success
-    success: "Uspjeh",
-    profileUpdated: "Profil uspješno ažuriran",
-    
-    // Error
-    error: "Greška",
-    saveFailed: "Nije uspjelo spremanje profila. Molimo pokušajte ponovno.",
-  },
-
-  notifications: {
-    channelName: "Dnevni Podsjetnici",
-    testTitle: "Testna Obavijest 🔔",
-    testBody: "Ovo je testna obavijest. Vaši dnevni podsjetnici rade!",
-    afternoonTitle: "Vrijeme za bilježenje dana! 📝",
-    afternoonBody: "Odvojite trenutak za bilježenje raspoloženja, obroka i kako se osjećate.",
-    eveningTitle: "Večernja provjera 🌙",
-    eveningBody: "Ne zaboravite zabilježiti večernje raspoloženje i obroke!",
   },
 };

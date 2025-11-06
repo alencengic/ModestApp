@@ -17,7 +17,6 @@ import {
 import { useRouter } from "expo-router";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useQuery } from "@tanstack/react-query";
-import { useTranslation } from "react-i18next";
 import {
   getFoodMoodCorrelationData,
   getFoodProductivityCorrelationData,
@@ -33,7 +32,6 @@ type CorrelationType = "mood" | "productivity";
 const FoodImpactAnalysisScreen: React.FC = () => {
   const { theme } = useTheme();
   const router = useRouter();
-  const { t } = useTranslation();
   const externalStyles = createStyles(theme);
   const POSITIVE_COLOR = "#3CB371";
   const NEUTRAL_COLOR = "#A9A9A9";
@@ -130,16 +128,16 @@ const FoodImpactAnalysisScreen: React.FC = () => {
     const absScore = Math.abs(score);
 
     if (absScore <= 0.2) {
-      return t("foodImpactAnalysis.noImpact");
+      return "No clear impact";
     }
 
     // For both mood and productivity, higher is better
-    if (score > 0.6) return t("foodImpactAnalysis.strongPositive");
-    if (score > 0.4) return t("foodImpactAnalysis.moderatePositive");
-    if (score > 0.2) return t("foodImpactAnalysis.slightPositive");
-    if (score < -0.6) return t("foodImpactAnalysis.strongNegative");
-    if (score < -0.4) return t("foodImpactAnalysis.moderateNegative");
-    return t("foodImpactAnalysis.slightNegative");
+    if (score > 0.6) return "Strong positive effect";
+    if (score > 0.4) return "Moderate positive effect";
+    if (score > 0.2) return "Slight positive effect";
+    if (score < -0.6) return "Strong negative effect";
+    if (score < -0.4) return "Moderate negative effect";
+    return "Slight negative effect";
   };
 
   // Get impact level (0-5)
@@ -204,8 +202,8 @@ const FoodImpactAnalysisScreen: React.FC = () => {
         </View>
 
         <View style={externalStyles.detailRow}>
-          <Text style={externalStyles.detailLabel}>{t("foodImpactAnalysis.logged")}</Text>
-          <Text style={externalStyles.detailValue}>{item.occurrences} {t("foodImpactAnalysis.times")}</Text>
+          <Text style={externalStyles.detailLabel}>📊 Logged:</Text>
+          <Text style={externalStyles.detailValue}>{item.occurrences} times</Text>
         </View>
       </View>
     );
@@ -218,7 +216,7 @@ const FoodImpactAnalysisScreen: React.FC = () => {
         <View style={externalStyles.centered}>
           <ActivityIndicator size="large" color={theme.colors.primary} />
           <Text style={externalStyles.centeredText}>
-            {t("foodImpactAnalysis.loadingData")}
+            Loading food correlation data...
           </Text>
         </View>
       </SafeAreaView>
@@ -230,7 +228,7 @@ const FoodImpactAnalysisScreen: React.FC = () => {
       <SafeAreaView style={externalStyles.container}>
         <View style={externalStyles.centered}>
           <Text style={externalStyles.errorText}>
-            {t("foodImpactAnalysis.errorLoading", { message: error?.message })}
+            Error loading data. {error?.message}
           </Text>
         </View>
       </SafeAreaView>
@@ -242,7 +240,7 @@ const FoodImpactAnalysisScreen: React.FC = () => {
       <ScrollView>
         <View style={externalStyles.header}>
           <TouchableOpacity onPress={() => router.push("/(tabs)/mood/analytics")} style={externalStyles.backButton}>
-            <Text style={externalStyles.backButtonText}>{t("foodImpactAnalysis.back")}</Text>
+            <Text style={externalStyles.backButtonText}>← Back</Text>
           </TouchableOpacity>
           <View style={externalStyles.headerTopRow}>
             <View style={{ width: 40 }} />
@@ -255,15 +253,15 @@ const FoodImpactAnalysisScreen: React.FC = () => {
             </TouchableOpacity>
           </View>
           <Text style={externalStyles.headerTitle}>
-            {t("foodImpactAnalysis.title")}
+            Food Impact Analysis
           </Text>
           <Text style={externalStyles.headerDescription}>
-            {t("foodImpactAnalysis.subtitle")}
+            Discover which foods positively or negatively affect your mood and productivity levels
           </Text>
         </View>
 
         <View style={externalStyles.chartWrapper}>
-          <Text style={externalStyles.chartSectionTitle}>{t("foodImpactAnalysis.timePeriod")}</Text>
+          <Text style={externalStyles.chartSectionTitle}>Time Period</Text>
           <View style={externalStyles.buttonGroup}>
             <TouchableOpacity
               style={[
@@ -278,7 +276,7 @@ const FoodImpactAnalysisScreen: React.FC = () => {
                   dateRange === "all" && externalStyles.filterButtonTextActive,
                 ]}
               >
-                {t("foodImpactAnalysis.allTime")}
+                All Time
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
@@ -294,7 +292,7 @@ const FoodImpactAnalysisScreen: React.FC = () => {
                   dateRange === "week" && externalStyles.filterButtonTextActive,
                 ]}
               >
-                {t("foodImpactAnalysis.thisWeek")}
+                This Week
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
@@ -310,7 +308,7 @@ const FoodImpactAnalysisScreen: React.FC = () => {
                   dateRange === "month" && externalStyles.filterButtonTextActive,
                 ]}
               >
-                {t("foodImpactAnalysis.thisMonth")}
+                This Month
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
@@ -326,7 +324,7 @@ const FoodImpactAnalysisScreen: React.FC = () => {
                   dateRange === "custom" && externalStyles.filterButtonTextActive,
                 ]}
               >
-                {t("foodImpactAnalysis.custom")}
+                Custom
               </Text>
             </TouchableOpacity>
           </View>
@@ -347,7 +345,7 @@ const FoodImpactAnalysisScreen: React.FC = () => {
           {dateRange === "custom" && (
             <View style={externalStyles.selectedDateDisplay}>
               <Text style={externalStyles.selectedDateText}>
-                {t("foodImpactAnalysis.selected")}: {selectedDate.toLocaleDateString('en-US', {
+                Selected: {selectedDate.toLocaleDateString('en-US', {
                   year: 'numeric',
                   month: 'long',
                   day: 'numeric'
@@ -358,7 +356,7 @@ const FoodImpactAnalysisScreen: React.FC = () => {
         </View>
 
         <View style={externalStyles.chartWrapper}>
-          <Text style={externalStyles.chartSectionTitle}>{t("foodImpactAnalysis.correlationType")}</Text>
+          <Text style={externalStyles.chartSectionTitle}>Correlation Type</Text>
           <View style={externalStyles.toggleContainer}>
             <TouchableOpacity
               style={[
@@ -374,7 +372,7 @@ const FoodImpactAnalysisScreen: React.FC = () => {
                     externalStyles.toggleButtonTextActive,
                 ]}
               >
-                {t("foodImpactAnalysis.mood")}
+                Mood
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
@@ -392,7 +390,7 @@ const FoodImpactAnalysisScreen: React.FC = () => {
                     externalStyles.toggleButtonTextActive,
                 ]}
               >
-                {t("foodImpactAnalysis.productivity")}
+                Productivity
               </Text>
             </TouchableOpacity>
           </View>
@@ -400,14 +398,14 @@ const FoodImpactAnalysisScreen: React.FC = () => {
 
         <View style={externalStyles.chartWrapper}>
           <Text style={externalStyles.chartSectionTitle}>
-            {t("foodImpactAnalysis.exploreFood")}
+            Explore Specific Food
           </Text>
           <TouchableOpacity
             style={externalStyles.foodSelectorButton}
             onPress={() => setIsModalVisible(true)}
           >
             <Text style={externalStyles.foodSelectorButtonText}>
-              {selectedFoodName || t("foodImpactAnalysis.selectFood")}
+              {selectedFoodName || "Select a food..."}
             </Text>
             <Text style={externalStyles.foodSelectorButtonIcon}>▼</Text>
           </TouchableOpacity>
@@ -417,7 +415,7 @@ const FoodImpactAnalysisScreen: React.FC = () => {
               style={externalStyles.clearButton}
               onPress={() => setSelectedFoodName(null)}
             >
-              <Text style={externalStyles.clearButtonText}>{t("foodImpactAnalysis.clearSelection")}</Text>
+              <Text style={externalStyles.clearButtonText}>Clear Selection</Text>
             </TouchableOpacity>
           )}
 
@@ -429,7 +427,7 @@ const FoodImpactAnalysisScreen: React.FC = () => {
           )}
           {selectedFoodName && !selectedFoodRawDetails && (
             <Text style={{ padding: 10, color: "orange", textAlign: "center" }}>
-              {t("foodImpactAnalysis.noDetailedData", { food: selectedFoodName })}
+              No detailed correlation data found for {selectedFoodName}.
             </Text>
           )}
         </View>
@@ -447,7 +445,7 @@ const FoodImpactAnalysisScreen: React.FC = () => {
             <View style={externalStyles.modalOverlay}>
               <View style={externalStyles.modalContainer}>
                 <View style={externalStyles.modalHeader}>
-                  <Text style={externalStyles.modalTitle}>{t("foodImpactAnalysis.selectFood")}</Text>
+                  <Text style={externalStyles.modalTitle}>Select Food</Text>
                   <Pressable
                     style={externalStyles.modalCloseButton}
                     onPress={() => {
@@ -461,7 +459,7 @@ const FoodImpactAnalysisScreen: React.FC = () => {
 
                 <TextInput
                   style={externalStyles.searchInput}
-                  placeholder={t("foodImpactAnalysis.searchFoods")}
+                  placeholder="Search foods..."
                   value={searchQuery}
                   onChangeText={setSearchQuery}
                   autoFocus
@@ -500,7 +498,7 @@ const FoodImpactAnalysisScreen: React.FC = () => {
                   ListEmptyComponent={
                     <View style={externalStyles.centered}>
                       <Text style={externalStyles.centeredText}>
-                        {t("foodImpactAnalysis.noFoodsFound")}
+                        No foods found
                       </Text>
                     </View>
                   }
@@ -512,7 +510,7 @@ const FoodImpactAnalysisScreen: React.FC = () => {
 
         <View style={externalStyles.chartWrapper}>
           <Text style={externalStyles.chartSectionTitle}>
-            {t("foodImpactAnalysis.topPositiveFoods")}
+            Top Positive Foods
           </Text>
           {topPositiveFoods.length > 0 ? (
             topPositiveFoods.map((food, index) => (
@@ -525,7 +523,7 @@ const FoodImpactAnalysisScreen: React.FC = () => {
           ) : (
             <View style={externalStyles.centered}>
               <Text style={externalStyles.centeredText}>
-                {t("foodImpactAnalysis.noPositiveData")}
+                Not enough data for positive foods.
               </Text>
             </View>
           )}
@@ -533,7 +531,7 @@ const FoodImpactAnalysisScreen: React.FC = () => {
 
         <View style={externalStyles.chartWrapper}>
           <Text style={externalStyles.chartSectionTitle}>
-            {t("foodImpactAnalysis.topNegativeFoods")}
+            Top Negative Foods
           </Text>
           {topNegativeFoods.length > 0 ? (
             topNegativeFoods.map((food, index) => (
@@ -546,7 +544,7 @@ const FoodImpactAnalysisScreen: React.FC = () => {
           ) : (
             <View style={externalStyles.centered}>
               <Text style={externalStyles.centeredText}>
-                {t("foodImpactAnalysis.noNegativeData")}
+                Not enough data for negative foods.
               </Text>
             </View>
           )}
@@ -562,7 +560,7 @@ const FoodImpactAnalysisScreen: React.FC = () => {
         <View style={externalStyles.infoModalOverlay}>
           <View style={externalStyles.infoModalContainer}>
             <View style={externalStyles.modalHeader}>
-              <Text style={externalStyles.modalTitle}>{t("foodImpactAnalysis.infoTitle")}</Text>
+              <Text style={externalStyles.modalTitle}>How Food Analysis Works</Text>
               <Pressable
                 style={externalStyles.modalCloseButton}
                 onPress={() => setIsInfoModalVisible(false)}
@@ -573,7 +571,7 @@ const FoodImpactAnalysisScreen: React.FC = () => {
 
             <ScrollView style={externalStyles.infoModalContent}>
               <Text style={externalStyles.infoText}>
-                {t("foodImpactAnalysis.infoDescription")}
+                This analysis shows which foods correlate with better or worse mood and productivity based on your personal data.
               </Text>
 
               <View style={externalStyles.colorExplanation}>
@@ -585,7 +583,7 @@ const FoodImpactAnalysisScreen: React.FC = () => {
                     ]}
                   />
                   <Text style={externalStyles.colorLabel}>
-                    <Text style={{ fontWeight: "bold" }}>{t("foodImpactAnalysis.infoPositive")}</Text> {t("foodImpactAnalysis.infoPositiveDesc")}
+                    <Text style={{ fontWeight: "bold" }}>Positive ({">"} 0.2):</Text> Associated with better mood/productivity
                   </Text>
                 </View>
 
@@ -597,7 +595,7 @@ const FoodImpactAnalysisScreen: React.FC = () => {
                     ]}
                   />
                   <Text style={externalStyles.colorLabel}>
-                    <Text style={{ fontWeight: "bold" }}>{t("foodImpactAnalysis.infoNeutral")}</Text> {t("foodImpactAnalysis.infoNeutralDesc")}
+                    <Text style={{ fontWeight: "bold" }}>Neutral (-0.2 to 0.2):</Text> No significant correlation
                   </Text>
                 </View>
 
@@ -609,18 +607,18 @@ const FoodImpactAnalysisScreen: React.FC = () => {
                     ]}
                   />
                   <Text style={externalStyles.colorLabel}>
-                    <Text style={{ fontWeight: "bold" }}>{t("foodImpactAnalysis.infoNegative")}</Text> {t("foodImpactAnalysis.infoNegativeDesc")}
+                    <Text style={{ fontWeight: "bold" }}>Negative ({"<"} -0.2):</Text> Associated with worse mood/productivity
                   </Text>
                 </View>
               </View>
 
               <Text style={externalStyles.infoText}>
-                <Text style={{ fontWeight: "bold" }}>{t("foodImpactAnalysis.infoHowItWorks")}{"\n"}</Text>
-                {t("foodImpactAnalysis.infoHowItWorksDesc")}
+                <Text style={{ fontWeight: "bold" }}>How it works:{"\n"}</Text>
+                The app analyzes your food entries and mood/productivity ratings to calculate average scores. Higher scores indicate a positive correlation, while lower scores suggest a negative impact.
               </Text>
 
               <Text style={externalStyles.infoNote}>
-                {t("foodImpactAnalysis.infoNote")}
+                Note: These correlations are based on your personal data. More entries lead to more accurate insights.
               </Text>
             </ScrollView>
           </View>

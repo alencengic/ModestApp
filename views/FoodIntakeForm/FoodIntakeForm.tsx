@@ -11,11 +11,11 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from "react-native";
-import { getDistinctMeals } from "@/storage/database";
+import { getDistinctMeals } from "@/storage/supabase/foodIntakes";
 import { foodIntakeFormStyles } from "./FoodIntakeForm.styles";
 import { COMMON_FOODS } from "@/constants/FoodDatabase";
 import { useGetAllMeals } from "@/hooks/queries/useMeals";
-import { getMealFoodsArray, type Meal, type MealType as StorageMealType } from "@/storage/meals";
+import { getMealFoodsArray, type Meal, type MealType as StorageMealType } from "@/storage/database";
 
 type MealType = "breakfast" | "lunch" | "dinner" | "snacks";
 

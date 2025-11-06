@@ -10,7 +10,7 @@ import {
   type Meal,
   type MealInput,
   type MealType,
-} from "@/storage/meals";
+} from "@/storage/database";
 
 // Query keys
 export const mealsKeys = {

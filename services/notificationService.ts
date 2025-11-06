@@ -1,14 +1,11 @@
 import * as Notifications from 'expo-notifications';
 import { Platform } from 'react-native';
-import i18n from '@/i18n/i18n.config';
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
     shouldShowAlert: true,
     shouldPlaySound: true,
     shouldSetBadge: false,
-    shouldShowBanner: true,
-    shouldShowList: true,
   }),
 });
 
@@ -29,7 +26,7 @@ export const requestNotificationPermissions = async (): Promise<boolean> => {
 
     if (Platform.OS === 'android') {
       await Notifications.setNotificationChannelAsync('daily-reminders', {
-        name: i18n.t('notifications.channelName'),
+        name: 'Daily Reminders',
         importance: Notifications.AndroidImportance.HIGH,
         vibrationPattern: [0, 250, 250, 250],
         lightColor: '#C88B6B',
@@ -47,8 +44,8 @@ export const sendTestNotification = async (): Promise<void> => {
   try {
     await Notifications.scheduleNotificationAsync({
       content: {
-        title: i18n.t('notifications.testTitle'),
-        body: i18n.t('notifications.testBody'),
+        title: "Test Notification 🔔",
+        body: "This is a test notification. Your daily reminders are working!",
         sound: true,
       },
       trigger: {
@@ -68,8 +65,8 @@ export const scheduleDailyNotifications = async (): Promise<void> => {
 
     await Notifications.scheduleNotificationAsync({
       content: {
-        title: i18n.t('notifications.afternoonTitle'),
-        body: i18n.t('notifications.afternoonBody'),
+        title: "Time to log your day! 📝",
+        body: "Take a moment to record your mood, meals, and how you're feeling.",
         sound: true,
       },
       trigger: {
@@ -82,8 +79,8 @@ export const scheduleDailyNotifications = async (): Promise<void> => {
 
     await Notifications.scheduleNotificationAsync({
       content: {
-        title: i18n.t('notifications.eveningTitle'),
-        body: i18n.t('notifications.eveningBody'),
+        title: "Evening check-in 🌙",
+        body: "Don't forget to log your evening mood and meals!",
         sound: true,
       },
       trigger: {

@@ -2,7 +2,6 @@ import React, { useState, useMemo } from "react";
 import { Alert, ScrollView, View, KeyboardAvoidingView, Platform } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { DateTime } from "luxon";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 import { createDailyEnterScreenStyles } from "./_DailyEnterScreen.styles";
 import { useTheme } from "@/context/ThemeContext";
@@ -11,8 +10,8 @@ import { RatingComponent } from "@/components/RatingComponent";
 import FoodIntakeForm, { MealFeeling } from "@/views/FoodIntakeForm";
 import { MealFeelingForm } from "@/views/MealFeelingForm";
 import { MealSymptomForm, MealSymptomData } from "@/views/MealSymptomForm";
-import { insertOrUpdateMood } from "@/storage/database";
-import { insertOrUpdateProductivity } from "@/storage/productivity_entries";
+import { insertOrUpdateMood } from "@/storage/supabase/moodEntries";
+import { insertOrUpdateProductivity } from "@/storage/database";
 import { useMutationInsertFoodIntake } from "@/hooks/queries/useMutationInsertFoodIntake";
 import { useCreateSymptom } from "@/hooks/symptoms";
 
@@ -20,20 +19,20 @@ import { moodRatingStyles } from "@/views/MoodRating/MoodRating.styles";
 import { productivityRatingStyles } from "@/views/ProductivityRating/ProductivityRating.styles";
 import { useTranslation } from "react-i18next";
 
-const getMoodOptions = (t: any, primaryColor: string) => [
-  { value: "Sad", display: <MaterialCommunityIcons name="emoticon-sad-outline" size={24} color={primaryColor} />, label: t('daily.poor') },
-  { value: "Neutral", display: <MaterialCommunityIcons name="emoticon-neutral-outline" size={24} color={primaryColor} />, label: t('daily.notGreat') },
-  { value: "Happy", display: <MaterialCommunityIcons name="emoticon-happy-outline" size={24} color={primaryColor} />, label: t('daily.okay') },
-  { value: "Very Happy", display: <MaterialCommunityIcons name="emoticon-excited-outline" size={24} color={primaryColor} />, label: t('daily.good') },
-  { value: "Ecstatic", display: <MaterialCommunityIcons name="emoticon-cool-outline" size={24} color={primaryColor} />, label: t('daily.excellent') },
+const getMoodOptions = (t: any) => [
+  { value: "Sad", display: "😞", label: t('daily.poor') },
+  { value: "Neutral", display: "😐", label: t('daily.notGreat') },
+  { value: "Happy", display: "😊", label: t('daily.okay') },
+  { value: "Very Happy", display: "😄", label: t('daily.good') },
+  { value: "Ecstatic", display: "🤩", label: t('daily.excellent') },
 ];
 
-const getProductivityOptions = (t: any, primaryColor: string) => [
-  { value: 1, display: <MaterialCommunityIcons name="sleep" size={24} color={primaryColor} />, label: t('daily.veryLow') },
-  { value: 2, display: <MaterialCommunityIcons name="walk" size={24} color={primaryColor} />, label: t('daily.low') },
-  { value: 3, display: <MaterialCommunityIcons name="run" size={24} color={primaryColor} />, label: t('daily.moderate') },
-  { value: 4, display: <MaterialCommunityIcons name="run-fast" size={24} color={primaryColor} />, label: t('daily.high') },
-  { value: 5, display: <MaterialCommunityIcons name="rocket-launch-outline" size={24} color={primaryColor} />, label: t('daily.veryHigh') },
+const getProductivityOptions = (t: any) => [
+  { value: 1, display: "😴", label: t('daily.veryLow') },
+  { value: 2, display: "😐", label: t('daily.low') },
+  { value: 3, display: "🙂", label: t('daily.moderate') },
+  { value: 4, display: "😊", label: t('daily.high') },
+  { value: 5, display: "🚀", label: t('daily.veryHigh') },
 ];
 
 type MealType = "breakfast" | "lunch" | "dinner" | "snacks";
@@ -50,8 +49,8 @@ export default function DailyEnterScreen() {
   const { t } = useTranslation();
   const styles = createDailyEnterScreenStyles(theme);
   const foodScrollViewRef = React.useRef<ScrollView>(null);
-  const moodOptions = getMoodOptions(t, theme.colors.primary);
-  const productivityOptions = getProductivityOptions(t, theme.colors.primary);
+  const moodOptions = getMoodOptions(t);
+  const productivityOptions = getProductivityOptions(t);
   const MEAL_CONFIG = getMealConfig(t);
   const [moodValue, setMoodValue] = useState<string | null>(null);
   const [productivityValue, setProductivityValue] = useState<number | null>(
@@ -164,7 +163,7 @@ export default function DailyEnterScreen() {
         const config = MEAL_CONFIG[mealType];
 
         steps.push({
-          title: `${config.icon} ${config.label} ${t('daily.feeling')}`,
+          title: `${config.icon} ${config.label} Feeling`,
           component: (
             <ScrollView
               key={`feeling-${mealType}-${resetKey}`}
@@ -183,7 +182,7 @@ export default function DailyEnterScreen() {
         });
 
         steps.push({
-          title: `${config.icon} ${config.label} ${t('daily.symptoms')}`,
+          title: `${config.icon} ${config.label} Symptoms`,
           component: (
             <ScrollView
               key={`symptom-${mealType}-${resetKey}`}

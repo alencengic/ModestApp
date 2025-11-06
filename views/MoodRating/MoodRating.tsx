@@ -1,7 +1,7 @@
 import React from "react";
 import { RatingComponent, RatingOption } from "@/components/RatingComponent";
 import { moodRatingStyles } from "./MoodRating.styles";
-import { insertOrUpdateMood } from "@/storage/database";
+import { insertOrUpdateMood } from "@/storage/supabase/moodEntries";
 import { DateTime } from "luxon";
 
 const moodOptions: RatingOption<string>[] = [

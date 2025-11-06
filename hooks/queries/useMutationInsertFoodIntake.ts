@@ -2,8 +2,8 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   insertFoodIntake as dbInsertFoodIntake,
   getFoodIntakeChartData as dbGetChartData,
-} from "@/storage/database";
-import { ChartDataItem } from "@/app/(tabs)/trends/trends";
+} from "@/storage/supabase/foodIntakes";
+import { ChartDataItem } from "@/app/(tabs)/trends";
 import { handleQueryError } from "./helpers/handleQueryError.helper";
 
 export const useMutationInsertFoodIntake = () => {

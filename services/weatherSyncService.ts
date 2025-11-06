@@ -1,5 +1,5 @@
 import { fetchAndSaveWeatherData } from "./weatherService";
-import { getWeatherByDate } from "@/storage/weather_data";
+import { getWeatherByDate } from "@/storage/database";
 import { DateTime } from "luxon";
 
 // Check if weather data needs to be synced

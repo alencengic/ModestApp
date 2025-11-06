@@ -13,7 +13,7 @@ export default function TrendsLayout() {
       }}
     >
       <Stack.Screen
-        name="index"
+        name="trends"
         options={{
           title: "Trends and Analytics",
         }}

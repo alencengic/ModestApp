@@ -7,10 +7,12 @@ import {
   StyleSheet,
   Switch,
   SafeAreaView,
+  Alert,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { useTheme } from "@/context/ThemeContext";
 import { useUserProfile } from "@/context/UserProfileContext";
+import { useAuth } from "@/context/AuthContext";
 import { useLanguage, SUPPORTED_LANGUAGES, type LanguageCode } from "@/context/LanguageContext";
 import { useTranslation } from "react-i18next";
 import { ThemeMode, ColorPaletteName, COLOR_PALETTES } from "@/constants/ColorPalettes";
@@ -19,9 +21,35 @@ export default function SettingsScreen() {
   const router = useRouter();
   const { theme, themeMode, setThemeMode, colorPalette, setColorPalette, isDark } = useTheme();
   const { name } = useUserProfile();
+  const { signOut, user } = useAuth();
   const { t } = useTranslation();
   const { currentLanguage, changeLanguage } = useLanguage();
   const [isSaving, setIsSaving] = useState(false);
+
+  const handleLogout = async () => {
+    Alert.alert(
+      'Sign Out',
+      'Are you sure you want to sign out?',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Sign Out',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await signOut();
+              // Navigation will be handled automatically by the auth context
+            } catch (error) {
+              Alert.alert('Error', 'Failed to sign out. Please try again.');
+            }
+          },
+        },
+      ]
+    );
+  };
 
   const handleThemeModeChange = async (mode: ThemeMode) => {
     setIsSaving(true);
@@ -209,6 +237,34 @@ export default function SettingsScreen() {
       color: theme.colors.primary,
       fontWeight: "700",
     },
+    logoutSection: {
+      padding: theme.spacing.lg,
+      paddingTop: 0,
+    },
+    logoutButton: {
+      backgroundColor: theme.colors.error,
+      borderRadius: theme.borderRadius.md,
+      padding: theme.spacing.md,
+      alignItems: 'center',
+      marginTop: theme.spacing.md,
+    },
+    logoutButtonText: {
+      color: '#FFFFFF',
+      fontSize: theme.typography.body.fontSize,
+      fontWeight: '600',
+    },
+    userInfo: {
+      backgroundColor: theme.colors.surface,
+      borderRadius: theme.borderRadius.md,
+      padding: theme.spacing.md,
+      marginBottom: theme.spacing.md,
+      ...theme.shadows.sm,
+    },
+    userEmail: {
+      fontSize: 14,
+      color: theme.colors.textSecondary,
+      marginTop: 4,
+    },
   });
 
   return (
@@ -247,9 +303,7 @@ export default function SettingsScreen() {
                   <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
                     <Text style={{ fontSize: 24 }}>{lang.flag}</Text>
                     <View>
-                      <Text style={styles.optionLabel}>
-                        {lang.code === 'en' ? t('settings.english') : t('settings.croatian')}
-                      </Text>
+                      <Text style={styles.optionLabel}>{lang.name}</Text>
                       <Text style={styles.optionDescription}>{lang.nativeName}</Text>
                     </View>
                   </View>
@@ -373,6 +427,23 @@ export default function SettingsScreen() {
               <Text style={styles.previewButtonText}>{t('settings.sampleButton')}</Text>
             </TouchableOpacity>
           </View>
+        </View>
+
+        {/* Account Section */}
+        <View style={styles.logoutSection}>
+          <Text style={styles.sectionTitle}>Account</Text>
+          
+          <View style={styles.userInfo}>
+            <Text style={styles.optionLabel}>Signed in as</Text>
+            <Text style={styles.userEmail}>{user?.email}</Text>
+          </View>
+
+          <TouchableOpacity 
+            style={styles.logoutButton} 
+            onPress={handleLogout}
+          >
+            <Text style={styles.logoutButtonText}>Sign Out</Text>
+          </TouchableOpacity>
         </View>
       </ScrollView>
     </SafeAreaView>

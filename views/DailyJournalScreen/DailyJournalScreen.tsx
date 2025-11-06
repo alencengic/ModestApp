@@ -17,7 +17,7 @@ import { useRouter } from "expo-router";
 import {
   insertJournalEntry,
   getJournalEntriesByRange,
-} from "@/storage/database";
+} from "@/storage/supabase/journalEntries";
 import { useTheme } from "@/context/ThemeContext";
 import { BannerAd } from "@/components/ads";
 import { useTranslation } from "react-i18next";
@@ -345,14 +345,13 @@ const DailyJournalScreen: React.FC = () => {
             <Text style={styles.filterTitle}>{t('dailyJournal.timePeriod')}</Text>
             <View style={styles.buttonGroup}>
               <TouchableOpacity
-                style={[styles.filterButton, range === "day" && !showDatePicker && styles.filterButtonActive]}
+                style={[styles.filterButton, range === "day" && styles.filterButtonActive]}
                 onPress={() => {
                   setRange("day");
                   setReadDate(new Date());
-                  setShowDatePicker(false);
                 }}
               >
-                <Text style={[styles.filterButtonText, range === "day" && !showDatePicker && styles.filterButtonTextActive]}>
+                <Text style={[styles.filterButtonText, range === "day" && styles.filterButtonTextActive]}>
                   {t('dailyJournal.today')}
                 </Text>
               </TouchableOpacity>
@@ -361,7 +360,6 @@ const DailyJournalScreen: React.FC = () => {
                 onPress={() => {
                   setRange("week");
                   setReadDate(new Date());
-                  setShowDatePicker(false);
                 }}
               >
                 <Text style={[styles.filterButtonText, range === "week" && styles.filterButtonTextActive]}>
@@ -373,7 +371,6 @@ const DailyJournalScreen: React.FC = () => {
                 onPress={() => {
                   setRange("month");
                   setReadDate(new Date());
-                  setShowDatePicker(false);
                 }}
               >
                 <Text style={[styles.filterButtonText, range === "month" && styles.filterButtonTextActive]}>
@@ -381,20 +378,17 @@ const DailyJournalScreen: React.FC = () => {
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
-                style={[styles.filterButton, showDatePicker && styles.filterButtonActive]}
-                onPress={() => {
-                  setShowDatePicker(true);
-                  setRange("day");
-                }}
+                style={styles.filterButton}
+                onPress={() => setShowDatePicker(true)}
               >
-                <Text style={[styles.filterButtonText, showDatePicker && styles.filterButtonTextActive]}>
+                <Text style={styles.filterButtonText}>
                   📅 {t('dailyJournal.day')}
                 </Text>
               </TouchableOpacity>
             </View>
           </View>
 
-          {showDatePicker && range === "day" && (
+          {showDatePicker && (
             <View style={styles.datePickerContainer}>
               <DateTimePicker
                 value={readDate}

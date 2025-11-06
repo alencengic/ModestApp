@@ -10,7 +10,6 @@ import { Card } from "react-native-paper";
 import { router, Href, useFocusEffect } from "expo-router";
 import { DateTime } from "luxon";
 import { useState, useCallback } from "react";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 import { useTheme } from "@/context/ThemeContext";
 import { useUserProfile } from "@/context/UserProfileContext";
@@ -21,40 +20,46 @@ import {
   getScheduledNotifications,
 } from "@/services/notificationService";
 import { Alert } from "react-native";
-import { getMoodByDate } from "@/storage/mood_entries";
-import { getProductivityByDate } from "@/storage/productivity_entries";
-import { getFoodIntakeByDate } from "@/storage/food_intakes";
+import { getMoodByDate } from "@/storage/database";
+import { getProductivityByDate } from "@/storage/database";
+import { getFoodIntakeByDate } from "@/storage/database";
 import { scaleFontSize, scale } from "@/utils/responsive";
 
 const getQuickAccessItems = (t: any): {
   title: string;
-  icon: keyof typeof MaterialCommunityIcons.glyphMap;
+  icon: string;
   route: Href;
+  emoji: string;
 }[] => [
   {
     title: t('navigation.dailyJournal'),
-    icon: "book-open-outline",
+    icon: "book-open-page-variant",
     route: "/daily/journal",
+    emoji: "📔",
   },
   {
     title: t('navigation.trendsAnalytics'),
-    icon: "chart-line-variant",
+    icon: "chart-line",
     route: "/trends/trends",
+    emoji: "📊",
   },
   {
     title: t('navigation.moodAnalytics'),
-    icon: "emoticon-excited-outline",
+    icon: "emoticon-happy-outline",
     route: "/mood/analytics",
+    emoji: "😊",
   },
   {
     title: t('trendsAnalytics.title'),
-    icon: "silverware-variant",
+    icon: "food-apple-outline",
     route: "/trends/food-analytics",
+    emoji: "🍎",
   },
   {
     title: t('navigation.weatherMood'),
-    icon: "weather-partly-cloudy",
+    icon: "weather-sunny",
     route: "/weather/weather-mood",
+    emoji: "🌤️",
   },
 ];
 
@@ -126,17 +131,17 @@ export default function HomeScreen() {
       borderRadius: theme.borderRadius.lg,
       elevation: 0,
       shadowOpacity: 0,
-      backgroundColor: theme.colors.surface,
     },
     cardContent: {
       alignItems: "center",
-      paddingVertical: theme.spacing.lg,
+      paddingVertical: theme.spacing.xl,
     },
-    iconContainer: {
+    emoji: {
+      fontSize: scaleFontSize(40),
       marginBottom: theme.spacing.sm,
     },
     cardText: {
-      fontSize: scaleFontSize(13),
+      fontSize: scaleFontSize(14),
       fontWeight: "600",
       color: theme.colors.textPrimary,
       textAlign: "center",
@@ -252,18 +257,14 @@ export default function HomeScreen() {
           {quickAccessItems.map((item, index) => (
             <Card
               key={item.title}
-              style={styles.card}
+              style={[
+                styles.card,
+                { backgroundColor: theme.colors.cardColors[Object.keys(theme.colors.cardColors)[index] as keyof typeof theme.colors.cardColors] || theme.colors.surface }
+              ]}
               onPress={() => router.push(item.route)}
             >
               <Card.Content style={styles.cardContent}>
-                <View style={styles.iconContainer}>
-                  <MaterialCommunityIcons 
-                    name={item.icon} 
-                    size={44} 
-                    color={theme.colors.primary}
-                    strokeWidth={0.5}
-                  />
-                </View>
+                <Text style={styles.emoji}>{item.emoji}</Text>
                 <Text style={styles.cardText}>{item.title}</Text>
               </Card.Content>
             </Card>

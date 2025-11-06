@@ -47,10 +47,6 @@ export default {
     insights: "Insights & Analytics",
     insightsDesc: "Visualize trends, discover correlations, and gain actionable insights about your health and habits.",
     welcomeDesc: "Your personal companion for tracking mood, food, and wellness habits. Start your journey to a healthier, happier you!",
-    
-    // Language names
-    english: "English",
-    croatian: "Croatian",
   },
 
   home: {
@@ -92,34 +88,6 @@ export default {
     day: "Day",
   },
 
-  journalEntryDetail: {
-    loadingEntry: "Loading entry...",
-    entryNotFound: "Entry not found",
-    goBack: "← Go Back",
-    back: "← Back",
-    journalEntry: "Journal Entry",
-    date: "Date:",
-    edit: "✏️ Edit",
-    delete: "🗑️ Delete",
-    cancel: "Cancel",
-    saveChanges: "💾 Save Changes",
-    saving: "Saving...",
-    deleting: "Deleting...",
-    
-    // Alerts
-    success: "Success",
-    entryUpdated: "Entry updated successfully",
-    error: "Error",
-    updateFailed: "Failed to update entry",
-    deleteFailed: "Failed to delete entry",
-    deleted: "Deleted",
-    entryDeleted: "Entry deleted successfully",
-    deleteConfirmTitle: "Delete Entry",
-    deleteConfirmMessage: "Are you sure you want to delete this entry? This action cannot be undone.",
-    emptyNote: "Empty Note",
-    emptyNoteMessage: "Please write something before saving.",
-  },
-
   moodAnalytics: {
     title: "Mood & Productivity Analytics",
     subtitle: "Understand how food and lifestyle choices affect your well-being",
@@ -138,7 +106,6 @@ export default {
   lifestyleAnalysis: {
     title: "Lifestyle Factors",
     subtitle: "How work and exercise affect your well-being",
-    back: "← Back",
     workSchedule: "Work Schedule Impact",
     exerciseHabits: "Exercise Habits Impact",
     mood: "Mood",
@@ -165,55 +132,6 @@ export default {
     neutralImpact: "Your {{metric}} appears neutral regardless of {{condition}}.",
     positiveImpact: "📈 Your {{metric}} tends to be {{difference}} on {{scenario}}.",
     negativeImpact: "📉 Your {{metric}} tends to be {{difference}} on {{scenario}}.",
-    
-    // Additional labels
-    workLifeBalance: "💼 Work-Life Balance",
-    workLifeBalanceDesc: "See how your well-being differs between work days and weekends",
-    workDaysLabel: "💼 Work Days",
-    weekendLabel: "🌴 Weekend",
-    daysTracked: "{{count}} days tracked",
-    noWorkingData: "No working day data available yet. Keep tracking to see insights!",
-    exerciseTraining: "💪 Exercise & Training Impact",
-    exerciseTrainingDesc: "Compare your well-being on days when you exercise versus rest days",
-    noTrainingData: "No training day data available yet. Set your training days in settings and keep tracking!",
-    workImpact: "💼 Work Impact",
-    exerciseImpact: "💪 Exercise Impact",
-    aiInsights: "💡 AI Insights",
-    confidence: "Confidence:",
-    significant: "Significant",
-    scoreGreat: "Great",
-    scoreGood: "Good",
-    scoreNeutral: "Neutral",
-    scoreFair: "Fair",
-    scorePoor: "Poor",
-    
-    // Exercise impact descriptions
-    exerciseConsistentlyGreat: "✨ Your {{metric}} stays consistently great whether you exercise or not!",
-    exerciseStable: "Your {{metric}} remains stable on both training and rest days",
-    exerciseMinimalImpact: "Exercise has minimal impact on your {{metric}}",
-    exerciseExcellentBoth: "💪 Your {{metric}} is excellent on both days, but slightly better when you exercise",
-    exerciseSignificantBoost: "💪 Exercise significantly boosts your {{metric}}!",
-    exerciseImproves: "✨ Exercise improves your {{metric}}",
-    exerciseGreatBothRest: "🌟 Your {{metric}} is great on both days, though slightly better on rest days",
-    exerciseLowerTraining: "⚠️ Your {{metric}} tends to be lower on training days - consider adjusting workout intensity",
-    exerciseSlightlyLower: "Your {{metric}} is slightly lower on training days",
-    
-    // Work impact descriptions
-    workConsistentlyGreat: "✨ Your {{metric}} stays consistently great throughout the week!",
-    workStable: "Your {{metric}} remains stable on both work days and weekends",
-    workMinimalImpact: "Work has minimal impact on your {{metric}}",
-    workExcellentThrive: "💼 Your {{metric}} is excellent throughout the week, but you thrive even more on work days",
-    workThriveSignificant: "💼 You thrive on work days! Your {{metric}} is significantly higher",
-    workBetterWorkDays: "✨ Your {{metric}} is better on work days",
-    workGreatWeekends: "🌴 Your {{metric}} is great all week, though you feel slightly better on weekends",
-    workRechargeWeekends: "🌴 You recharge on weekends - your {{metric}} is notably better than on work days",
-    workSlightlyBetterWeekends: "Your {{metric}} is slightly better on weekends",
-    
-    // Data reliability
-    limitedDataMessage: "⚠️ Limited data: Keep tracking for at least 5 days in each category for more reliable insights.",
-    buildingInsights: "📊 Building insights: Track for 2-3 more weeks for stronger patterns and recommendations.",
-    goodDataCoverage: "✅ Good data coverage: These insights are based on sufficient tracking data.",
-    loadingLifestyleData: "Loading lifestyle data...",
   },
 
   trendsAnalytics: {
@@ -246,17 +164,6 @@ export default {
     errorLoading: "Error loading data. Please try again.",
     noData: "No food intake data available for the selected period.\nStart tracking your meals to see insights!",
     entries: "entries",
-    showMore: "Show {{count}} More Foods",
-    showLess: "Show Less",
-    
-    // Info modal
-    infoTitle: "Understanding Your Food Trends",
-    totalEntriesInfo: "The total number of times you've logged food items during the selected time period. More entries mean better tracking consistency.",
-    uniqueFoodsInfo: "The number of different foods you've eaten. A higher variety indicates a more diverse diet, which is generally healthier.",
-    diversityScoreInfo: "A score from 0-100% that measures how varied your diet is. Higher scores (70%+) indicate excellent food diversity. Lower scores suggest you might benefit from trying new foods.",
-    topFoodsInfo: "Your three most frequently consumed foods, shown with medals. These are your dietary staples - it's good to have favorites, but balance is key.",
-    tips: "💡 Tips for Better Nutrition",
-    tipsInfo: "• Aim for variety - try to eat different colored fruits and vegetables\n• If one food dominates your diet (>40%), try adding alternatives\n• Track consistently for more accurate insights\n• Higher diversity scores correlate with better nutritional balance",
   },
 
   meals: {
@@ -278,39 +185,25 @@ export default {
     snacks: "Snacks",
 
     // Modal
-    createMeal: "Create New Meal",
+    createMeal: "Create Meal",
     editMeal: "Edit Meal",
     mealName: "Meal Name",
-    mealNamePlaceholder: "e.g., My Favorite Breakfast",
+    mealNamePlaceholder: "e.g., Protein Smoothie",
     mealType: "Meal Type (Optional)",
-    foods: "Foods ({{count}})",
     selectedFoods: "Selected Foods",
-    addFoods: "+ Add Foods",
-    hideFoodList: "- Hide Food List",
     addFood: "+ Add Food",
     selectFood: "Select Food",
     searchFoods: "Search foods...",
-    searchCommonFoods: "Search common foods...",
-    addCustomFood: "Add custom food...",
     noFoodsFound: "No foods found",
     customFood: "Custom Food",
     customFoodPlaceholder: "Enter food name...",
     add: "Add",
-    cancel: "Cancel",
-    create: "Create",
-    update: "Update",
-    edit: "Edit",
-    delete: "Delete",
+    addThisFood: "This food is already added",
+    enterFoodName: "Please enter a food name",
 
     // Validation
-    error: "Error",
     emptyMealName: "Please enter a meal name",
     emptyFoodList: "Please add at least one food item",
-    enterFoodName: "Please enter a food name",
-    foodAlreadyAdded: "This food is already added",
-    failedToSave: "Failed to save meal",
-    failedToDelete: "Failed to delete meal",
-    info: "Info",
 
     // Success messages
     mealCreated: "Meal created successfully!",
@@ -319,7 +212,6 @@ export default {
 
     // Delete confirmation
     deleteMeal: "Delete Meal",
-    deleteMealMessage: "Are you sure you want to delete \"{{name}}\"?",
     deleteMealConfirm: "Are you sure you want to delete this meal?",
   },
 
@@ -354,79 +246,13 @@ export default {
     entryUpdated: "Entry Updated",
     entryUpdatedMessage: "Your daily entry has been updated successfully.",
     savingEntry: "Saving entry...",
-    feeling: "Feeling",
-    symptoms: "Symptoms",
-    
-    // Stepper navigation
-    step: "Step",
-    of: "of",
-    back: "Back",
-    next: "Next",
-    cancel: "Cancel",
-    saveAll: "Save All",
-    saving: "Saving...",
-    skipAndSave: "Skip & Save",
-    
-    // Meal feeling
-    howDidYouFeel: "How did you feel after eating?",
-    selectFeeling: "Select how you felt after this meal",
-    great: "Great",
-    bad: "Bad",
-    terrible: "Terrible",
     deleteFoodItem: "Delete Food Item",
     deleteFoodConfirm: "Are you sure you want to remove this food?",
-    
-    // Meal symptoms
-    howDoYouFeelAfter: "How do you feel after {{meal}}?",
-    everythingNormal: "Everything was normal",
-    noSymptomsOrIssues: "No symptoms or issues",
-    orProvideDetailsBelow: "OR PROVIDE DETAILS BELOW",
-    generalWellbeing: "General Wellbeing",
-    energyLevel: "Energy Level",
-    digestiveSymptoms: "Digestive Symptoms",
-    bloating: "Bloating",
-    bristolStoolScale: "Bristol Stool Scale",
-    additionalSymptoms: "Additional Symptoms",
-    
-    // Energy labels
-    energyVeryLow: "Very Low",
-    energyLow: "Low",
-    energyNormal: "Normal",
-    energyGood: "Good",
-    energyEnergized: "Energized",
-    
-    // Bloating levels
-    none: "None",
-    mild: "Mild",
-    severeBloating: "Severe",
-    
-    // Symptoms
-    diarrhea: "Diarrhea",
-    nausea: "Nausea",
-    pain: "Pain",
-    
-    // Bristol scale
-    bristolType1: "Type 1",
-    bristolType2: "Type 2",
-    bristolType3: "Type 3",
-    bristolType4: "Type 4",
-    bristolType5: "Type 5",
-    bristolType6: "Type 6",
-    bristolType7: "Type 7",
-    bristolDesc1: "Separate hard lumps",
-    bristolDesc2: "Lumpy and sausage-like",
-    bristolDesc3: "Sausage with cracks",
-    bristolDesc4: "Smooth and soft (Normal)",
-    bristolDesc5: "Soft blobs",
-    bristolDesc6: "Mushy consistency",
-    bristolDesc7: "Liquid consistency",
   },
 
   settings: {
     language: "Language",
     selectLanguage: "Select Language",
-    english: "English",
-    croatian: "Croatian",
     theme: "Theme",
     themeMode: "Theme Mode",
     themeModeDescription: "Choose how the app should display: light, dark, or follow your system settings",
@@ -471,239 +297,5 @@ export default {
     moderate: "🙂 Moderate",
     high: "😊 High",
     veryHigh: "🚀 Very High",
-  },
-
-  foodImpactAnalysis: {
-    title: "Food Impact Analysis",
-    subtitle: "Discover which foods positively or negatively affect your mood and productivity levels",
-    back: "← Back",
-    timePeriod: "Time Period",
-    allTime: "All Time",
-    thisWeek: "This Week",
-    thisMonth: "This Month",
-    custom: "Custom",
-    selected: "Selected",
-    correlationType: "Correlation Type",
-    mood: "Mood",
-    productivity: "Productivity",
-    exploreFood: "Explore Specific Food",
-    selectFood: "Select a food...",
-    clearSelection: "Clear Selection",
-    topPositiveFoods: "Top Positive Foods",
-    topNegativeFoods: "Top Negative Foods",
-    noPositiveData: "Not enough data for positive foods.",
-    noNegativeData: "Not enough data for negative foods.",
-    noDetailedData: "No detailed correlation data found for {{food}}.",
-    searchFoods: "Search foods...",
-    noFoodsFound: "No foods found",
-    loadingData: "Loading food correlation data...",
-    errorLoading: "Error loading data. {{message}}",
-    logged: "📊 Logged:",
-    times: "times",
-    
-    // Impact descriptions
-    noImpact: "No clear impact",
-    strongPositive: "Strong positive effect",
-    moderatePositive: "Moderate positive effect",
-    slightPositive: "Slight positive effect",
-    strongNegative: "Strong negative effect",
-    moderateNegative: "Moderate negative effect",
-    slightNegative: "Slight negative effect",
-    
-    // Info modal
-    infoTitle: "How Food Analysis Works",
-    infoDescription: "This analysis shows which foods correlate with better or worse mood and productivity based on your personal data.",
-    infoPositive: "Positive (> 0.2):",
-    infoPositiveDesc: "Associated with better mood/productivity",
-    infoNeutral: "Neutral (-0.2 to 0.2):",
-    infoNeutralDesc: "No significant correlation",
-    infoNegative: "Negative (< -0.2):",
-    infoNegativeDesc: "Associated with worse mood/productivity",
-    infoHowItWorks: "How it works:",
-    infoHowItWorksDesc: "The app analyzes your food entries and mood/productivity ratings to calculate average scores. Higher scores indicate a positive correlation, while lower scores suggest a negative impact.",
-    infoNote: "Note: These correlations are based on your personal data. More entries lead to more accurate insights.",
-  },
-
-  weatherMood: {
-    title: "Weather & Mood",
-    subtitle: "Discover how weather affects your mood",
-    loadingData: "Loading correlation data...",
-    errorLoading: "Error loading data. Please try again.",
-    noData: "No correlation data available yet.",
-    noDataDesc: "Start tracking your mood to see weather patterns!",
-    
-    // Filter
-    filterByMood: "Filter by Mood",
-    all: "All",
-    showingEntries: "Showing {{count}} entries for {{mood}}",
-    
-    // Overview
-    overview: "Overview",
-    totalEntries: "Total Entries",
-    positiveMood: "Positive Mood",
-    
-    // Insights
-    weatherInsights: "Weather Insights",
-    temperatureRange: "Temperature Range",
-    yourHappyTemp: "Your Happy Temp",
-    avgTemp: "Avg Temp",
-    avgHumidity: "Avg Humidity",
-    bestWeather: "✨ Best Weather for Your Mood:",
-    positiveEntries: "positive entries",
-    
-    // Recommendations
-    personalizedTips: "💡 Personalized Tips",
-    planActivities: "Plan activities on {{condition}} days",
-    feelBest: "You feel best during {{condition}} weather",
-    idealTemp: "Your ideal temperature is around {{temp}}°C",
-    stayComfortable: "Try to stay comfortable within this range",
-    greatConsistency: "Great mood consistency!",
-    positivePercentage: "{{percentage}}% of your entries show positive mood",
-    
-    // Patterns
-    moodWeatherPatterns: "Mood-Weather Patterns",
-    topMoodPatterns: "Top Mood Patterns",
-    topMoodPatternsDesc: "Your most frequent moods with weather correlations",
-    avgTempLabel: "Avg Temp",
-    weatherLabel: "Weather",
-    commonWeather: "Common Weather",
-    entries: "entries",
-    
-    // Recent entries
-    recentEntries: "Recent Entries",
-    moodLabel: "Mood:",
-    weatherCondition: "Weather:",
-    temperature: "Temperature:",
-    humidity: "Humidity:",
-    showMore: "Show {{count}} more entries",
-    showLess: "Show Less",
-    
-    // Info modal
-    infoTitle: "Weather & Mood Insights",
-    infoWhatShows: "What This Shows:",
-    infoWhatShowsDesc: "This screen correlates your logged mood entries with weather data at the time of logging.",
-    infoPatterns: "Mood-Weather Patterns:",
-    infoPatternsDesc: "• Shows which moods occur most frequently\n• Average temperature when feeling each mood\n• Most common weather conditions for each mood",
-    infoKeyInsights: "Key Insights:",
-    infoKeyInsightsDesc: "• Average weather conditions across all entries\n• Weather conditions associated with positive moods\n• Temperature and humidity trends",
-    infoHowToUse: "How to Use:",
-    infoHowToUseDesc: "Track your mood daily to build a comprehensive dataset. Over time, you'll discover patterns that help you understand how weather influences your well-being.",
-    gotIt: "Got it!",
-  },
-
-  profileSetup: {
-    title: "Personalize Your Experience",
-    subtitle: "Help us tailor insights to your lifestyle. You can change these anytime in Settings.",
-    
-    // Name section
-    nameTitle: "Your Name *",
-    nameDescription: "We'll use this to personalize your experience.",
-    namePlaceholder: "Enter your name",
-    
-    // Age section
-    ageTitle: "Age (Optional)",
-    ageDescription: "Helps provide age-appropriate health insights.",
-    agePlaceholder: "Enter your age",
-    
-    // Weight section
-    weightTitle: "Current Weight (Optional)",
-    weightDescription: "Your weight helps us provide more accurate health insights and calculations.",
-    weightPlaceholder: "Enter weight",
-    kg: "kg",
-    lbs: "lbs",
-    
-    // Working days section
-    workingDaysTitle: "Working Days",
-    workingDaysDescription: "Select the days you typically work. This helps identify patterns between work and wellbeing.",
-    weekend: "Weekend:",
-    
-    // Sport days section
-    sportDaysTitle: "Sport/Training Days",
-    sportDaysDescription: "Select days when you exercise or train. We'll factor this into your wellness analysis.",
-    
-    // Days of week
-    mon: "Mon",
-    tue: "Tue",
-    wed: "Wed",
-    thu: "Thu",
-    fri: "Fri",
-    sat: "Sat",
-    sun: "Sun",
-    
-    // Buttons
-    saveAndContinue: "Save & Continue",
-    skipForNow: "Skip for Now",
-    
-    // Validation
-    nameRequired: "Name Required",
-    nameRequiredMessage: "Please enter your name",
-    invalidAge: "Invalid Age",
-    invalidAgeMessage: "Please enter a valid age (1-150)",
-    invalidWeight: "Invalid Weight",
-    invalidWeightMessage: "Please enter a valid weight",
-    error: "Error",
-    errorMessage: "Failed to save profile. Please try again.",
-  },
-
-  userProfile: {
-    title: "User Profile",
-    subtitle: "Manage your personal information and preferences",
-    loadingProfile: "Loading profile...",
-    
-    // Sections
-    name: "Name *",
-    age: "Age",
-    weight: "Weight",
-    workingDays: "Working Days",
-    sportTrainingDays: "Sport/Training Days",
-    
-    // Placeholders
-    enterName: "Enter your name",
-    enterAge: "Enter your age",
-    enterWeight: "Enter weight",
-    
-    // Descriptions
-    selectWorkingDays: "Select your typical working days",
-    selectSportDays: "Select days when you exercise or train",
-    
-    // Days
-    mon: "Mon",
-    tue: "Tue",
-    wed: "Wed",
-    thu: "Thu",
-    fri: "Fri",
-    sat: "Sat",
-    sun: "Sun",
-    weekend: "Weekend: {{days}}",
-    
-    // Buttons
-    saveChanges: "Save Changes",
-    saving: "Saving...",
-    
-    // Validation
-    nameRequired: "Name Required",
-    nameRequiredMessage: "Please enter your name",
-    invalidAge: "Invalid Age",
-    invalidAgeMessage: "Please enter a valid age (1-150)",
-    invalidWeight: "Invalid Weight",
-    invalidWeightMessage: "Please enter a valid weight",
-    
-    // Success
-    success: "Success",
-    profileUpdated: "Profile updated successfully",
-    
-    // Error
-    error: "Error",
-    saveFailed: "Failed to save profile. Please try again.",
-  },
-
-  notifications: {
-    channelName: "Daily Reminders",
-    testTitle: "Test Notification 🔔",
-    testBody: "This is a test notification. Your daily reminders are working!",
-    afternoonTitle: "Time to log your day! 📝",
-    afternoonBody: "Take a moment to record your mood, meals, and how you're feeling.",
-    eveningTitle: "Evening check-in 🌙",
-    eveningBody: "Don't forget to log your evening mood and meals!",
   },
 };

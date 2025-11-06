@@ -61,7 +61,6 @@ const OnboardingScreen: React.FC = () => {
   const { t } = useTranslation();
   const { currentLanguage, changeLanguage, languages } = useLanguage();
   const [currentSlide, setCurrentSlide] = useState(0);
-  const [selectedLanguage, setSelectedLanguage] = useState<LanguageCode>(currentLanguage);
   const slides = getSlides(t);
 
   const handleNext = () => {
@@ -83,14 +82,8 @@ const OnboardingScreen: React.FC = () => {
   const isLastSlide = currentSlide === slides.length - 1;
   const slide = slides[currentSlide];
 
-  const handleLanguageSelect = (langCode: LanguageCode) => {
-    setSelectedLanguage(langCode);
-  };
-
-  const handleLanguageConfirm = async () => {
-    if (selectedLanguage !== currentLanguage) {
-      await changeLanguage(selectedLanguage);
-    }
+  const handleLanguageSelect = async (langCode: LanguageCode) => {
+    await changeLanguage(langCode);
     handleNext();
   };
 
@@ -248,20 +241,18 @@ const OnboardingScreen: React.FC = () => {
                   key={lang.code}
                   style={[
                     styles.languageButton,
-                    selectedLanguage === lang.code && styles.languageButtonActive,
+                    currentLanguage === lang.code && styles.languageButtonActive,
                   ]}
                   onPress={() => handleLanguageSelect(lang.code)}
                 >
                   <View style={styles.languageInfo}>
                     <Text style={styles.languageFlag}>{lang.flag}</Text>
                     <View style={styles.languageNames}>
-                      <Text style={styles.languageName}>
-                        {lang.code === 'en' ? t('onboarding.english') : t('onboarding.croatian')}
-                      </Text>
+                      <Text style={styles.languageName}>{lang.name}</Text>
                       <Text style={styles.languageNativeName}>{lang.nativeName}</Text>
                     </View>
                   </View>
-                  {selectedLanguage === lang.code && (
+                  {currentLanguage === lang.code && (
                     <Text style={styles.checkmark}>✓</Text>
                   )}
                 </TouchableOpacity>
@@ -293,18 +284,11 @@ const OnboardingScreen: React.FC = () => {
           >
             <Text style={styles.getStartedText}>{t('onboarding.getStarted')}</Text>
           </TouchableOpacity>
-        ) : slide.isLanguageSelection ? (
-          <TouchableOpacity 
-            style={styles.nextButton} 
-            onPress={handleLanguageConfirm}
-          >
-            <Text style={styles.nextText}>{t('onboarding.continue')} →</Text>
-          </TouchableOpacity>
-        ) : (
+        ) : !slide.isLanguageSelection ? (
           <TouchableOpacity style={styles.nextButton} onPress={handleNext}>
             <Text style={styles.nextText}>{t('onboarding.continue')} →</Text>
           </TouchableOpacity>
-        )}
+        ) : null}
       </View>
     </SafeAreaView>
   );

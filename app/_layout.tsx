@@ -4,12 +4,6 @@ import {
   ThemeProvider as NavigationThemeProvider,
 } from "@react-navigation/native";
 import { useFonts } from "expo-font";
-import {
-  Inter_400Regular,
-  Inter_500Medium,
-  Inter_600SemiBold,
-  Inter_700Bold,
-} from "@expo-google-fonts/inter";
 import { Stack, useRouter, useSegments } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
@@ -17,14 +11,14 @@ import { useEffect, useState } from "react";
 import "react-native-reanimated";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Text, TextInput } from "react-native";
 
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { useWeatherSync } from "@/hooks/useWeatherSync";
-import { requestNotificationPermissions, scheduleDailyNotifications, cancelAllNotifications } from "@/services/notificationService";
+import { requestNotificationPermissions, scheduleDailyNotifications } from "@/services/notificationService";
 import { ThemeProvider, useTheme } from "@/context/ThemeContext";
 import { UserProfileProvider } from "@/context/UserProfileContext";
 import { LanguageProvider } from "@/context/LanguageContext";
+import { AuthProvider, useAuth } from "@/context/AuthContext";
 import "@/i18n/i18n.config";
 
 SplashScreen.preventAutoHideAsync();
@@ -35,6 +29,7 @@ function RootLayoutNav() {
   const router = useRouter();
   const segments = useSegments();
   const { isDark } = useTheme();
+  const { user, loading: authLoading } = useAuth();
   const [hasSeenOnboarding, setHasSeenOnboarding] = useState<boolean | null>(null);
 
   useWeatherSync();
@@ -58,23 +53,30 @@ function RootLayoutNav() {
     recheckOnboarding();
   }, [segments]);
 
+  // Handle authentication and onboarding flow
   useEffect(() => {
-    if (hasSeenOnboarding !== null) {
-      // Redirect to onboarding if not seen
+    if (!authLoading && hasSeenOnboarding !== null) {
       const currentPath = segments.join('/');
+      const isOnAuthScreen = currentPath.includes('auth');
       const isOnOnboardingFlow = currentPath.includes('onboarding') || currentPath.includes('profile-setup');
-      if (!hasSeenOnboarding && !isOnOnboardingFlow) {
+
+      if (!user && !isOnAuthScreen) {
+        // User not authenticated, redirect to auth
+        router.replace("/auth");
+      } else if (user && !hasSeenOnboarding && !isOnOnboardingFlow) {
+        // User authenticated but hasn't seen onboarding
         router.replace("/onboarding");
+      } else if (user && hasSeenOnboarding && (isOnAuthScreen || isOnOnboardingFlow)) {
+        // User authenticated and has seen onboarding, redirect to main app
+        router.replace("/(tabs)");
       }
     }
-  }, [hasSeenOnboarding, segments]);
+  }, [user, authLoading, hasSeenOnboarding, segments]);
 
   useEffect(() => {
     const setupNotifications = async () => {
       const hasPermission = await requestNotificationPermissions();
       if (hasPermission) {
-        // Always cancel all notifications first to avoid duplicates from previous installations
-        await cancelAllNotifications();
         await scheduleDailyNotifications();
       }
     };
@@ -82,7 +84,7 @@ function RootLayoutNav() {
     setupNotifications();
   }, []);
 
-  if (hasSeenOnboarding === null) {
+  if (authLoading || hasSeenOnboarding === null) {
     return null;
   }
 
@@ -94,6 +96,7 @@ function RootLayoutNav() {
           fullScreenGestureEnabled: true,
         }}
       >
+        <Stack.Screen name="auth" options={{ headerShown: false }} />
         <Stack.Screen name="onboarding" options={{ headerShown: false }} />
         <Stack.Screen name="profile-setup" options={{ headerShown: false }} />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
@@ -108,27 +111,10 @@ function RootLayoutNav() {
 export default function RootLayout() {
   const [loaded] = useFonts({
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
-    Inter_400Regular,
-    Inter_500Medium,
-    Inter_600SemiBold,
-    Inter_700Bold,
   });
 
   useEffect(() => {
     if (loaded) {
-      // Set default font for all Text components
-      const defaultFontFamily = { fontFamily: 'Inter_400Regular' };
-      // @ts-ignore
-      Text.defaultProps = Text.defaultProps || {};
-      // @ts-ignore
-      Text.defaultProps.style = defaultFontFamily;
-      
-      // Set default font for all TextInput components
-      // @ts-ignore
-      TextInput.defaultProps = TextInput.defaultProps || {};
-      // @ts-ignore
-      TextInput.defaultProps.style = defaultFontFamily;
-      
       SplashScreen.hideAsync();
     }
   }, [loaded]);
@@ -141,9 +127,11 @@ export default function RootLayout() {
     <QueryClientProvider client={queryClient}>
       <LanguageProvider>
         <ThemeProvider>
-          <UserProfileProvider>
-            <RootLayoutNav />
-          </UserProfileProvider>
+          <AuthProvider>
+            <UserProfileProvider>
+              <RootLayoutNav />
+            </UserProfileProvider>
+          </AuthProvider>
         </ThemeProvider>
       </LanguageProvider>
     </QueryClientProvider>

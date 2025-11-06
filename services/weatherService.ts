@@ -1,5 +1,5 @@
 import { getCurrentLocation, LocationCoords } from "./locationService";
-import { insertWeatherData, getWeatherByDate } from "@/storage/weather_data";
+import { insertWeatherData, getWeatherByDate } from "@/storage/database";
 import { DateTime } from "luxon";
 import Constants from "expo-constants";
 

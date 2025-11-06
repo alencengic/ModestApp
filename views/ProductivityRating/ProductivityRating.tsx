@@ -2,7 +2,7 @@ import React from "react";
 import { RatingComponent, RatingOption } from "@/components/RatingComponent";
 import { productivityRatingStyles } from "./ProductivityRating.styles";
 import { DateTime } from "luxon";
-import { insertOrUpdateProductivity } from "@/storage/productivity_entries";
+import { insertOrUpdateProductivity } from "@/storage/database";
 
 const productivityOptions: RatingOption<number>[] = [
   { value: 1, display: "😴", label: "Very Low" },

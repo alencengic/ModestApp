@@ -78,12 +78,6 @@ export const createStyles = (theme: Theme) => StyleSheet.create({
     color: theme.colors.textPrimary,
     marginBottom: 12,
   },
-  sectionSubtitle: {
-    fontSize: 13,
-    color: theme.colors.textSecondary,
-    marginBottom: 16,
-    lineHeight: 20,
-  },
   patternCard: {
     backgroundColor: theme.colors.surface,
     borderRadius: 16,

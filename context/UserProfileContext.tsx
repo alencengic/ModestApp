@@ -4,9 +4,11 @@ import {
   upsertUserProfile,
   type UserProfile,
   type UserProfileInput,
-  type WeightUnit,
-  type DayOfWeek,
-} from "@/storage/userProfile";
+} from "@/storage/supabase/userProfile";
+import { useAuth } from "@/context/AuthContext";
+
+export type WeightUnit = "kg" | "lbs";
+export type DayOfWeek = "monday" | "tuesday" | "wednesday" | "thursday" | "friday" | "saturday" | "sunday";
 
 interface UserProfileContextType {
   profile: UserProfile | null;
@@ -31,8 +33,17 @@ export const UserProfileProvider: React.FC<{ children: ReactNode }> = ({ childre
   const [loading, setLoading] = useState(true);
   const [workingDays, setWorkingDays] = useState<DayOfWeek[]>([]);
   const [sportDays, setSportDays] = useState<DayOfWeek[]>([]);
+  const { user } = useAuth();
 
   const loadProfile = async () => {
+    if (!user) {
+      setProfile(null);
+      setWorkingDays([]);
+      setSportDays([]);
+      setLoading(false);
+      return;
+    }
+
     try {
       setLoading(true);
       const userProfile = await getUserProfile();
@@ -43,8 +54,8 @@ export const UserProfileProvider: React.FC<{ children: ReactNode }> = ({ childre
         try {
           const working = userProfile.working_days ? JSON.parse(userProfile.working_days) : [];
           const sport = userProfile.sport_days ? JSON.parse(userProfile.sport_days) : [];
-          setWorkingDays(working);
-          setSportDays(sport);
+          setWorkingDays(working as DayOfWeek[]);
+          setSportDays(sport as DayOfWeek[]);
         } catch (e) {
           console.error("Error parsing days:", e);
           setWorkingDays([]);
@@ -53,6 +64,9 @@ export const UserProfileProvider: React.FC<{ children: ReactNode }> = ({ childre
       }
     } catch (error) {
       console.error("Error loading user profile:", error);
+      setProfile(null);
+      setWorkingDays([]);
+      setSportDays([]);
     } finally {
       setLoading(false);
     }
@@ -60,16 +74,18 @@ export const UserProfileProvider: React.FC<{ children: ReactNode }> = ({ childre
 
   useEffect(() => {
     loadProfile();
-  }, []);
+  }, [user]);
 
   const updateProfile = async (input: UserProfileInput) => {
+    if (!user) throw new Error('User not authenticated');
+    
     try {
       const updatedProfile = await upsertUserProfile(input);
       setProfile(updatedProfile);
 
       // Update local state for days
-      if (input.working_days) setWorkingDays(input.working_days);
-      if (input.sport_days) setSportDays(input.sport_days);
+      if (input.working_days) setWorkingDays(input.working_days as DayOfWeek[]);
+      if (input.sport_days) setSportDays(input.sport_days as DayOfWeek[]);
     } catch (error) {
       console.error("Error updating profile:", error);
       throw error;

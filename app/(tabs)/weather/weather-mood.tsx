@@ -9,9 +9,8 @@ import {
   Modal,
 } from "react-native";
 import { useQuery } from "@tanstack/react-query";
-import { useTranslation } from "react-i18next";
-import { getWeatherMoodCorrelation } from "@/storage/weather_data";
-import { createStyles } from "./_WeatherMoodScreen.styles";
+import { getWeatherMoodCorrelation } from "@/storage/database";
+import { createStyles } from "./WeatherMoodScreen.styles";
 import { VideoAd } from "@/components/ads";
 import { useTheme } from "@/context/ThemeContext";
 
@@ -61,12 +60,9 @@ const getWeatherEmoji = (condition: string): string => {
 
 const WeatherMoodScreen: React.FC = () => {
   const { theme } = useTheme();
-  const { t } = useTranslation();
   const styles = createStyles(theme);
   const [showInfoModal, setShowInfoModal] = useState(false);
   const [filterMood, setFilterMood] = useState<string | null>(null);
-  const [showAllEntries, setShowAllEntries] = useState(false);
-  const ENTRIES_TO_SHOW = 5;
 
   const {
     data: correlationData = [],
@@ -203,7 +199,7 @@ const WeatherMoodScreen: React.FC = () => {
       <SafeAreaView style={styles.container}>
         <View style={styles.centered}>
           <ActivityIndicator size="large" color="#C88B6B" />
-          <Text style={styles.loadingText}>{t("weatherMood.loadingData")}</Text>
+          <Text style={styles.loadingText}>Loading correlation data...</Text>
         </View>
       </SafeAreaView>
     );
@@ -215,7 +211,7 @@ const WeatherMoodScreen: React.FC = () => {
         <View style={styles.emptyStateContainer}>
           <Text style={styles.emptyStateIcon}>⚠️</Text>
           <Text style={styles.errorText}>
-            {t("weatherMood.errorLoading")}
+            Error loading data. Please try again.
           </Text>
         </View>
       </SafeAreaView>
@@ -227,16 +223,16 @@ const WeatherMoodScreen: React.FC = () => {
       <SafeAreaView style={styles.container}>
         <ScrollView>
           <View style={styles.header}>
-            <Text style={styles.headerTitle}>{t("weatherMood.title")}</Text>
+            <Text style={styles.headerTitle}>Weather & Mood</Text>
             <Text style={styles.headerSubtitle}>
-              {t("weatherMood.subtitle")}
+              Discover how weather affects your mood
             </Text>
           </View>
           <View style={styles.emptyStateContainer}>
             <Text style={styles.emptyStateIcon}>🌤️</Text>
             <Text style={styles.emptyStateText}>
-              {t("weatherMood.noData")}{"\n"}
-              {t("weatherMood.noDataDesc")}
+              No correlation data available yet.{"\n"}
+              Start tracking your mood to see weather patterns!
             </Text>
           </View>
         </ScrollView>
@@ -250,9 +246,9 @@ const WeatherMoodScreen: React.FC = () => {
         <View style={styles.header}>
           <View style={styles.headerRow}>
             <View style={{ flex: 1 }}>
-              <Text style={styles.headerTitle}>{t("weatherMood.title")}</Text>
+              <Text style={styles.headerTitle}>Weather & Mood</Text>
               <Text style={styles.headerSubtitle}>
-                {t("weatherMood.subtitle")}
+                Discover how weather affects your mood
               </Text>
             </View>
             <TouchableOpacity
@@ -273,33 +269,37 @@ const WeatherMoodScreen: React.FC = () => {
         >
           <View style={styles.modalOverlay}>
             <View style={styles.modalContent}>
-              <Text style={styles.modalTitle}>{t("weatherMood.infoTitle")}</Text>
+              <Text style={styles.modalTitle}>Weather & Mood Insights</Text>
 
-              <Text style={styles.modalSectionTitle}>{t("weatherMood.infoWhatShows")}</Text>
+              <Text style={styles.modalSectionTitle}>What This Shows:</Text>
               <Text style={styles.modalText}>
-                {t("weatherMood.infoWhatShowsDesc")}
+                This screen correlates your logged mood entries with weather data at the time of logging.
               </Text>
 
-              <Text style={styles.modalSectionTitle}>{t("weatherMood.infoPatterns")}</Text>
+              <Text style={styles.modalSectionTitle}>Mood-Weather Patterns:</Text>
               <Text style={styles.modalText}>
-                {t("weatherMood.infoPatternsDesc")}
+                • Shows which moods occur most frequently{"\n"}
+                • Average temperature when feeling each mood{"\n"}
+                • Most common weather conditions for each mood
               </Text>
 
-              <Text style={styles.modalSectionTitle}>{t("weatherMood.infoKeyInsights")}</Text>
+              <Text style={styles.modalSectionTitle}>Key Insights:</Text>
               <Text style={styles.modalText}>
-                {t("weatherMood.infoKeyInsightsDesc")}
+                • Average weather conditions across all entries{"\n"}
+                • Weather conditions associated with positive moods{"\n"}
+                • Temperature and humidity trends
               </Text>
 
-              <Text style={styles.modalSectionTitle}>{t("weatherMood.infoHowToUse")}</Text>
+              <Text style={styles.modalSectionTitle}>How to Use:</Text>
               <Text style={styles.modalText}>
-                {t("weatherMood.infoHowToUseDesc")}
+                Track your mood daily to build a comprehensive dataset. Over time, you'll discover patterns that help you understand how weather influences your well-being.
               </Text>
 
               <TouchableOpacity
                 style={styles.modalCloseButton}
                 onPress={() => setShowInfoModal(false)}
               >
-                <Text style={styles.modalCloseButtonText}>{t("weatherMood.gotIt")}</Text>
+                <Text style={styles.modalCloseButtonText}>Got it!</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -307,7 +307,7 @@ const WeatherMoodScreen: React.FC = () => {
 
         {/* Mood Filter */}
         <View style={styles.filterCard}>
-          <Text style={styles.cardTitle}>{t("weatherMood.filterByMood")}</Text>
+          <Text style={styles.cardTitle}>Filter by Mood</Text>
           <View style={styles.filterButtons}>
             <TouchableOpacity
               style={[
@@ -320,7 +320,7 @@ const WeatherMoodScreen: React.FC = () => {
                 styles.filterButtonText,
                 !filterMood && styles.filterButtonTextActive
               ]}>
-                {t("weatherMood.all")}
+                All
               </Text>
             </TouchableOpacity>
             {uniqueMoods.map(mood => (
@@ -343,22 +343,22 @@ const WeatherMoodScreen: React.FC = () => {
           </View>
           {filterMood && (
             <Text style={styles.filterSubtext}>
-              {t("weatherMood.showingEntries", { count: filteredData.length, mood: filterMood })}
+              Showing {filteredData.length} entries for {filterMood}
             </Text>
           )}
         </View>
 
         {/* Summary Card */}
         <View style={styles.summaryCard}>
-          <Text style={styles.cardTitle}>{t("weatherMood.overview")}</Text>
+          <Text style={styles.cardTitle}>Overview</Text>
           <View style={styles.summaryRow}>
             <View style={styles.summaryItem}>
               <Text style={styles.summaryValue}>{correlationData.length}</Text>
-              <Text style={styles.summaryLabel}>{t("weatherMood.totalEntries")}</Text>
+              <Text style={styles.summaryLabel}>Total Entries</Text>
             </View>
             <View style={styles.summaryItem}>
               <Text style={styles.summaryValue}>{insights?.positivePercentage}%</Text>
-              <Text style={styles.summaryLabel}>{t("weatherMood.positiveMood")}</Text>
+              <Text style={styles.summaryLabel}>Positive Mood</Text>
             </View>
           </View>
         </View>
@@ -366,11 +366,11 @@ const WeatherMoodScreen: React.FC = () => {
         {/* Key Insights Card */}
         {insights && (
           <View style={styles.insightsCard}>
-            <Text style={styles.cardTitle}>{t("weatherMood.weatherInsights")}</Text>
+            <Text style={styles.cardTitle}>Weather Insights</Text>
 
             {/* Temperature Range */}
             <View style={styles.tempRangeContainer}>
-              <Text style={styles.tempRangeTitle}>{t("weatherMood.temperatureRange")}</Text>
+              <Text style={styles.tempRangeTitle}>Temperature Range</Text>
               <View style={styles.tempRangeBar}>
                 <View style={styles.tempRangeTrack}>
                   <View style={[styles.tempRangeFill, {
@@ -387,7 +387,7 @@ const WeatherMoodScreen: React.FC = () => {
                 <Text style={styles.tempRangeLabel}>{insights.minTemp}°C</Text>
                 <View style={styles.tempRangeOptimalLabel}>
                   <Text style={styles.tempRangeOptimalText}>⭐ {insights.optimalTemp}°C</Text>
-                  <Text style={styles.tempRangeOptimalSubtext}>{t("weatherMood.yourHappyTemp")}</Text>
+                  <Text style={styles.tempRangeOptimalSubtext}>Your Happy Temp</Text>
                 </View>
                 <Text style={styles.tempRangeLabel}>{insights.maxTemp}°C</Text>
               </View>
@@ -397,12 +397,12 @@ const WeatherMoodScreen: React.FC = () => {
             <View style={styles.insightRow}>
               <View style={styles.insightItem}>
                 <Text style={styles.insightEmoji}>🌡️</Text>
-                <Text style={styles.insightLabel}>{t("weatherMood.avgTemp")}</Text>
+                <Text style={styles.insightLabel}>Avg Temp</Text>
                 <Text style={styles.insightValue}>{insights.avgTemp}°C</Text>
               </View>
               <View style={styles.insightItem}>
                 <Text style={styles.insightEmoji}>💧</Text>
-                <Text style={styles.insightLabel}>{t("weatherMood.avgHumidity")}</Text>
+                <Text style={styles.insightLabel}>Avg Humidity</Text>
                 <Text style={styles.insightValue}>{insights.avgHumidity}%</Text>
               </View>
             </View>
@@ -410,14 +410,14 @@ const WeatherMoodScreen: React.FC = () => {
             {insights.bestCondition !== "N/A" && (
               <View style={styles.bestWeatherContainer}>
                 <Text style={styles.bestWeatherLabel}>
-                  {t("weatherMood.bestWeather")}
+                  ✨ Best Weather for Your Mood:
                 </Text>
                 <View style={styles.bestWeatherBadge}>
                   <Text style={styles.bestWeatherText}>
                     {getWeatherEmoji(insights.bestCondition)} {insights.bestCondition}
                   </Text>
                   <Text style={styles.bestWeatherCount}>
-                    ({insights.bestConditionCount} {t("weatherMood.positiveEntries")})
+                    ({insights.bestConditionCount} positive entries)
                   </Text>
                 </View>
               </View>
@@ -428,22 +428,22 @@ const WeatherMoodScreen: React.FC = () => {
         {/* Recommendations Card */}
         {insights && insights.bestCondition !== "N/A" && (
           <View style={styles.recommendationsCard}>
-            <Text style={styles.cardTitle}>{t("weatherMood.personalizedTips")}</Text>
+            <Text style={styles.cardTitle}>💡 Personalized Tips</Text>
             <View style={styles.recommendationItem}>
               <Text style={styles.recommendationIcon}>🌤️</Text>
               <View style={styles.recommendationText}>
-                <Text style={styles.recommendationTitle}>{t("weatherMood.planActivities", { condition: insights.bestCondition })}</Text>
+                <Text style={styles.recommendationTitle}>Plan activities on {insights.bestCondition} days</Text>
                 <Text style={styles.recommendationDesc}>
-                  {t("weatherMood.feelBest", { condition: insights.bestCondition })}
+                  You feel best during {insights.bestCondition} weather
                 </Text>
               </View>
             </View>
             <View style={styles.recommendationItem}>
               <Text style={styles.recommendationIcon}>🌡️</Text>
               <View style={styles.recommendationText}>
-                <Text style={styles.recommendationTitle}>{t("weatherMood.idealTemp", { temp: insights.optimalTemp })}</Text>
+                <Text style={styles.recommendationTitle}>Your ideal temperature is around {insights.optimalTemp}°C</Text>
                 <Text style={styles.recommendationDesc}>
-                  {t("weatherMood.stayComfortable")}
+                  Try to stay comfortable within this range
                 </Text>
               </View>
             </View>
@@ -451,9 +451,9 @@ const WeatherMoodScreen: React.FC = () => {
               <View style={styles.recommendationItem}>
                 <Text style={styles.recommendationIcon}>😊</Text>
                 <View style={styles.recommendationText}>
-                  <Text style={styles.recommendationTitle}>{t("weatherMood.greatConsistency")}</Text>
+                  <Text style={styles.recommendationTitle}>Great mood consistency!</Text>
                   <Text style={styles.recommendationDesc}>
-                    {t("weatherMood.positivePercentage", { percentage: insights.positivePercentage })}
+                    {insights.positivePercentage}% of your entries show positive mood
                   </Text>
                 </View>
               </View>
@@ -461,20 +461,15 @@ const WeatherMoodScreen: React.FC = () => {
           </View>
         )}
 
-        {/* Mood-Weather Patterns - Top 3 Only */}
+        {/* Mood-Weather Patterns */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>{t("weatherMood.topMoodPatterns")}</Text>
-          <Text style={styles.sectionSubtitle}>{t("weatherMood.topMoodPatternsDesc")}</Text>
-          {stats?.slice(0, 3).map((pattern, index) => {
+          <Text style={styles.sectionTitle}>Mood-Weather Patterns</Text>
+          {stats?.map((pattern, index) => {
             const percentage = (pattern.count / correlationData.length) * 100;
-            const medals = ["🥇", "🥈", "🥉"];
             return (
               <View key={pattern.mood} style={styles.patternCard}>
                 <View style={styles.patternHeader}>
                   <View style={styles.patternMoodContainer}>
-                    <Text style={styles.patternEmoji}>
-                      {medals[index]}
-                    </Text>
                     <Text style={styles.patternEmoji}>
                       {getMoodEmoji(pattern.mood)}
                     </Text>
@@ -499,19 +494,19 @@ const WeatherMoodScreen: React.FC = () => {
                     />
                   </View>
                   <Text style={styles.progressBarText}>
-                    {pattern.count} {t("weatherMood.entries")} ({percentage.toFixed(0)}%)
+                    {pattern.count} ({percentage.toFixed(0)}%)
                   </Text>
                 </View>
 
                 <View style={styles.patternStats}>
                   <View style={styles.patternStat}>
-                    <Text style={styles.patternLabel}>{t("weatherMood.avgTempLabel")}</Text>
+                    <Text style={styles.patternLabel}>Avg Temp</Text>
                     <Text style={styles.patternValue}>
                       {pattern.avgTemp.toFixed(1)}°C
                     </Text>
                   </View>
                   <View style={styles.patternStat}>
-                    <Text style={styles.patternLabel}>{t("weatherMood.commonWeather")}</Text>
+                    <Text style={styles.patternLabel}>Weather</Text>
                     <Text style={styles.patternValue}>
                       {pattern.mostCommonCondition}
                     </Text>
@@ -522,18 +517,19 @@ const WeatherMoodScreen: React.FC = () => {
           })}
         </View>
 
-        {/* Recent Entries - Limited with Show More */}
+        {/* Recent Entries */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>
-            {t("weatherMood.recentEntries")} {filterMood && `(${filterMood})`}
+            Recent Entries {filterMood && `(${filterMood})`}
           </Text>
-          {filteredData.slice(0, showAllEntries ? filteredData.length : ENTRIES_TO_SHOW).map((entry, index) => (
+          {filteredData.slice(0, 10).map((entry, index) => (
             <View key={`${entry.date}-${index}`} style={styles.entryCard}>
               <View style={styles.entryHeader}>
                 <Text style={styles.entryDate}>
-                  {new Date(entry.date).toLocaleDateString(undefined, {
+                  {new Date(entry.date).toLocaleDateString("en-US", {
                     month: "short",
                     day: "numeric",
+                    year: "numeric",
                   })}
                 </Text>
                 <Text style={styles.entryMoodEmoji}>
@@ -542,44 +538,26 @@ const WeatherMoodScreen: React.FC = () => {
               </View>
               <View style={styles.entryDetails}>
                 <View style={styles.entryRow}>
-                  <Text style={styles.entryLabel}>{t("weatherMood.moodLabel")}</Text>
+                  <Text style={styles.entryLabel}>Mood:</Text>
                   <Text style={styles.entryValue}>{entry.mood}</Text>
                 </View>
                 <View style={styles.entryRow}>
-                  <Text style={styles.entryLabel}>{t("weatherMood.weatherCondition")}</Text>
+                  <Text style={styles.entryLabel}>Weather:</Text>
                   <Text style={styles.entryValue}>
                     {getWeatherEmoji(entry.condition)} {entry.condition}
                   </Text>
                 </View>
                 <View style={styles.entryRow}>
-                  <Text style={styles.entryLabel}>{t("weatherMood.temperature")}</Text>
+                  <Text style={styles.entryLabel}>Temperature:</Text>
                   <Text style={styles.entryValue}>{entry.temperature}°C</Text>
+                </View>
+                <View style={styles.entryRow}>
+                  <Text style={styles.entryLabel}>Humidity:</Text>
+                  <Text style={styles.entryValue}>{entry.humidity}%</Text>
                 </View>
               </View>
             </View>
           ))}
-          
-          {/* Show More/Less Button */}
-          {filteredData.length > ENTRIES_TO_SHOW && (
-            <TouchableOpacity
-              onPress={() => setShowAllEntries(!showAllEntries)}
-              style={{
-                marginTop: theme.spacing.md,
-                padding: theme.spacing.md,
-                backgroundColor: theme.colors.surface,
-                borderRadius: theme.borderRadius.md,
-                borderWidth: 1,
-                borderColor: theme.colors.border,
-                alignItems: 'center',
-              }}
-            >
-              <Text style={{ color: theme.colors.primary, fontWeight: '600', fontSize: 14 }}>
-                {showAllEntries
-                  ? t('weatherMood.showLess')
-                  : t('weatherMood.showMore', { count: filteredData.length - ENTRIES_TO_SHOW })}
-              </Text>
-            </TouchableOpacity>
-          )}
         </View>
       </ScrollView>
     </SafeAreaView>
