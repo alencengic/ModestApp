@@ -21,7 +21,7 @@ import { Text, TextInput } from "react-native";
 
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { useWeatherSync } from "@/hooks/useWeatherSync";
-import { requestNotificationPermissions, scheduleDailyNotifications } from "@/services/notificationService";
+import { requestNotificationPermissions, scheduleDailyNotifications, cancelAllNotifications } from "@/services/notificationService";
 import { ThemeProvider, useTheme } from "@/context/ThemeContext";
 import { UserProfileProvider } from "@/context/UserProfileContext";
 import { LanguageProvider } from "@/context/LanguageContext";
@@ -73,6 +73,8 @@ function RootLayoutNav() {
     const setupNotifications = async () => {
       const hasPermission = await requestNotificationPermissions();
       if (hasPermission) {
+        // Always cancel all notifications first to avoid duplicates from previous installations
+        await cancelAllNotifications();
         await scheduleDailyNotifications();
       }
     };

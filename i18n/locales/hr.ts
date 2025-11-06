@@ -562,8 +562,12 @@ export default {
     
     // Patterns
     moodWeatherPatterns: "Obrasci Raspoloženja i Vremena",
+    topMoodPatterns: "Top Obrasci Raspoloženja",
+    topMoodPatternsDesc: "Vaša najčešća raspoloženja s korelacijama vremena",
     avgTempLabel: "Pros. Temp",
     weatherLabel: "Vrijeme",
+    commonWeather: "Uobičajeno Vrijeme",
+    entries: "unosa",
     
     // Recent entries
     recentEntries: "Nedavni Unosi",
@@ -571,6 +575,8 @@ export default {
     weatherCondition: "Vrijeme:",
     temperature: "Temperatura:",
     humidity: "Vlažnost:",
+    showMore: "Prikaži još {{count}} unosa",
+    showLess: "Prikaži Manje",
     
     // Info modal
     infoTitle: "Uvidi o Vremenu i Raspoloženju",

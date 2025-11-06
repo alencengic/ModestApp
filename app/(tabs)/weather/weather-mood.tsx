@@ -65,6 +65,8 @@ const WeatherMoodScreen: React.FC = () => {
   const styles = createStyles(theme);
   const [showInfoModal, setShowInfoModal] = useState(false);
   const [filterMood, setFilterMood] = useState<string | null>(null);
+  const [showAllEntries, setShowAllEntries] = useState(false);
+  const ENTRIES_TO_SHOW = 5;
 
   const {
     data: correlationData = [],
@@ -459,15 +461,20 @@ const WeatherMoodScreen: React.FC = () => {
           </View>
         )}
 
-        {/* Mood-Weather Patterns */}
+        {/* Mood-Weather Patterns - Top 3 Only */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>{t("weatherMood.moodWeatherPatterns")}</Text>
-          {stats?.map((pattern, index) => {
+          <Text style={styles.sectionTitle}>{t("weatherMood.topMoodPatterns")}</Text>
+          <Text style={styles.sectionSubtitle}>{t("weatherMood.topMoodPatternsDesc")}</Text>
+          {stats?.slice(0, 3).map((pattern, index) => {
             const percentage = (pattern.count / correlationData.length) * 100;
+            const medals = ["🥇", "🥈", "🥉"];
             return (
               <View key={pattern.mood} style={styles.patternCard}>
                 <View style={styles.patternHeader}>
                   <View style={styles.patternMoodContainer}>
+                    <Text style={styles.patternEmoji}>
+                      {medals[index]}
+                    </Text>
                     <Text style={styles.patternEmoji}>
                       {getMoodEmoji(pattern.mood)}
                     </Text>
@@ -492,7 +499,7 @@ const WeatherMoodScreen: React.FC = () => {
                     />
                   </View>
                   <Text style={styles.progressBarText}>
-                    {pattern.count} ({percentage.toFixed(0)}%)
+                    {pattern.count} {t("weatherMood.entries")} ({percentage.toFixed(0)}%)
                   </Text>
                 </View>
 
@@ -504,7 +511,7 @@ const WeatherMoodScreen: React.FC = () => {
                     </Text>
                   </View>
                   <View style={styles.patternStat}>
-                    <Text style={styles.patternLabel}>{t("weatherMood.weatherLabel")}</Text>
+                    <Text style={styles.patternLabel}>{t("weatherMood.commonWeather")}</Text>
                     <Text style={styles.patternValue}>
                       {pattern.mostCommonCondition}
                     </Text>
@@ -515,19 +522,18 @@ const WeatherMoodScreen: React.FC = () => {
           })}
         </View>
 
-        {/* Recent Entries */}
+        {/* Recent Entries - Limited with Show More */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>
             {t("weatherMood.recentEntries")} {filterMood && `(${filterMood})`}
           </Text>
-          {filteredData.slice(0, 10).map((entry, index) => (
+          {filteredData.slice(0, showAllEntries ? filteredData.length : ENTRIES_TO_SHOW).map((entry, index) => (
             <View key={`${entry.date}-${index}`} style={styles.entryCard}>
               <View style={styles.entryHeader}>
                 <Text style={styles.entryDate}>
-                  {new Date(entry.date).toLocaleDateString("en-US", {
+                  {new Date(entry.date).toLocaleDateString(undefined, {
                     month: "short",
                     day: "numeric",
-                    year: "numeric",
                   })}
                 </Text>
                 <Text style={styles.entryMoodEmoji}>
@@ -549,13 +555,31 @@ const WeatherMoodScreen: React.FC = () => {
                   <Text style={styles.entryLabel}>{t("weatherMood.temperature")}</Text>
                   <Text style={styles.entryValue}>{entry.temperature}°C</Text>
                 </View>
-                <View style={styles.entryRow}>
-                  <Text style={styles.entryLabel}>{t("weatherMood.humidity")}</Text>
-                  <Text style={styles.entryValue}>{entry.humidity}%</Text>
-                </View>
               </View>
             </View>
           ))}
+          
+          {/* Show More/Less Button */}
+          {filteredData.length > ENTRIES_TO_SHOW && (
+            <TouchableOpacity
+              onPress={() => setShowAllEntries(!showAllEntries)}
+              style={{
+                marginTop: theme.spacing.md,
+                padding: theme.spacing.md,
+                backgroundColor: theme.colors.surface,
+                borderRadius: theme.borderRadius.md,
+                borderWidth: 1,
+                borderColor: theme.colors.border,
+                alignItems: 'center',
+              }}
+            >
+              <Text style={{ color: theme.colors.primary, fontWeight: '600', fontSize: 14 }}>
+                {showAllEntries
+                  ? t('weatherMood.showLess')
+                  : t('weatherMood.showMore', { count: filteredData.length - ENTRIES_TO_SHOW })}
+              </Text>
+            </TouchableOpacity>
+          )}
         </View>
       </ScrollView>
     </SafeAreaView>

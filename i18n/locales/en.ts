@@ -562,8 +562,12 @@ export default {
     
     // Patterns
     moodWeatherPatterns: "Mood-Weather Patterns",
+    topMoodPatterns: "Top Mood Patterns",
+    topMoodPatternsDesc: "Your most frequent moods with weather correlations",
     avgTempLabel: "Avg Temp",
     weatherLabel: "Weather",
+    commonWeather: "Common Weather",
+    entries: "entries",
     
     // Recent entries
     recentEntries: "Recent Entries",
@@ -571,6 +575,8 @@ export default {
     weatherCondition: "Weather:",
     temperature: "Temperature:",
     humidity: "Humidity:",
+    showMore: "Show {{count}} more entries",
+    showLess: "Show Less",
     
     // Info modal
     infoTitle: "Weather & Mood Insights",
