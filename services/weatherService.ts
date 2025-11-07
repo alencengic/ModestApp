@@ -63,11 +63,7 @@ export const fetchAndSaveWeatherData = async (): Promise<boolean> => {
 
     const currentDate = DateTime.now().toISODate() as string;
 
-    const existingWeather = await getWeatherByDate(currentDate);
-    if (existingWeather) {
-      return true;
-    }
-
+    // Use upsert functionality - this will insert or update if exists
     await insertWeatherData({
       date: currentDate,
       temperature: weatherData.main.temp,

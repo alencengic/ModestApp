@@ -12,6 +12,7 @@ import { DateTime } from "luxon";
 import { useState, useCallback } from "react";
 
 import { useTheme } from "@/context/ThemeContext";
+import { useAuth } from "@/context/AuthContext";
 import { useUserProfile } from "@/context/UserProfileContext";
 import { BannerAd } from "@/components/ads";
 import { useTranslation } from "react-i18next";
@@ -34,37 +35,38 @@ const getQuickAccessItems = (t: any): {
   {
     title: t('navigation.dailyJournal'),
     icon: "book-open-page-variant",
-    route: "/daily/journal",
+    route: "/daily-journal" as any,
     emoji: "📔",
   },
   {
     title: t('navigation.trendsAnalytics'),
     icon: "chart-line",
-    route: "/trends/trends",
+    route: "/trends" as any,
     emoji: "📊",
   },
   {
     title: t('navigation.moodAnalytics'),
     icon: "emoticon-happy-outline",
-    route: "/mood/analytics",
+    route: "/mood" as any,
     emoji: "😊",
   },
   {
-    title: t('trendsAnalytics.title'),
-    icon: "food-apple-outline",
-    route: "/trends/food-analytics",
-    emoji: "🍎",
+    title: t('navigation.myMeals'),
+    icon: "food-fork-drink",
+    route: "/meals/meals" as any,
+    emoji: "🍽️",
   },
   {
     title: t('navigation.weatherMood'),
     icon: "weather-sunny",
-    route: "/weather/weather-mood",
+    route: "/weather/weather-mood" as any,
     emoji: "🌤️",
   },
 ];
 
 export default function HomeScreen() {
   const { theme } = useTheme();
+  const { user } = useAuth();
   const { name } = useUserProfile();
   const { t } = useTranslation();
   const [hasExistingData, setHasExistingData] = useState(false);
@@ -169,22 +171,30 @@ export default function HomeScreen() {
   // Re-check data whenever the screen comes into focus
   useFocusEffect(
     useCallback(() => {
+      // Only check data if user is authenticated
+      if (!user) return;
+      
       const checkExistingData = async () => {
-        const today = DateTime.now().toISODate() as string;
+        try {
+          const today = DateTime.now().toISODate() as string;
 
-        // Check if there's any data for today
-        const [mood, productivity, foodIntake] = await Promise.all([
-          getMoodByDate(today),
-          getProductivityByDate(today),
-          getFoodIntakeByDate(today),
-        ]);
+          // Check if there's any data for today
+          const [mood, productivity, foodIntake] = await Promise.all([
+            getMoodByDate(today),
+            getProductivityByDate(today),
+            getFoodIntakeByDate(today),
+          ]);
 
-        // If any data exists for today, show "Continue" text
-        setHasExistingData(!!(mood || productivity || foodIntake));
+          // If any data exists for today, show "Continue" text
+          setHasExistingData(!!(mood || productivity || foodIntake));
+        } catch (error) {
+          console.error('Error checking existing data:', error);
+          setHasExistingData(false);
+        }
       };
 
       checkExistingData();
-    }, [])
+    }, [user])
   );
 
   const handleTestNotification = async () => {
@@ -227,7 +237,7 @@ export default function HomeScreen() {
 
           <TouchableOpacity
             style={styles.startButton}
-            onPress={() => router.push("/daily/daily")}
+            onPress={() => router.push("/daily-entry")}
           >
             <Text style={styles.startButtonText}>
               {hasExistingData ? t('home.editEntry') : t('home.startEntry')}

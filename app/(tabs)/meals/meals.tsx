@@ -13,7 +13,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useTheme } from "@/context/ThemeContext";
-import { createStyles } from "./MealsScreen.styles";
+import { createStyles } from "./MealsScreenAltStyles";
 import {
   useGetAllMeals,
   useInsertMeal,

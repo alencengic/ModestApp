@@ -12,7 +12,7 @@ import { useFont, SkFont } from "@shopify/react-native-skia";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useQuery } from "@tanstack/react-query";
 import { useQueryFoodIntakeChartData } from "@/hooks/queries/useMutationInsertFoodIntake";
-import { createStyles } from "./_TrendsScreen.styles";
+import { createStyles } from "./TrendsScreen.styles";
 import { useTheme } from "@/context/ThemeContext";
 import { useTranslation } from "react-i18next";
 import { MaterialCommunityIcons } from "@expo/vector-icons";

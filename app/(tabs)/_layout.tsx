@@ -40,7 +40,18 @@ export default function TabLayout() {
         }}
       />
       <Drawer.Screen
-        name="daily"
+        name="daily-entry"
+        options={{
+          title: t('navigation.dailyEntry'),
+          drawerIcon: ({ color }) => (
+            <IconSymbol size={24} name="pencil" color={color} />
+          ),
+          headerShown: true,
+          drawerItemStyle: { display: "none" },
+        }}
+      />
+      <Drawer.Screen
+        name="daily-journal"
         options={{
           title: t('navigation.dailyJournal'),
           drawerIcon: ({ color }) => (
@@ -95,18 +106,11 @@ export default function TabLayout() {
         }}
       />
       <Drawer.Screen
-        name="weather"
-        options={{
-          drawerItemStyle: { display: "none" },
-          headerShown: false,
-        }}
-      />
-      <Drawer.Screen
         name="settings/user-profile"
         options={{
           title: t('navigation.userProfile'),
           drawerIcon: ({ color }) => (
-            <IconSymbol size={24} name="person.fill" color={color} />
+            <IconSymbol size={24} name="house.fill" color={color} />
           ),
           headerShown: true,
         }}

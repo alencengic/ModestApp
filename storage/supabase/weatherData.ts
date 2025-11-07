@@ -29,6 +29,8 @@ export const insertWeatherData = async (weather: {
     .upsert({
       user_id: user.id,
       ...weather,
+    }, {
+      onConflict: 'user_id,date'
     })
     .select('id')
     .single();

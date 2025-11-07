@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import { useQuery } from "@tanstack/react-query";
 import { getWeatherMoodCorrelation } from "@/storage/database";
-import { createStyles } from "./WeatherMoodScreen.styles";
+import { createStyles } from "./WeatherMoodScreenAltStyles";
 import { VideoAd } from "@/components/ads";
 import { useTheme } from "@/context/ThemeContext";
 

@@ -10,6 +10,7 @@ import {
   Alert,
 } from "react-native";
 import { useRouter } from "expo-router";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useTheme } from "@/context/ThemeContext";
 import { useUserProfile } from "@/context/UserProfileContext";
 import { useAuth } from "@/context/AuthContext";
@@ -21,10 +22,65 @@ export default function SettingsScreen() {
   const router = useRouter();
   const { theme, themeMode, setThemeMode, colorPalette, setColorPalette, isDark } = useTheme();
   const { name } = useUserProfile();
-  const { signOut, user } = useAuth();
+  const { signOut, user, clearAuthData } = useAuth();
   const { t } = useTranslation();
   const { currentLanguage, changeLanguage } = useLanguage();
   const [isSaving, setIsSaving] = useState(false);
+
+  const handleClearOnboardingData = async () => {
+    Alert.alert(
+      'Clear Onboarding Data',
+      'This will reset onboarding and profile setup status. Are you sure?',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Clear Data',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              if (user?.id) {
+                await Promise.all([
+                  AsyncStorage.removeItem(`hasSeenOnboarding_${user.id}`),
+                  AsyncStorage.removeItem(`hasCompletedProfileSetup_${user.id}`)
+                ]);
+                Alert.alert('Success', 'Onboarding data cleared. App will restart onboarding.');
+              }
+            } catch (error) {
+              Alert.alert('Error', 'Failed to clear onboarding data');
+            }
+          },
+        },
+      ]
+    );
+  };
+
+  const handleClearAuthData = async () => {
+    Alert.alert(
+      'Clear Auth Data',
+      'This will clear all authentication and onboarding data. Are you sure?',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Clear Data',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await clearAuthData();
+              Alert.alert('Success', 'Auth data cleared successfully');
+            } catch (error) {
+              Alert.alert('Error', 'Failed to clear auth data');
+            }
+          },
+        },
+      ]
+    );
+  };
 
   const handleLogout = async () => {
     Alert.alert(
@@ -265,6 +321,18 @@ export default function SettingsScreen() {
       color: theme.colors.textSecondary,
       marginTop: 4,
     },
+    debugButton: {
+      backgroundColor: theme.colors.warning,
+      borderRadius: theme.borderRadius.md,
+      padding: theme.spacing.md,
+      alignItems: 'center',
+      marginTop: theme.spacing.sm,
+    },
+    debugButtonText: {
+      color: '#FFFFFF',
+      fontSize: theme.typography.body.fontSize,
+      fontWeight: '600',
+    },
   });
 
   return (
@@ -435,7 +503,7 @@ export default function SettingsScreen() {
           
           <View style={styles.userInfo}>
             <Text style={styles.optionLabel}>Signed in as</Text>
-            <Text style={styles.userEmail}>{user?.email}</Text>
+            <Text style={styles.userEmail}>{user?.email || 'Not signed in'}</Text>
           </View>
 
           <TouchableOpacity 
@@ -443,6 +511,20 @@ export default function SettingsScreen() {
             onPress={handleLogout}
           >
             <Text style={styles.logoutButtonText}>Sign Out</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity 
+            style={styles.debugButton} 
+            onPress={handleClearAuthData}
+          >
+            <Text style={styles.debugButtonText}>Clear Auth Data (Debug)</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity 
+            style={styles.debugButton} 
+            onPress={handleClearOnboardingData}
+          >
+            <Text style={styles.debugButtonText}>Clear Onboarding Data (Debug)</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>

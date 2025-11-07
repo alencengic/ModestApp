@@ -31,47 +31,74 @@ function RootLayoutNav() {
   const { isDark } = useTheme();
   const { user, loading: authLoading } = useAuth();
   const [hasSeenOnboarding, setHasSeenOnboarding] = useState<boolean | null>(null);
+  const [hasCompletedProfileSetup, setHasCompletedProfileSetup] = useState<boolean | null>(null);
 
   useWeatherSync();
 
+  // Check onboarding and profile setup status
   useEffect(() => {
-    const checkOnboarding = async () => {
-      const seen = await AsyncStorage.getItem("hasSeenOnboarding");
-      setHasSeenOnboarding(seen === "true");
-    };
-    checkOnboarding();
-  }, []);
+    const checkOnboardingStatus = async () => {
+      if (!user) {
+        setHasSeenOnboarding(null);
+        setHasCompletedProfileSetup(null);
+        return;
+      }
 
-  // Re-check onboarding status when segments change (e.g., after completing onboarding)
-  useEffect(() => {
-    const recheckOnboarding = async () => {
-      const seen = await AsyncStorage.getItem("hasSeenOnboarding");
-      if (seen === "true" && !hasSeenOnboarding) {
-        setHasSeenOnboarding(true);
+      try {
+        const [onboardingSeen, profileSetupCompleted] = await Promise.all([
+          AsyncStorage.getItem(`hasSeenOnboarding_${user.id}`),
+          AsyncStorage.getItem(`hasCompletedProfileSetup_${user.id}`)
+        ]);
+        
+        setHasSeenOnboarding(onboardingSeen === "true");
+        setHasCompletedProfileSetup(profileSetupCompleted === "true");
+      } catch (error) {
+        console.error('Error checking onboarding status:', error);
+        setHasSeenOnboarding(false);
+        setHasCompletedProfileSetup(false);
       }
     };
-    recheckOnboarding();
-  }, [segments]);
+    
+    checkOnboardingStatus();
+  }, [user]);
 
   // Handle authentication and onboarding flow
   useEffect(() => {
-    if (!authLoading && hasSeenOnboarding !== null) {
+    if (!authLoading) {
       const currentPath = segments.join('/');
       const isOnAuthScreen = currentPath.includes('auth');
       const isOnOnboardingFlow = currentPath.includes('onboarding') || currentPath.includes('profile-setup');
+      const isOnMainApp = currentPath.includes('(tabs)');
 
-      if (!user && !isOnAuthScreen) {
-        // User not authenticated, redirect to auth
-        router.replace("/auth");
-      } else if (user && !hasSeenOnboarding && !isOnOnboardingFlow) {
-        // User authenticated but hasn't seen onboarding
-        router.replace("/onboarding");
-      } else if (user && hasSeenOnboarding && (isOnAuthScreen || isOnOnboardingFlow)) {
-        // User authenticated and has seen onboarding, redirect to main app
-        router.replace("/(tabs)");
+      if (!user) {
+        // No authenticated user
+        if (!isOnAuthScreen) {
+          router.replace("/auth" as any);
+        }
+      } else {
+        // User is authenticated
+        if (isOnAuthScreen) {
+          // Authenticated user on auth screen, redirect based on onboarding status
+          if (hasSeenOnboarding === false) {
+            router.replace("/onboarding" as any);
+          } else if (hasSeenOnboarding === true && hasCompletedProfileSetup === false) {
+            router.replace("/profile-setup" as any);
+          } else if (hasSeenOnboarding === true && hasCompletedProfileSetup === true) {
+            router.replace("/(tabs)" as any);
+          }
+        } else if (!hasSeenOnboarding && !isOnOnboardingFlow) {
+          // User authenticated but hasn't seen onboarding and not on onboarding flow
+          router.replace("/onboarding" as any);
+        } else if (hasSeenOnboarding && !hasCompletedProfileSetup && !currentPath.includes('profile-setup')) {
+          // User has seen onboarding but hasn't completed profile setup
+          router.replace("/profile-setup" as any);
+        } else if (hasSeenOnboarding && hasCompletedProfileSetup && isOnOnboardingFlow) {
+          // User fully onboarded but on onboarding flow, redirect to main app
+          router.replace("/(tabs)" as any);
+        }
       }
     }
-  }, [user, authLoading, hasSeenOnboarding, segments]);
+  }, [user, authLoading, hasSeenOnboarding, hasCompletedProfileSetup, segments]);
 
   useEffect(() => {
     const setupNotifications = async () => {
@@ -84,7 +111,12 @@ function RootLayoutNav() {
     setupNotifications();
   }, []);
 
-  if (authLoading || hasSeenOnboarding === null) {
+  if (authLoading) {
+    return null;
+  }
+
+  // Don't render until we have checked onboarding status for authenticated users
+  if (user && (hasSeenOnboarding === null || hasCompletedProfileSetup === null)) {
     return null;
   }
 

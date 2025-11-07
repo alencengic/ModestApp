@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { Session, User, AuthError } from '@supabase/supabase-js';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { supabase } from '@/lib/supabase';
 
 interface AuthContextType {
@@ -10,6 +11,7 @@ interface AuthContextType {
   signIn: (email: string, password: string) => Promise<{ error: AuthError | null }>;
   signOut: () => Promise<{ error: AuthError | null }>;
   resetPassword: (email: string) => Promise<{ error: AuthError | null }>;
+  clearAuthData: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -20,6 +22,7 @@ const AuthContext = createContext<AuthContextType>({
   signIn: async () => ({ error: null }),
   signOut: async () => ({ error: null }),
   resetPassword: async () => ({ error: null }),
+  clearAuthData: async () => {},
 });
 
 export const useAuth = () => {
@@ -41,16 +44,22 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   useEffect(() => {
     // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
+    supabase.auth.getSession().then(({ data: { session }, error }) => {
+      if (error) {
+        console.error('Session error:', error);
+        setSession(null);
+        setUser(null);
+      } else {
+        setSession(session);
+        setUser(session?.user ?? null);
+      }
       setLoading(false);
     });
 
     // Listen for auth changes
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    } = supabase.auth.onAuthStateChange((event, session) => {
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
@@ -85,6 +94,30 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     return { error };
   };
 
+  const clearAuthData = async () => {
+    try {
+      // Clear all AsyncStorage items related to auth and onboarding
+      const keys = await AsyncStorage.getAllKeys();
+      const authKeys = keys.filter(key => 
+        key.includes('hasSeenOnboarding_') || 
+        key.includes('hasCompletedProfileSetup_') ||
+        key.includes('supabase.')
+      );
+      await AsyncStorage.multiRemove(authKeys);
+      
+      // Clear Supabase session
+      await supabase.auth.signOut();
+      
+      // Reset local state
+      setUser(null);
+      setSession(null);
+      
+      console.log('Auth data cleared');
+    } catch (error) {
+      console.error('Error clearing auth data:', error);
+    }
+  };
+
   const value: AuthContextType = {
     user,
     session,
@@ -93,6 +126,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     signIn,
     signOut,
     resetPassword,
+    clearAuthData,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

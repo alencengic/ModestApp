@@ -10,6 +10,7 @@ import {
 import { useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useTheme } from "@/context/ThemeContext";
+import { useAuth } from "@/context/AuthContext";
 import { useLanguage, SUPPORTED_LANGUAGES, type LanguageCode } from "@/context/LanguageContext";
 import { useTranslation } from "react-i18next";
 
@@ -59,6 +60,7 @@ const OnboardingScreen: React.FC = () => {
   const router = useRouter();
   const { theme } = useTheme();
   const { t } = useTranslation();
+  const { user } = useAuth();
   const { currentLanguage, changeLanguage, languages } = useLanguage();
   const [currentSlide, setCurrentSlide] = useState(0);
   const slides = getSlides(t);
@@ -70,13 +72,17 @@ const OnboardingScreen: React.FC = () => {
   };
 
   const handleSkip = async () => {
-    await AsyncStorage.setItem("hasSeenOnboarding", "true");
-    router.replace("/profile-setup");
+    if (user) {
+      await AsyncStorage.setItem(`hasSeenOnboarding_${user.id}`, "true");
+    }
+    router.replace("/profile-setup" as any);
   };
 
   const handleGetStarted = async () => {
-    await AsyncStorage.setItem("hasSeenOnboarding", "true");
-    router.replace("/profile-setup");
+    if (user) {
+      await AsyncStorage.setItem(`hasSeenOnboarding_${user.id}`, "true");
+    }
+    router.replace("/profile-setup" as any);
   };
 
   const isLastSlide = currentSlide === slides.length - 1;

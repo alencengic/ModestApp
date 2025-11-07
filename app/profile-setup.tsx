@@ -12,6 +12,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useTheme } from "@/context/ThemeContext";
+import { useAuth } from "@/context/AuthContext";
 import { useUserProfile } from "@/context/UserProfileContext";
 import type { DayOfWeek, WeightUnit } from "@/context/UserProfileContext";
 
@@ -28,6 +29,7 @@ const DAYS_OF_WEEK: { value: DayOfWeek; label: string }[] = [
 const ProfileSetupScreen: React.FC = () => {
   const router = useRouter();
   const { theme } = useTheme();
+  const { user } = useAuth();
   const { updateProfile } = useUserProfile();
 
   const [name, setName] = useState("");
@@ -83,23 +85,27 @@ const ProfileSetupScreen: React.FC = () => {
 
       await updateProfile({
         name: name.trim(),
-        age: ageNum,
-        weight: weightNum,
+        age: ageNum || undefined,
+        weight: weightNum || undefined,
         weight_unit: weightUnit,
         working_days: workingDays,
         sport_days: sportDays,
       });
 
-      await AsyncStorage.setItem("hasCompletedProfileSetup", "true");
-      router.replace("/(tabs)");
+      if (user) {
+        await AsyncStorage.setItem(`hasCompletedProfileSetup_${user.id}`, "true");
+      }
+      router.replace("/(tabs)" as any);
     } catch (error) {
       Alert.alert("Error", "Failed to save profile. Please try again.");
     }
   };
 
   const handleSkip = async () => {
-    await AsyncStorage.setItem("hasCompletedProfileSetup", "true");
-    router.replace("/(tabs)");
+    if (user) {
+      await AsyncStorage.setItem(`hasCompletedProfileSetup_${user.id}`, "true");
+    }
+    router.replace("/(tabs)" as any);
   };
 
   const styles = StyleSheet.create({

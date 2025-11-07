@@ -1,9 +1,15 @@
 import React, { useState, useMemo } from "react";
-import { Alert, ScrollView, View, KeyboardAvoidingView, Platform } from "react-native";
+import {
+  Alert,
+  ScrollView,
+  View,
+  KeyboardAvoidingView,
+  Platform,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { DateTime } from "luxon";
 
-import { createDailyEnterScreenStyles } from "./_DailyEnterScreen.styles";
+import { createDailyEnterScreenStyles } from "./DailyEnterScreen.styles";
 import { useTheme } from "@/context/ThemeContext";
 import { Stepper, StepConfig } from "@/components/ui/Stepper";
 import { RatingComponent } from "@/components/RatingComponent";
@@ -20,28 +26,28 @@ import { productivityRatingStyles } from "@/views/ProductivityRating/Productivit
 import { useTranslation } from "react-i18next";
 
 const getMoodOptions = (t: any) => [
-  { value: "Sad", display: "😞", label: t('daily.poor') },
-  { value: "Neutral", display: "😐", label: t('daily.notGreat') },
-  { value: "Happy", display: "😊", label: t('daily.okay') },
-  { value: "Very Happy", display: "😄", label: t('daily.good') },
-  { value: "Ecstatic", display: "🤩", label: t('daily.excellent') },
+  { value: "Sad", display: "😞", label: t("daily.poor") },
+  { value: "Neutral", display: "😐", label: t("daily.notGreat") },
+  { value: "Happy", display: "😊", label: t("daily.okay") },
+  { value: "Very Happy", display: "😄", label: t("daily.good") },
+  { value: "Ecstatic", display: "🤩", label: t("daily.excellent") },
 ];
 
 const getProductivityOptions = (t: any) => [
-  { value: 1, display: "😴", label: t('daily.veryLow') },
-  { value: 2, display: "😐", label: t('daily.low') },
-  { value: 3, display: "🙂", label: t('daily.moderate') },
-  { value: 4, display: "😊", label: t('daily.high') },
-  { value: 5, display: "🚀", label: t('daily.veryHigh') },
+  { value: 1, display: "😴", label: t("daily.veryLow") },
+  { value: 2, display: "😐", label: t("daily.low") },
+  { value: 3, display: "🙂", label: t("daily.moderate") },
+  { value: 4, display: "😊", label: t("daily.high") },
+  { value: 5, display: "🚀", label: t("daily.veryHigh") },
 ];
 
 type MealType = "breakfast" | "lunch" | "dinner" | "snacks";
 
 const getMealConfig = (t: any) => ({
-  breakfast: { label: t('meals.breakfast'), icon: "☀️" },
-  lunch: { label: t('meals.lunch'), icon: "🌤️" },
-  dinner: { label: t('meals.dinner'), icon: "🌙" },
-  snacks: { label: t('meals.snacks'), icon: "🍎" },
+  breakfast: { label: t("meals.breakfast"), icon: "☀️" },
+  lunch: { label: t("meals.lunch"), icon: "🌤️" },
+  dinner: { label: t("meals.dinner"), icon: "🌙" },
+  snacks: { label: t("meals.snacks"), icon: "🍎" },
 });
 
 export default function DailyEnterScreen() {
@@ -123,7 +129,7 @@ export default function DailyEnterScreen() {
         }
       }
 
-      Alert.alert(t('daily.entrySaved'), t('daily.entrySavedMessage'));
+      Alert.alert(t("daily.entrySaved"), t("daily.entrySavedMessage"));
 
       setMoodValue(null);
       setProductivityValue(null);
@@ -144,7 +150,7 @@ export default function DailyEnterScreen() {
       setResetKey((prev) => prev + 1);
     } catch (error) {
       console.error("Failed to save daily entries:", error);
-      Alert.alert(t('common.error'), t('daily.savingEntry'));
+      Alert.alert(t("common.error"), t("daily.savingEntry"));
       throw error;
     }
   };
@@ -207,14 +213,14 @@ export default function DailyEnterScreen() {
 
   const steps: StepConfig[] = [
     {
-      title: t('daily.selectMood'),
+      title: t("daily.selectMood"),
       component: (
         <ScrollView
           key={`mood-${resetKey}`}
           showsVerticalScrollIndicator={false}
         >
           <RatingComponent
-            title={t('daily.selectMood')}
+            title={t("daily.selectMood")}
             options={moodOptions}
             onChange={(value) => setMoodValue(value as string)}
             autoSave={false}
@@ -231,14 +237,14 @@ export default function DailyEnterScreen() {
       ),
     },
     {
-      title: t('daily.selectProductivity'),
+      title: t("daily.selectProductivity"),
       component: (
         <ScrollView
           key={`productivity-${resetKey}`}
           showsVerticalScrollIndicator={false}
         >
           <RatingComponent
-            title={t('daily.selectProductivity')}
+            title={t("daily.selectProductivity")}
             options={productivityOptions}
             onChange={(value) => setProductivityValue(value as number)}
             autoSave={false}
@@ -257,7 +263,7 @@ export default function DailyEnterScreen() {
       ),
     },
     {
-      title: t('daily.foodIntake'),
+      title: t("daily.foodIntake"),
       component: (
         <KeyboardAvoidingView
           behavior={Platform.OS === "ios" ? "padding" : "height"}
