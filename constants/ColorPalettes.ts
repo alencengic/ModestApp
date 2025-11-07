@@ -141,20 +141,20 @@ export const BrightLightPalette: ColorPalette = {
 export const BrightDarkPalette: ColorPalette = {
   name: "Bright",
   colors: {
-    primary: "#E8B4A0",
+    primary: "#F5C3A9",
     primaryLight: "#F5DCC8",
-    primaryDark: "#C88B6B",
+    primaryDark: "#E8B4A0",
 
     secondary: "#4A3F35",
     secondaryLight: "#5C5047",
     secondaryDark: "#3A302A",
 
-    accent: "#6B5D50",
-    accentLight: "#8A7A6B",
+    accent: "#8A7A6B",
+    accentLight: "#A89E8F",
     success: "#A8B896",
-    info: "#9B8E7F",
-    warning: "#E8B4A0",
-    error: "#E67A5F",
+    info: "#B0A89C",
+    warning: "#F5C3A9",
+    error: "#FF8A6B",
 
     background: "#1A1512",
     surface: "#2A2219",
@@ -164,11 +164,11 @@ export const BrightDarkPalette: ColorPalette = {
     cardShadow: "rgba(0, 0, 0, 0.3)",
 
     textPrimary: "#F5E6D3",
-    textSecondary: "#C8B4A0",
-    textLight: "#9B8E7F",
+    textSecondary: "#D4C5B3",
+    textLight: "#B0A89C",
     textOnPrimary: "#1A1512",
 
-    border: "#4A3F35",
+    border: "#5C5047",
     divider: "#3A302A",
 
     moodColors: {
@@ -287,20 +287,20 @@ export const OceanLightPalette: ColorPalette = {
 export const OceanDarkPalette: ColorPalette = {
   name: "Ocean",
   colors: {
-    primary: "#7BB3C0",
-    primaryLight: "#A8D5E2",
-    primaryDark: "#4A90A4",
+    primary: "#A8D5E2",
+    primaryLight: "#C8E8F0",
+    primaryDark: "#7BB3C0",
 
     secondary: "#1E3A47",
     secondaryLight: "#2C4F5E",
     secondaryDark: "#152833",
 
-    accent: "#4A7C8C",
-    accentLight: "#6A9CAC",
-    success: "#6CBF84",
-    info: "#5A9FB0",
-    warning: "#F5B461",
-    error: "#E57373",
+    accent: "#6A9CAC",
+    accentLight: "#8BBAC7",
+    success: "#8BDEA0",
+    info: "#7BB3C0",
+    warning: "#FFD084",
+    error: "#FF8989",
 
     background: "#0A1A22",
     surface: "#152833",
@@ -310,11 +310,11 @@ export const OceanDarkPalette: ColorPalette = {
     cardShadow: "rgba(0, 0, 0, 0.3)",
 
     textPrimary: "#E8F4F8",
-    textSecondary: "#A8D5E2",
-    textLight: "#6A9CAC",
+    textSecondary: "#C8E8F0",
+    textLight: "#8BBAC7",
     textOnPrimary: "#0A1A22",
 
-    border: "#2C4F5E",
+    border: "#3A5F6E",
     divider: "#1E3A47",
 
     moodColors: {
@@ -433,20 +433,20 @@ export const ForestLightPalette: ColorPalette = {
 export const ForestDarkPalette: ColorPalette = {
   name: "Forest",
   colors: {
-    primary: "#98BF9B",
+    primary: "#B5D9B8",
     primaryLight: "#C5DFC5",
-    primaryDark: "#6B8E6F",
+    primaryDark: "#98BF9B",
 
     secondary: "#2A3E2A",
     secondaryLight: "#3E5538",
     secondaryDark: "#1C2B1C",
 
-    accent: "#556B55",
-    accentLight: "#7FA884",
-    success: "#76B583",
-    info: "#6B8E7A",
-    warning: "#D4A574",
-    error: "#C86B6B",
+    accent: "#7FA884",
+    accentLight: "#9DC2A0",
+    success: "#8DD49A",
+    info: "#8AB08F",
+    warning: "#F0C090",
+    error: "#E88B8B",
 
     background: "#151C15",
     surface: "#1C2B1C",
@@ -456,11 +456,11 @@ export const ForestDarkPalette: ColorPalette = {
     cardShadow: "rgba(0, 0, 0, 0.3)",
 
     textPrimary: "#EFF5EF",
-    textSecondary: "#A8C5A8",
-    textLight: "#7FA884",
+    textSecondary: "#C5DFC5",
+    textLight: "#9DC2A0",
     textOnPrimary: "#151C15",
 
-    border: "#3E5538",
+    border: "#4A6348",
     divider: "#2A3E2A",
 
     moodColors: {
@@ -579,20 +579,20 @@ export const SunsetLightPalette: ColorPalette = {
 export const SunsetDarkPalette: ColorPalette = {
   name: "Sunset",
   colors: {
-    primary: "#F5A389",
+    primary: "#FFB8A0",
     primaryLight: "#F5C3A9",
-    primaryDark: "#E67A5F",
+    primaryDark: "#F5A389",
 
     secondary: "#3A2A25",
     secondaryLight: "#4F3C35",
     secondaryDark: "#2A1F1A",
 
-    accent: "#8B5F4A",
-    accentLight: "#B08070",
-    success: "#8BC896",
-    info: "#C89B7A",
-    warning: "#F5D461",
-    error: "#E55F5F",
+    accent: "#B08070",
+    accentLight: "#D0A090",
+    success: "#A0DBAD",
+    info: "#E8B89A",
+    warning: "#FFE48B",
+    error: "#FF8B8B",
 
     background: "#1A120F",
     surface: "#2A1F1A",
@@ -602,11 +602,11 @@ export const SunsetDarkPalette: ColorPalette = {
     cardShadow: "rgba(0, 0, 0, 0.3)",
 
     textPrimary: "#FFF5F0",
-    textSecondary: "#F5C3A9",
-    textLight: "#B08070",
+    textSecondary: "#FFDCC8",
+    textLight: "#D0A090",
     textOnPrimary: "#1A120F",
 
-    border: "#4F3C35",
+    border: "#6A4F45",
     divider: "#3A2A25",
 
     moodColors: {
@@ -725,20 +725,20 @@ export const LavenderLightPalette: ColorPalette = {
 export const LavenderDarkPalette: ColorPalette = {
   name: "Lavender",
   colors: {
-    primary: "#C5B3D9",
+    primary: "#D9C8ED",
     primaryLight: "#E8DFF5",
-    primaryDark: "#9B7EBD",
+    primaryDark: "#C5B3D9",
 
     secondary: "#2A1F3A",
     secondaryLight: "#3F334F",
     secondaryDark: "#1F152A",
 
-    accent: "#5A4D6B",
-    accentLight: "#7B6A8B",
-    success: "#8BC896",
-    info: "#9B8EC5",
-    warning: "#E8C461",
-    error: "#D47BA0",
+    accent: "#7B6A8B",
+    accentLight: "#9B8AAB",
+    success: "#A0DBAD",
+    info: "#B8A8D5",
+    warning: "#FFD88B",
+    error: "#F098C0",
 
     background: "#151020",
     surface: "#1F152A",
@@ -748,11 +748,11 @@ export const LavenderDarkPalette: ColorPalette = {
     cardShadow: "rgba(0, 0, 0, 0.3)",
 
     textPrimary: "#F5F0FA",
-    textSecondary: "#D4C5E8",
-    textLight: "#9B8EC5",
+    textSecondary: "#E8DFF5",
+    textLight: "#B8A8D5",
     textOnPrimary: "#151020",
 
-    border: "#3F334F",
+    border: "#54476B",
     divider: "#2A1F3A",
 
     moodColors: {

@@ -7,5 +7,5 @@ export * from "./supabase/moodEntries";
 export * from "./supabase/productivityEntries";
 export * from "./supabase/weatherData";
 
-// Note: Some complex functions like correlations may need separate migration
-// export * from "./correlations"; // TODO: Migrate to Supabase
+// Correlations and analysis functions (still using SQLite)
+export * from "./correlations";

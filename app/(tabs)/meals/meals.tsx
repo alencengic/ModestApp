@@ -503,11 +503,11 @@ export default function MealsScreen() {
                     placeholderTextColor={theme.colors.textSecondary}
                   />
                   <ScrollView style={styles.foodList} nestedScrollEnabled keyboardShouldPersistTaps="handled">
-                    {filteredFoods.map((food) => {
+                    {filteredFoods.map((food, index) => {
                       const isSelected = selectedFoods.includes(food);
                       return (
                         <TouchableOpacity
-                          key={food}
+                          key={`${food}-${index}`}
                           style={[
                             styles.foodOption,
                             isSelected && styles.foodOptionSelected,
