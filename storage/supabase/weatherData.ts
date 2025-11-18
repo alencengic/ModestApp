@@ -77,30 +77,50 @@ export const getWeatherMoodCorrelation = async () => {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error('User not authenticated');
 
-  const { data, error } = await supabase
+  // Fetch mood ratings
+  const { data: moodRatings, error: moodError } = await supabase
     .from('mood_ratings')
-    .select(`
-      mood,
-      date,
-      weather_data!inner(
-        temperature,
-        condition,
-        humidity,
-        pressure
-      )
-    `)
+    .select('mood, date')
     .eq('user_id', user.id)
-    .not('weather_data', 'is', null)
     .order('date', { ascending: false });
 
-  if (error) throw error;
+  if (moodError) throw moodError;
 
-  return (data || []).map((item: any) => ({
-    mood: item.mood,
-    temperature: item.weather_data.temperature,
-    condition: item.weather_data.condition,
-    humidity: item.weather_data.humidity,
-    pressure: item.weather_data.pressure,
-    date: item.date,
-  }));
+  if (!moodRatings || moodRatings.length === 0) {
+    return [];
+  }
+
+  // Fetch weather data
+  const { data: weatherData, error: weatherError } = await supabase
+    .from('weather_data')
+    .select('date, temperature, condition, humidity, pressure')
+    .eq('user_id', user.id);
+
+  if (weatherError) throw weatherError;
+
+  if (!weatherData || weatherData.length === 0) {
+    return [];
+  }
+
+  // Create a map of weather data by date for quick lookup
+  const weatherByDate = new Map(
+    weatherData.map(w => [w.date, w])
+  );
+
+  // Join mood ratings with weather data by date
+  return moodRatings
+    .map((mood) => {
+      const weather = weatherByDate.get(mood.date);
+      if (!weather) return null;
+
+      return {
+        mood: mood.mood,
+        temperature: weather.temperature,
+        condition: weather.condition,
+        humidity: weather.humidity,
+        pressure: weather.pressure,
+        date: mood.date,
+      };
+    })
+    .filter((item): item is NonNullable<typeof item> => item !== null);
 };

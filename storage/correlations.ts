@@ -1,5 +1,4 @@
-import { openDatabase } from "./db_connection";
-import { FoodIntake } from "./food_intakes";
+import { supabase } from "@/lib/supabase";
 import { isWorkingDay, isSportDay } from "./userProfile";
 import { DateTime } from "luxon";
 
@@ -9,9 +8,12 @@ export interface FoodMoodCorrelation {
   occurrences: number;
 }
 
-export interface MoodRating {
+interface FoodIntake {
   id: number;
-  mood: string;
+  breakfast?: string;
+  lunch?: string;
+  dinner?: string;
+  snacks?: string;
   date: string;
 }
 
@@ -36,21 +38,31 @@ const splitMealItems = (mealString: string | null | undefined): string[] => {
 export const getFoodMoodCorrelationData = async (): Promise<
   FoodMoodCorrelation[]
 > => {
-  const db = await openDatabase();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('User not authenticated');
 
-  const foodIntakes: FoodIntake[] = await db.getAllAsync(
-    "SELECT * FROM food_intakes"
-  );
-  const moodRatings: MoodRating[] = await db.getAllAsync(
-    "SELECT * FROM mood_ratings"
-  );
+  // Fetch food intakes from Supabase
+  const { data: foodIntakes, error: foodError } = await supabase
+    .from('food_intakes')
+    .select('*')
+    .eq('user_id', user.id);
 
-  if (!foodIntakes.length || !moodRatings.length) {
+  if (foodError) throw foodError;
+
+  // Fetch mood ratings from Supabase
+  const { data: moodRatings, error: moodError } = await supabase
+    .from('mood_ratings')
+    .select('*')
+    .eq('user_id', user.id);
+
+  if (moodError) throw moodError;
+
+  if (!foodIntakes?.length || !moodRatings?.length) {
     return [];
   }
 
   const moodByDate: Record<string, number> = {};
-  moodRatings.forEach((rating) => {
+  moodRatings.forEach((rating: any) => {
     if (MOOD_SCORE_MAP[rating.mood] !== undefined) {
       moodByDate[rating.date] = MOOD_SCORE_MAP[rating.mood];
     }
@@ -61,7 +73,7 @@ export const getFoodMoodCorrelationData = async (): Promise<
     { sumMoodScore: number; occurrences: number }
   > = {};
 
-  foodIntakes.forEach((intake) => {
+  foodIntakes.forEach((intake: FoodIntake) => {
     const moodScore = moodByDate[intake.date];
     if (moodScore === undefined) {
       return;
@@ -93,8 +105,6 @@ export const getFoodMoodCorrelationData = async (): Promise<
   }));
 };
 
-import { SymptomRow, BloatingLevel } from "./symptom_entries";
-
 export type SymptomType =
   | "bloating"
   | "energy"
@@ -107,6 +117,21 @@ export interface FoodSymptomCorrelation {
   foodName: string;
   averageSymptomScore: number;
   occurrences: number;
+}
+
+type BloatingLevel = "None" | "Mild" | "Moderate" | "Severe";
+
+interface SymptomRow {
+  id: string;
+  meal_id?: string;
+  meal_type_tag?: string;
+  created_at: string;
+  bloating: BloatingLevel;
+  energy: number;
+  stool_consistency: number;
+  diarrhea: number;
+  nausea: number;
+  pain: number;
 }
 
 const BLOATING_TO_NUM: Record<BloatingLevel, 0 | 1 | 2 | 3> = {
@@ -141,22 +166,32 @@ const calculateSymptomScore = (
 export const getFoodSymptomCorrelationData = async (
   symptomType: SymptomType
 ): Promise<FoodSymptomCorrelation[]> => {
-  const db = await openDatabase();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('User not authenticated');
 
-  const foodIntakes: FoodIntake[] = await db.getAllAsync(
-    "SELECT * FROM food_intakes"
-  );
-  const symptoms: SymptomRow[] = await db.getAllAsync(
-    "SELECT * FROM symptom_entries"
-  );
+  // Fetch food intakes from Supabase
+  const { data: foodIntakes, error: foodError } = await supabase
+    .from('food_intakes')
+    .select('*')
+    .eq('user_id', user.id);
 
-  if (!foodIntakes.length || !symptoms.length) {
+  if (foodError) throw foodError;
+
+  // Fetch symptom entries from Supabase
+  const { data: symptoms, error: symptomsError } = await supabase
+    .from('symptom_entries')
+    .select('*')
+    .eq('user_id', user.id);
+
+  if (symptomsError) throw symptomsError;
+
+  if (!foodIntakes?.length || !symptoms?.length) {
     return [];
   }
 
   const symptomsByDate: Record<string, { totalScore: number; count: number }> =
     {};
-  symptoms.forEach((symptom) => {
+  symptoms.forEach((symptom: SymptomRow) => {
     const date = symptom.created_at.split("T")[0];
     if (!symptomsByDate[date]) {
       symptomsByDate[date] = { totalScore: 0, count: 0 };
@@ -179,7 +214,7 @@ export const getFoodSymptomCorrelationData = async (
     { sumSymptomScore: number; occurrences: number }
   > = {};
 
-  foodIntakes.forEach((intake) => {
+  foodIntakes.forEach((intake: FoodIntake) => {
     const symptomScore = averageSymptomScoreByDate[intake.date];
     if (symptomScore === undefined) {
       return;
@@ -226,19 +261,29 @@ export interface FoodProductivityCorrelation {
 export const getFoodProductivityCorrelationData = async (): Promise<
   FoodProductivityCorrelation[]
 > => {
-  const db = await openDatabase();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('User not authenticated');
 
-  const foodIntakes: FoodIntake[] = await db.getAllAsync(
-    "SELECT * FROM food_intakes"
-  );
-  const productivityRatings: ProductivityRating[] = await db.getAllAsync(
-    "SELECT * FROM productivity_ratings"
-  );
+  // Fetch food intakes from Supabase
+  const { data: foodIntakes, error: foodError } = await supabase
+    .from('food_intakes')
+    .select('*')
+    .eq('user_id', user.id);
 
-  if (!foodIntakes.length || !productivityRatings.length) return [];
+  if (foodError) throw foodError;
+
+  // Fetch productivity ratings from Supabase
+  const { data: productivityRatings, error: prodError } = await supabase
+    .from('productivity_ratings')
+    .select('*')
+    .eq('user_id', user.id);
+
+  if (prodError) throw prodError;
+
+  if (!foodIntakes?.length || !productivityRatings?.length) return [];
 
   const prodByDate: Record<string, number> = {};
-  productivityRatings.forEach((rating) => {
+  productivityRatings.forEach((rating: ProductivityRating) => {
     if (typeof rating.productivity === "number") {
       // Extract just the date part from the ISO timestamp
       const dateOnly = rating.date.split("T")[0];
@@ -254,7 +299,7 @@ export const getFoodProductivityCorrelationData = async (): Promise<
     { sumProductivity: number; occurrences: number }
   > = {};
 
-  foodIntakes.forEach((intake) => {
+  foodIntakes.forEach((intake: FoodIntake) => {
     const productivityScore = prodByDate[intake.date];
     if (productivityScore === undefined) return;
 
@@ -307,14 +352,26 @@ export interface WorkingDayAnalysis {
 }
 
 export const getWorkingDayAnalysis = async (): Promise<WorkingDayAnalysis> => {
-  const db = await openDatabase();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('User not authenticated');
 
-  const moodRatings: MoodRating[] = await db.getAllAsync(
-    "SELECT * FROM mood_ratings ORDER BY date"
-  );
-  const productivityRatings: ProductivityRating[] = await db.getAllAsync(
-    "SELECT * FROM productivity_ratings ORDER BY date"
-  );
+  // Fetch mood ratings from Supabase
+  const { data: moodRatings, error: moodError } = await supabase
+    .from('mood_ratings')
+    .select('*')
+    .eq('user_id', user.id)
+    .order('date', { ascending: true });
+
+  if (moodError) throw moodError;
+
+  // Fetch productivity ratings from Supabase
+  const { data: productivityRatings, error: prodError } = await supabase
+    .from('productivity_ratings')
+    .select('*')
+    .eq('user_id', user.id)
+    .order('date', { ascending: true });
+
+  if (prodError) throw prodError;
 
   let workingDayMoodSum = 0;
   let workingDayMoodCount = 0;
@@ -324,21 +381,23 @@ export const getWorkingDayAnalysis = async (): Promise<WorkingDayAnalysis> => {
   const nonWorkingDayMoodScores: number[] = [];
 
   // Process mood ratings
-  for (const rating of moodRatings) {
-    const moodScore = MOOD_SCORE_MAP[rating.mood];
-    if (moodScore === undefined) continue;
+  if (moodRatings) {
+    for (const rating of moodRatings) {
+      const moodScore = MOOD_SCORE_MAP[rating.mood];
+      if (moodScore === undefined) continue;
 
-    const date = DateTime.fromISO(rating.date).toJSDate();
-    const isWorking = await isWorkingDay(date);
+      const date = DateTime.fromISO(rating.date).toJSDate();
+      const isWorking = await isWorkingDay(date);
 
-    if (isWorking) {
-      workingDayMoodSum += moodScore;
-      workingDayMoodCount++;
-      workingDayMoodScores.push(moodScore);
-    } else {
-      nonWorkingDayMoodSum += moodScore;
-      nonWorkingDayMoodCount++;
-      nonWorkingDayMoodScores.push(moodScore);
+      if (isWorking) {
+        workingDayMoodSum += moodScore;
+        workingDayMoodCount++;
+        workingDayMoodScores.push(moodScore);
+      } else {
+        nonWorkingDayMoodSum += moodScore;
+        nonWorkingDayMoodCount++;
+        nonWorkingDayMoodScores.push(moodScore);
+      }
     }
   }
 
@@ -350,21 +409,23 @@ export const getWorkingDayAnalysis = async (): Promise<WorkingDayAnalysis> => {
   const nonWorkingDayProdScores: number[] = [];
 
   // Process productivity ratings
-  for (const rating of productivityRatings) {
-    if (typeof rating.productivity !== "number") continue;
+  if (productivityRatings) {
+    for (const rating of productivityRatings) {
+      if (typeof rating.productivity !== "number") continue;
 
-    const date = DateTime.fromISO(rating.date).toJSDate();
-    const isWorking = await isWorkingDay(date);
-    const normalizedScore = rating.productivity - 3; // Normalize to -2 to +2
+      const date = DateTime.fromISO(rating.date).toJSDate();
+      const isWorking = await isWorkingDay(date);
+      const normalizedScore = rating.productivity - 3; // Normalize to -2 to +2
 
-    if (isWorking) {
-      workingDayProdSum += normalizedScore;
-      workingDayProdCount++;
-      workingDayProdScores.push(normalizedScore);
-    } else {
-      nonWorkingDayProdSum += normalizedScore;
-      nonWorkingDayProdCount++;
-      nonWorkingDayProdScores.push(normalizedScore);
+      if (isWorking) {
+        workingDayProdSum += normalizedScore;
+        workingDayProdCount++;
+        workingDayProdScores.push(normalizedScore);
+      } else {
+        nonWorkingDayProdSum += normalizedScore;
+        nonWorkingDayProdCount++;
+        nonWorkingDayProdScores.push(normalizedScore);
+      }
     }
   }
 
@@ -476,14 +537,26 @@ export interface TrainingDayAnalysis {
 }
 
 export const getTrainingDayAnalysis = async (): Promise<TrainingDayAnalysis> => {
-  const db = await openDatabase();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('User not authenticated');
 
-  const moodRatings: MoodRating[] = await db.getAllAsync(
-    "SELECT * FROM mood_ratings ORDER BY date"
-  );
-  const productivityRatings: ProductivityRating[] = await db.getAllAsync(
-    "SELECT * FROM productivity_ratings ORDER BY date"
-  );
+  // Fetch mood ratings from Supabase
+  const { data: moodRatings, error: moodError } = await supabase
+    .from('mood_ratings')
+    .select('*')
+    .eq('user_id', user.id)
+    .order('date', { ascending: true });
+
+  if (moodError) throw moodError;
+
+  // Fetch productivity ratings from Supabase
+  const { data: productivityRatings, error: prodError } = await supabase
+    .from('productivity_ratings')
+    .select('*')
+    .eq('user_id', user.id)
+    .order('date', { ascending: true });
+
+  if (prodError) throw prodError;
 
   let trainingDayMoodSum = 0;
   let trainingDayMoodCount = 0;
@@ -493,21 +566,23 @@ export const getTrainingDayAnalysis = async (): Promise<TrainingDayAnalysis> => 
   const nonTrainingDayMoodScores: number[] = [];
 
   // Process mood ratings
-  for (const rating of moodRatings) {
-    const moodScore = MOOD_SCORE_MAP[rating.mood];
-    if (moodScore === undefined) continue;
+  if (moodRatings) {
+    for (const rating of moodRatings) {
+      const moodScore = MOOD_SCORE_MAP[rating.mood];
+      if (moodScore === undefined) continue;
 
-    const date = DateTime.fromISO(rating.date).toJSDate();
-    const isTraining = await isSportDay(date);
+      const date = DateTime.fromISO(rating.date).toJSDate();
+      const isTraining = await isSportDay(date);
 
-    if (isTraining) {
-      trainingDayMoodSum += moodScore;
-      trainingDayMoodCount++;
-      trainingDayMoodScores.push(moodScore);
-    } else {
-      nonTrainingDayMoodSum += moodScore;
-      nonTrainingDayMoodCount++;
-      nonTrainingDayMoodScores.push(moodScore);
+      if (isTraining) {
+        trainingDayMoodSum += moodScore;
+        trainingDayMoodCount++;
+        trainingDayMoodScores.push(moodScore);
+      } else {
+        nonTrainingDayMoodSum += moodScore;
+        nonTrainingDayMoodCount++;
+        nonTrainingDayMoodScores.push(moodScore);
+      }
     }
   }
 
@@ -519,21 +594,23 @@ export const getTrainingDayAnalysis = async (): Promise<TrainingDayAnalysis> => 
   const nonTrainingDayProdScores: number[] = [];
 
   // Process productivity ratings
-  for (const rating of productivityRatings) {
-    if (typeof rating.productivity !== "number") continue;
+  if (productivityRatings) {
+    for (const rating of productivityRatings) {
+      if (typeof rating.productivity !== "number") continue;
 
-    const date = DateTime.fromISO(rating.date).toJSDate();
-    const isTraining = await isSportDay(date);
-    const normalizedScore = rating.productivity - 3; // Normalize to -2 to +2
+      const date = DateTime.fromISO(rating.date).toJSDate();
+      const isTraining = await isSportDay(date);
+      const normalizedScore = rating.productivity - 3; // Normalize to -2 to +2
 
-    if (isTraining) {
-      trainingDayProdSum += normalizedScore;
-      trainingDayProdCount++;
-      trainingDayProdScores.push(normalizedScore);
-    } else {
-      nonTrainingDayProdSum += normalizedScore;
-      nonTrainingDayProdCount++;
-      nonTrainingDayProdScores.push(normalizedScore);
+      if (isTraining) {
+        trainingDayProdSum += normalizedScore;
+        trainingDayProdCount++;
+        trainingDayProdScores.push(normalizedScore);
+      } else {
+        nonTrainingDayProdSum += normalizedScore;
+        nonTrainingDayProdCount++;
+        nonTrainingDayProdScores.push(normalizedScore);
+      }
     }
   }
 
