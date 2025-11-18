@@ -34,10 +34,15 @@ export const insertFoodIntake = async (foodIntake: FoodIntakeInput) => {
 
   const { data, error } = await supabase
     .from('food_intakes')
-    .insert({
-      user_id: user.id,
-      ...foodIntake,
-    })
+    .upsert(
+      {
+        user_id: user.id,
+        ...foodIntake,
+      },
+      {
+        onConflict: 'user_id,date',
+      }
+    )
     .select()
     .single();
 

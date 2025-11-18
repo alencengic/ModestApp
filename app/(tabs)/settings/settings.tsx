@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -8,15 +8,22 @@ import {
   Switch,
   SafeAreaView,
   Alert,
+  Platform,
 } from "react-native";
 import { useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import DateTimePicker from '@react-native-community/datetimepicker';
 import { useTheme } from "@/context/ThemeContext";
 import { useUserProfile } from "@/context/UserProfileContext";
 import { useAuth } from "@/context/AuthContext";
 import { useLanguage, SUPPORTED_LANGUAGES, type LanguageCode } from "@/context/LanguageContext";
 import { useTranslation } from "react-i18next";
 import { ThemeMode, ColorPaletteName, COLOR_PALETTES } from "@/constants/ColorPalettes";
+import {
+  scheduleDailyStreakReminder,
+  cancelStreakReminders,
+  hasNotificationPermissions,
+} from "@/services/streakNotificationService";
 
 export default function SettingsScreen() {
   const router = useRouter();
@@ -26,6 +33,110 @@ export default function SettingsScreen() {
   const { t } = useTranslation();
   const { currentLanguage, changeLanguage } = useLanguage();
   const [isSaving, setIsSaving] = useState(false);
+
+  // Notification settings state
+  const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+  const [reminderTime, setReminderTime] = useState(new Date());
+  const [showTimePicker, setShowTimePicker] = useState(false);
+
+  useEffect(() => {
+    loadNotificationSettings();
+  }, [user]);
+
+  const loadNotificationSettings = async () => {
+    if (!user?.id) return;
+
+    try {
+      const enabled = await AsyncStorage.getItem(`streak_notifications_enabled_${user.id}`);
+      const time = await AsyncStorage.getItem(`streak_reminder_time_${user.id}`);
+
+      if (enabled === 'true') {
+        setNotificationsEnabled(true);
+      }
+
+      if (time) {
+        const [hours, minutes] = time.split(':').map(Number);
+        const date = new Date();
+        date.setHours(hours, minutes, 0, 0);
+        setReminderTime(date);
+      } else {
+        // Default to 8:00 PM
+        const date = new Date();
+        date.setHours(20, 0, 0, 0);
+        setReminderTime(date);
+      }
+    } catch (error) {
+      console.error('Error loading notification settings:', error);
+    }
+  };
+
+  const handleToggleNotifications = async (value: boolean) => {
+    if (!user?.id) return;
+
+    try {
+      if (value) {
+        // Check permissions first
+        const hasPermission = await hasNotificationPermissions();
+        if (!hasPermission) {
+          Alert.alert(
+            'Permission Required',
+            'Notification permissions are needed to send streak reminders. Please enable notifications in your device settings.',
+            [{ text: 'OK' }]
+          );
+          return;
+        }
+
+        // Schedule the notification
+        const hours = reminderTime.getHours();
+        const minutes = reminderTime.getMinutes();
+        await scheduleDailyStreakReminder(hours, minutes);
+
+        // Save settings
+        await AsyncStorage.setItem(`streak_notifications_enabled_${user.id}`, 'true');
+        await AsyncStorage.setItem(`streak_reminder_time_${user.id}`, `${hours}:${minutes}`);
+
+        setNotificationsEnabled(true);
+        Alert.alert('Success', 'Daily streak reminders enabled!');
+      } else {
+        // Cancel notifications
+        await cancelStreakReminders();
+        await AsyncStorage.setItem(`streak_notifications_enabled_${user.id}`, 'false');
+
+        setNotificationsEnabled(false);
+        Alert.alert('Success', 'Daily streak reminders disabled.');
+      }
+    } catch (error) {
+      console.error('Error toggling notifications:', error);
+      Alert.alert('Error', 'Failed to update notification settings. Please try again.');
+    }
+  };
+
+  const handleTimeChange = async (event: any, selectedDate?: Date) => {
+    if (Platform.OS === 'android') {
+      setShowTimePicker(false);
+    }
+
+    if (selectedDate && user?.id) {
+      setReminderTime(selectedDate);
+
+      // If notifications are enabled, reschedule with new time
+      if (notificationsEnabled) {
+        try {
+          const hours = selectedDate.getHours();
+          const minutes = selectedDate.getMinutes();
+
+          await cancelStreakReminders();
+          await scheduleDailyStreakReminder(hours, minutes);
+          await AsyncStorage.setItem(`streak_reminder_time_${user.id}`, `${hours}:${minutes}`);
+
+          Alert.alert('Success', `Reminder time updated to ${hours}:${minutes.toString().padStart(2, '0')}`);
+        } catch (error) {
+          console.error('Error updating reminder time:', error);
+          Alert.alert('Error', 'Failed to update reminder time. Please try again.');
+        }
+      }
+    }
+  };
 
   const handleClearOnboardingData = async () => {
     Alert.alert(
@@ -333,6 +444,36 @@ export default function SettingsScreen() {
       fontSize: theme.typography.body.fontSize,
       fontWeight: '600',
     },
+    switchContainer: {
+      backgroundColor: theme.colors.surface,
+      borderRadius: theme.borderRadius.md,
+      padding: theme.spacing.md,
+      marginBottom: theme.spacing.md,
+      ...theme.shadows.sm,
+    },
+    switchRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+    },
+    switchContent: {
+      flex: 1,
+      marginRight: theme.spacing.md,
+    },
+    timePickerButton: {
+      backgroundColor: theme.colors.surface,
+      borderRadius: theme.borderRadius.md,
+      padding: theme.spacing.md,
+      marginTop: theme.spacing.md,
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+    },
+    timePickerText: {
+      fontSize: theme.typography.body.fontSize,
+      fontWeight: '600',
+      color: theme.colors.textPrimary,
+      textAlign: 'center',
+    },
   });
 
   return (
@@ -495,6 +636,78 @@ export default function SettingsScreen() {
               <Text style={styles.previewButtonText}>{t('settings.sampleButton')}</Text>
             </TouchableOpacity>
           </View>
+        </View>
+
+        {/* Notifications Section */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Streak Notifications</Text>
+          <Text style={styles.sectionDescription}>
+            Get daily reminders to maintain your streak and celebrate achievements.
+          </Text>
+
+          <View style={styles.switchContainer}>
+            <View style={styles.switchRow}>
+              <View style={styles.switchContent}>
+                <Text style={styles.optionLabel}>Daily Streak Reminders</Text>
+                <Text style={styles.optionDescription}>
+                  Receive a daily notification to log your entries
+                </Text>
+              </View>
+              <Switch
+                value={notificationsEnabled}
+                onValueChange={handleToggleNotifications}
+                trackColor={{
+                  false: theme.colors.border,
+                  true: theme.colors.primary
+                }}
+                thumbColor={notificationsEnabled ? theme.colors.textOnPrimary : theme.colors.textSecondary}
+              />
+            </View>
+
+            {notificationsEnabled && (
+              <>
+                <TouchableOpacity
+                  style={styles.timePickerButton}
+                  onPress={() => setShowTimePicker(true)}
+                >
+                  <Text style={styles.timePickerText}>
+                    Reminder Time: {reminderTime.getHours()}:{reminderTime.getMinutes().toString().padStart(2, '0')}
+                  </Text>
+                </TouchableOpacity>
+
+                {showTimePicker && (
+                  <>
+                    <DateTimePicker
+                      value={reminderTime}
+                      mode="time"
+                      is24Hour={true}
+                      display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                      onChange={handleTimeChange}
+                    />
+                    {Platform.OS === 'ios' && (
+                      <TouchableOpacity
+                        style={[styles.timePickerButton, { marginTop: theme.spacing.sm }]}
+                        onPress={() => setShowTimePicker(false)}
+                      >
+                        <Text style={styles.timePickerText}>Done</Text>
+                      </TouchableOpacity>
+                    )}
+                  </>
+                )}
+              </>
+            )}
+          </View>
+
+          <View style={styles.switchContainer}>
+            <View style={styles.optionContent}>
+              <Text style={styles.optionLabel}>Achievement Notifications</Text>
+              <Text style={styles.optionDescription}>
+                Get notified when you unlock new achievements (always enabled)
+              </Text>
+            </View>
+          </View>
+
+          <View style={styles.divider} />
         </View>
 
         {/* Account Section */}

@@ -272,3 +272,49 @@ CREATE INDEX idx_mood_ratings_user_id_date ON public.mood_ratings(user_id, date)
 CREATE INDEX idx_meals_user_id ON public.meals(user_id);
 CREATE INDEX idx_weight_history_user_id_date ON public.weight_history(user_id, date);
 CREATE INDEX idx_journal_entries_user_id_date ON public.journal_entries(user_id, date);
+
+-- 11. User streaks table
+CREATE TABLE public.user_streaks (
+  id SERIAL PRIMARY KEY,
+  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL UNIQUE,
+  current_streak INTEGER DEFAULT 0,
+  longest_streak INTEGER DEFAULT 0,
+  last_entry_date DATE,
+  total_entries INTEGER DEFAULT 0,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- 12. User achievements table
+CREATE TABLE public.user_achievements (
+  id SERIAL PRIMARY KEY,
+  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
+  achievement_key TEXT NOT NULL,
+  unlocked_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(user_id, achievement_key)
+);
+
+-- Enable RLS on streak tables
+ALTER TABLE public.user_streaks ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.user_achievements ENABLE ROW LEVEL SECURITY;
+
+-- User streaks policies
+CREATE POLICY "Users can view own streaks" ON public.user_streaks
+  FOR SELECT USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can insert own streaks" ON public.user_streaks
+  FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can update own streaks" ON public.user_streaks
+  FOR UPDATE USING (auth.uid() = user_id);
+
+-- User achievements policies
+CREATE POLICY "Users can view own achievements" ON public.user_achievements
+  FOR SELECT USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can insert own achievements" ON public.user_achievements
+  FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+-- Indexes for streaks
+CREATE INDEX idx_user_streaks_user_id ON public.user_streaks(user_id);
+CREATE INDEX idx_user_achievements_user_id ON public.user_achievements(user_id);

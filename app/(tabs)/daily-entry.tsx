@@ -17,9 +17,11 @@ import FoodIntakeForm, { MealFeeling } from "@/views/FoodIntakeForm";
 import { MealFeelingForm } from "@/views/MealFeelingForm";
 import { MealSymptomForm, MealSymptomData } from "@/views/MealSymptomForm";
 import { insertOrUpdateMood } from "@/storage/supabase/moodEntries";
-import { insertOrUpdateProductivity } from "@/storage/database";
+import { insertOrUpdateProductivity } from "@/storage/supabase/productivityEntries";
 import { useMutationInsertFoodIntake } from "@/hooks/queries/useMutationInsertFoodIntake";
 import { useCreateSymptom } from "@/hooks/symptoms";
+import { updateStreak } from "@/storage/supabase/streaks";
+import { useQueryClient } from "@tanstack/react-query";
 
 import { moodRatingStyles } from "@/views/MoodRating/MoodRating.styles";
 import { productivityRatingStyles } from "@/views/ProductivityRating/ProductivityRating.styles";
@@ -53,6 +55,7 @@ const getMealConfig = (t: any) => ({
 export default function DailyEnterScreen() {
   const { theme } = useTheme();
   const { t } = useTranslation();
+  const queryClient = useQueryClient();
   const styles = createDailyEnterScreenStyles(theme);
   const foodScrollViewRef = React.useRef<ScrollView>(null);
   const moodOptions = getMoodOptions(t);
@@ -100,7 +103,7 @@ export default function DailyEnterScreen() {
       if (productivityValue) {
         await insertOrUpdateProductivity(
           productivityValue,
-          DateTime.now().toISO()
+          currentDate
         );
       }
 
@@ -128,6 +131,12 @@ export default function DailyEnterScreen() {
           });
         }
       }
+
+      // Update user streak and check for achievements
+      await updateStreak();
+
+      // Refresh the streak data on the home screen
+      queryClient.invalidateQueries({ queryKey: ['userStreak'] });
 
       Alert.alert(t("daily.entrySaved"), t("daily.entrySavedMessage"));
 

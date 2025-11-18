@@ -17,11 +17,16 @@ export const insertOrUpdateProductivity = async (
 
   const { data, error } = await supabase
     .from('productivity_ratings')
-    .upsert({
-      user_id: user.id,
-      productivity,
-      date,
-    })
+    .upsert(
+      {
+        user_id: user.id,
+        productivity,
+        date,
+      },
+      {
+        onConflict: 'user_id,date',
+      }
+    )
     .select()
     .single();
 

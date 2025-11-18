@@ -9,7 +9,7 @@ import {
 import { Card } from "react-native-paper";
 import { router, Href, useFocusEffect } from "expo-router";
 import { DateTime } from "luxon";
-import { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 import { useTheme } from "@/context/ThemeContext";
@@ -26,6 +26,9 @@ import { getMoodByDate } from "@/storage/database";
 import { getProductivityByDate } from "@/storage/database";
 import { getFoodIntakeByDate } from "@/storage/database";
 import { scaleFontSize, scale } from "@/utils/responsive";
+import { StreakCard } from "@/components/StreakCard";
+import { useQuery } from "@tanstack/react-query";
+import { getUserStreak } from "@/storage/supabase/streaks";
 
 const getQuickAccessItems = (t: any): {
   title: string;
@@ -66,6 +69,23 @@ export default function HomeScreen() {
   const { t } = useTranslation();
   const [hasExistingData, setHasExistingData] = useState(false);
   const quickAccessItems = getQuickAccessItems(t);
+
+  // Fetch user streak data
+  const { data: streak, isLoading: streakLoading, error: streakError } = useQuery({
+    queryKey: ['userStreak'],
+    queryFn: getUserStreak,
+    enabled: !!user,
+  });
+
+  // Debug logging
+  useEffect(() => {
+    if (streakError) {
+      console.error('Error fetching streak:', streakError);
+    }
+    if (streak) {
+      console.log('Streak data:', streak);
+    }
+  }, [streak, streakError]);
 
   // Get greeting based on time of day
   const getGreeting = () => {
@@ -254,6 +274,15 @@ export default function HomeScreen() {
             </TouchableOpacity>
           </View>
         </View>
+
+        {!streakLoading && (
+          <StreakCard
+            currentStreak={streak?.current_streak ?? 0}
+            longestStreak={streak?.longest_streak ?? 0}
+            totalEntries={streak?.total_entries ?? 0}
+            onPress={() => router.push('/achievements' as any)}
+          />
+        )}
 
         <BannerAd size="small" position="top" />
 

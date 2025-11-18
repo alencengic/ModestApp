@@ -63,11 +63,16 @@ export const insertOrUpdateMood = async (mood: string, date: string) => {
 
   const { data, error } = await supabase
     .from('mood_ratings')
-    .upsert({
-      user_id: user.id,
-      mood,
-      date,
-    })
+    .upsert(
+      {
+        user_id: user.id,
+        mood,
+        date,
+      },
+      {
+        onConflict: 'user_id,date',
+      }
+    )
     .select()
     .single();
 

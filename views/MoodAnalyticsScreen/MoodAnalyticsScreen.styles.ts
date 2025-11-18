@@ -9,7 +9,8 @@ export const createStyles = (theme: Theme) => StyleSheet.create({
   },
   optionsContainer: {
     paddingHorizontal: theme.spacing.md,
-    paddingVertical: theme.spacing.lg,
+    paddingTop: theme.spacing.md,
+    paddingBottom: theme.spacing.lg,
   },
   optionCard: {
     flexDirection: "row",
@@ -19,6 +20,8 @@ export const createStyles = (theme: Theme) => StyleSheet.create({
     padding: theme.spacing.lg,
     marginBottom: theme.spacing.md,
     borderLeftWidth: 4,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
     ...theme.shadows.md,
   },
   optionEmojiContainer: {
@@ -35,12 +38,13 @@ export const createStyles = (theme: Theme) => StyleSheet.create({
   },
   optionContent: {
     flex: 1,
+    marginRight: theme.spacing.sm,
   },
   optionTitle: {
-    fontSize: scaleFontSize(18),
+    fontSize: scaleFontSize(17),
     fontWeight: "700",
     color: theme.colors.textPrimary,
-    marginBottom: theme.spacing.xs / 2,
+    marginBottom: theme.spacing.xs,
   },
   optionDescription: {
     fontSize: scaleFontSize(14),
@@ -51,7 +55,6 @@ export const createStyles = (theme: Theme) => StyleSheet.create({
     fontSize: scaleFontSize(28),
     color: theme.colors.primary,
     fontWeight: "700",
-    marginLeft: theme.spacing.sm,
   },
   infoCard: {
     margin: theme.spacing.md,
