@@ -318,3 +318,33 @@ CREATE POLICY "Users can insert own achievements" ON public.user_achievements
 -- Indexes for streaks
 CREATE INDEX idx_user_streaks_user_id ON public.user_streaks(user_id);
 CREATE INDEX idx_user_achievements_user_id ON public.user_achievements(user_id);
+
+-- 13. Weekly insights table
+CREATE TABLE public.weekly_insights (
+  id SERIAL PRIMARY KEY,
+  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
+  week_start_date DATE NOT NULL,
+  week_end_date DATE NOT NULL,
+  insights JSONB NOT NULL, -- Stores all insights as JSON
+  mood_summary JSONB, -- Overall mood stats for the week
+  productivity_summary JSONB, -- Overall productivity stats
+  food_summary JSONB, -- Food diversity and patterns
+  generated_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(user_id, week_start_date)
+);
+
+-- Enable RLS on weekly insights
+ALTER TABLE public.weekly_insights ENABLE ROW LEVEL SECURITY;
+
+-- Weekly insights policies
+CREATE POLICY "Users can view own weekly insights" ON public.weekly_insights
+  FOR SELECT USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can insert own weekly insights" ON public.weekly_insights
+  FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can update own weekly insights" ON public.weekly_insights
+  FOR UPDATE USING (auth.uid() = user_id);
+
+-- Index for weekly insights
+CREATE INDEX idx_weekly_insights_user_id_date ON public.weekly_insights(user_id, week_start_date DESC);

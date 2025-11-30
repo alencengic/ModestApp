@@ -29,6 +29,7 @@ import { scaleFontSize, scale } from "@/utils/responsive";
 import { StreakCard } from "@/components/StreakCard";
 import { useQuery } from "@tanstack/react-query";
 import { getUserStreak } from "@/storage/supabase/streaks";
+import { getLatestWeeklyInsights } from "@/services/weeklyInsightsService";
 
 const getQuickAccessItems = (t: any): {
   title: string;
@@ -74,6 +75,13 @@ export default function HomeScreen() {
   const { data: streak, isLoading: streakLoading, error: streakError } = useQuery({
     queryKey: ['userStreak'],
     queryFn: getUserStreak,
+    enabled: !!user,
+  });
+
+  // Fetch weekly insights
+  const { data: weeklyInsights, isLoading: insightsLoading } = useQuery({
+    queryKey: ['weeklyInsights'],
+    queryFn: getLatestWeeklyInsights,
     enabled: !!user,
   });
 
@@ -181,6 +189,61 @@ export default function HomeScreen() {
       fontSize: scaleFontSize(13),
       fontWeight: "500",
     },
+    insightsCard: {
+      margin: theme.spacing.lg,
+      backgroundColor: theme.colors.surface,
+      borderRadius: theme.borderRadius.lg,
+      padding: theme.spacing.lg,
+      ...theme.shadows.md,
+    },
+    insightsHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: theme.spacing.md,
+    },
+    insightsTitle: {
+      fontSize: scaleFontSize(18),
+      fontWeight: '700',
+      color: theme.colors.textPrimary,
+    },
+    viewAllButton: {
+      paddingHorizontal: scale(12),
+      paddingVertical: scale(6),
+      borderRadius: scale(12),
+      backgroundColor: theme.colors.primary + '20',
+    },
+    viewAllText: {
+      fontSize: scaleFontSize(12),
+      fontWeight: '600',
+      color: theme.colors.primary,
+    },
+    insightPreview: {
+      flexDirection: 'row',
+      alignItems: 'flex-start',
+      marginBottom: theme.spacing.sm,
+      paddingBottom: theme.spacing.sm,
+      borderBottomWidth: 1,
+      borderBottomColor: theme.colors.divider,
+    },
+    insightEmoji: {
+      fontSize: 20,
+      marginRight: theme.spacing.sm,
+    },
+    insightContent: {
+      flex: 1,
+    },
+    insightTitle: {
+      fontSize: scaleFontSize(14),
+      fontWeight: '600',
+      color: theme.colors.textPrimary,
+      marginBottom: theme.spacing.xs / 2,
+    },
+    insightDescription: {
+      fontSize: scaleFontSize(13),
+      color: theme.colors.textSecondary,
+      lineHeight: 18,
+    },
   });
 
   // Re-check data whenever the screen comes into focus
@@ -282,6 +345,33 @@ export default function HomeScreen() {
             totalEntries={streak?.total_entries ?? 0}
             onPress={() => router.push('/achievements' as any)}
           />
+        )}
+
+        {/* Weekly Insights Card */}
+        {!insightsLoading && weeklyInsights && weeklyInsights.insights.length > 0 && (
+          <View style={styles.insightsCard}>
+            <View style={styles.insightsHeader}>
+              <Text style={styles.insightsTitle}>This Week's Insights</Text>
+              <TouchableOpacity
+                style={styles.viewAllButton}
+                onPress={() => router.push('/insights' as any)}
+              >
+                <Text style={styles.viewAllText}>View All</Text>
+              </TouchableOpacity>
+            </View>
+
+            {weeklyInsights.insights.slice(0, 3).map((insight) => (
+              <View key={insight.id} style={styles.insightPreview}>
+                <Text style={styles.insightEmoji}>{insight.emoji}</Text>
+                <View style={styles.insightContent}>
+                  <Text style={styles.insightTitle}>{insight.title}</Text>
+                  <Text style={styles.insightDescription} numberOfLines={2}>
+                    {insight.description}
+                  </Text>
+                </View>
+              </View>
+            ))}
+          </View>
         )}
 
         <BannerAd size="small" position="top" />

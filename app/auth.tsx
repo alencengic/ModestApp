@@ -32,6 +32,7 @@ const LoginScreen: React.FC = () => {
     }
 
     setLoading(true);
+    
     try {
       const { error } = isSignUp 
         ? await signUp(email, password)
@@ -52,6 +53,8 @@ const LoginScreen: React.FC = () => {
     }
   };
 
+
+  
   const handleForgotPassword = async () => {
     if (!email) {
       Alert.alert('Error', 'Please enter your email address');
