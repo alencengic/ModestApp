@@ -2,7 +2,7 @@ import React from "react";
 import { ScrollView, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { createDailyEnterScreenStyles } from "./DailyEnterScreen.styles";
+import { createDailyEnterScreenStyles } from "@/styles/DailyEnterScreen.styles";
 import { useTheme } from "@/context/ThemeContext";
 
 import DailyJournalScreen from "@/views/DailyJournalScreen/DailyJournalScreen";

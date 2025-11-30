@@ -9,7 +9,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { DateTime } from "luxon";
 
-import { createDailyEnterScreenStyles } from "./DailyEnterScreen.styles";
+import { createDailyEnterScreenStyles } from "@/styles/DailyEnterScreen.styles";
 import { useTheme } from "@/context/ThemeContext";
 import { Stepper, StepConfig } from "@/components/ui/Stepper";
 import { RatingComponent } from "@/components/RatingComponent";
