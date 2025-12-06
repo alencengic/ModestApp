@@ -5,11 +5,12 @@ import {
   View,
   Text,
   TouchableOpacity,
+  ActivityIndicator,
 } from "react-native";
 import { Card } from "react-native-paper";
 import { router, Href, useFocusEffect } from "expo-router";
 import { DateTime } from "luxon";
-import React, { useState, useCallback, useEffect } from "react";
+import { useState, useCallback } from "react";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 import { useTheme } from "@/context/ThemeContext";
@@ -26,10 +27,12 @@ import { getMoodByDate } from "@/storage/database";
 import { getProductivityByDate } from "@/storage/database";
 import { getFoodIntakeByDate } from "@/storage/database";
 import { scaleFontSize, scale } from "@/utils/responsive";
-import { StreakCard } from "@/components/StreakCard";
-import { useQuery } from "@tanstack/react-query";
-import { getUserStreak } from "@/storage/supabase/streaks";
-import { getLatestWeeklyInsights } from "@/services/weeklyInsightsService";
+
+// Import new services
+import { calculateMoodPrediction, MoodPrediction } from "@/services/moodPredictionService";
+import { getAchievements, getStreakData, Achievement, StreakData } from "@/services/achievementService";
+import { generateWeeklySummary, WeeklySummary } from "@/services/weeklyDigestService";
+import { detectTrendAlerts, TrendAlert } from "@/services/trendsAndExportService";
 
 const getQuickAccessItems = (t: any): {
   title: string;
@@ -69,31 +72,13 @@ export default function HomeScreen() {
   const { name } = useUserProfile();
   const { t } = useTranslation();
   const [hasExistingData, setHasExistingData] = useState(false);
+  const [moodPrediction, setMoodPrediction] = useState<MoodPrediction | null>(null);
+  const [achievements, setAchievements] = useState<Achievement[]>([]);
+  const [streakData, setStreakData] = useState<StreakData | null>(null);
+  const [weeklyDigest, setWeeklyDigest] = useState<WeeklySummary | null>(null);
+  const [trendAlerts, setTrendAlerts] = useState<TrendAlert[]>([]);
+  const [isLoadingInsights, setIsLoadingInsights] = useState(false);
   const quickAccessItems = getQuickAccessItems(t);
-
-  // Fetch user streak data
-  const { data: streak, isLoading: streakLoading, error: streakError } = useQuery({
-    queryKey: ['userStreak'],
-    queryFn: getUserStreak,
-    enabled: !!user,
-  });
-
-  // Fetch weekly insights
-  const { data: weeklyInsights, isLoading: insightsLoading } = useQuery({
-    queryKey: ['weeklyInsights'],
-    queryFn: getLatestWeeklyInsights,
-    enabled: !!user,
-  });
-
-  // Debug logging
-  useEffect(() => {
-    if (streakError) {
-      console.error('Error fetching streak:', streakError);
-    }
-    if (streak) {
-      console.log('Streak data:', streak);
-    }
-  }, [streak, streakError]);
 
   // Get greeting based on time of day
   const getGreeting = () => {
@@ -189,60 +174,96 @@ export default function HomeScreen() {
       fontSize: scaleFontSize(13),
       fontWeight: "500",
     },
-    insightsCard: {
-      margin: theme.spacing.lg,
+    insightsSection: {
+      marginTop: theme.spacing.lg,
+      paddingHorizontal: theme.spacing.md,
+    },
+    insightCard: {
       backgroundColor: theme.colors.surface,
       borderRadius: theme.borderRadius.lg,
-      padding: theme.spacing.lg,
-      ...theme.shadows.md,
-    },
-    insightsHeader: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
+      padding: theme.spacing.md,
       marginBottom: theme.spacing.md,
     },
-    insightsTitle: {
-      fontSize: scaleFontSize(18),
-      fontWeight: '700',
+    insightTitle: {
+      fontSize: scaleFontSize(16),
+      fontWeight: "700",
       color: theme.colors.textPrimary,
-    },
-    viewAllButton: {
-      paddingHorizontal: scale(12),
-      paddingVertical: scale(6),
-      borderRadius: scale(12),
-      backgroundColor: theme.colors.primary + '20',
-    },
-    viewAllText: {
-      fontSize: scaleFontSize(12),
-      fontWeight: '600',
-      color: theme.colors.primary,
-    },
-    insightPreview: {
-      flexDirection: 'row',
-      alignItems: 'flex-start',
       marginBottom: theme.spacing.sm,
-      paddingBottom: theme.spacing.sm,
-      borderBottomWidth: 1,
-      borderBottomColor: theme.colors.divider,
     },
-    insightEmoji: {
-      fontSize: 20,
+    insightText: {
+      fontSize: scaleFontSize(14),
+      color: theme.colors.textSecondary,
+      lineHeight: 20,
+    },
+    predictionContainer: {
+      flexDirection: "row",
+      alignItems: "center",
+      marginTop: theme.spacing.sm,
+    },
+    predictionEmoji: {
+      fontSize: scaleFontSize(32),
       marginRight: theme.spacing.sm,
     },
-    insightContent: {
+    predictionDetails: {
       flex: 1,
     },
-    insightTitle: {
-      fontSize: scaleFontSize(14),
-      fontWeight: '600',
+    predictionLevel: {
+      fontSize: scaleFontSize(18),
+      fontWeight: "600",
       color: theme.colors.textPrimary,
-      marginBottom: theme.spacing.xs / 2,
     },
-    insightDescription: {
-      fontSize: scaleFontSize(13),
+    predictionConfidence: {
+      fontSize: scaleFontSize(12),
       color: theme.colors.textSecondary,
-      lineHeight: 18,
+    },
+    achievementBadge: {
+      flexDirection: "row",
+      alignItems: "center",
+      backgroundColor: theme.colors.primaryLight,
+      paddingHorizontal: theme.spacing.sm,
+      paddingVertical: theme.spacing.xs,
+      borderRadius: theme.borderRadius.sm,
+      marginRight: theme.spacing.xs,
+      marginBottom: theme.spacing.xs,
+    },
+    achievementText: {
+      fontSize: scaleFontSize(12),
+      color: theme.colors.primary,
+      marginLeft: 4,
+    },
+    achievementsRow: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      marginTop: theme.spacing.sm,
+    },
+    streakContainer: {
+      flexDirection: "row",
+      alignItems: "center",
+      marginTop: theme.spacing.sm,
+    },
+    streakText: {
+      fontSize: scaleFontSize(24),
+      fontWeight: "700",
+      color: theme.colors.primary,
+      marginRight: theme.spacing.sm,
+    },
+    streakLabel: {
+      fontSize: scaleFontSize(14),
+      color: theme.colors.textSecondary,
+    },
+    alertCard: {
+      backgroundColor: theme.colors.warning + '20',
+      borderRadius: theme.borderRadius.md,
+      padding: theme.spacing.sm,
+      marginBottom: theme.spacing.sm,
+    },
+    alertText: {
+      fontSize: scaleFontSize(13),
+      color: theme.colors.warning,
+    },
+    loadingContainer: {
+      padding: theme.spacing.lg,
+      alignItems: "center",
     },
   });
 
@@ -271,7 +292,32 @@ export default function HomeScreen() {
         }
       };
 
+      const loadInsights = async () => {
+        setIsLoadingInsights(true);
+        try {
+          // Load all insights in parallel
+          const [prediction, achievementsList, streak, digest, alerts] = await Promise.all([
+            calculateMoodPrediction().catch(() => null),
+            getAchievements().catch(() => []),
+            getStreakData().catch(() => null),
+            generateWeeklySummary().catch(() => null),
+            detectTrendAlerts().catch(() => []),
+          ]);
+
+          setMoodPrediction(prediction);
+          setAchievements(achievementsList.filter(a => a.earnedDate));
+          setStreakData(streak);
+          setWeeklyDigest(digest);
+          setTrendAlerts(alerts);
+        } catch (error) {
+          console.error('Error loading insights:', error);
+        } finally {
+          setIsLoadingInsights(false);
+        }
+      };
+
       checkExistingData();
+      loadInsights();
     }, [user])
   );
 
@@ -338,42 +384,6 @@ export default function HomeScreen() {
           </View>
         </View>
 
-        {!streakLoading && (
-          <StreakCard
-            currentStreak={streak?.current_streak ?? 0}
-            longestStreak={streak?.longest_streak ?? 0}
-            totalEntries={streak?.total_entries ?? 0}
-            onPress={() => router.push('/achievements' as any)}
-          />
-        )}
-
-        {/* Weekly Insights Card */}
-        {!insightsLoading && weeklyInsights && weeklyInsights.insights.length > 0 && (
-          <View style={styles.insightsCard}>
-            <View style={styles.insightsHeader}>
-              <Text style={styles.insightsTitle}>This Week's Insights</Text>
-              <TouchableOpacity
-                style={styles.viewAllButton}
-                onPress={() => router.push('/insights' as any)}
-              >
-                <Text style={styles.viewAllText}>View All</Text>
-              </TouchableOpacity>
-            </View>
-
-            {weeklyInsights.insights.slice(0, 3).map((insight) => (
-              <View key={insight.id} style={styles.insightPreview}>
-                <Text style={styles.insightEmoji}>{insight.emoji}</Text>
-                <View style={styles.insightContent}>
-                  <Text style={styles.insightTitle}>{insight.title}</Text>
-                  <Text style={styles.insightDescription} numberOfLines={2}>
-                    {insight.description}
-                  </Text>
-                </View>
-              </View>
-            ))}
-          </View>
-        )}
-
         <BannerAd size="small" position="top" />
 
         <Text style={styles.sectionTitle}>{t('home.quickAccess')}</Text>
@@ -397,6 +407,100 @@ export default function HomeScreen() {
               </Card.Content>
             </Card>
           ))}
+        </View>
+
+        {/* Insights Section */}
+        <Text style={styles.sectionTitle}>Your Insights</Text>
+        <View style={styles.insightsSection}>
+          {isLoadingInsights ? (
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator size="small" color={theme.colors.primary} />
+              <Text style={styles.insightText}>Loading insights...</Text>
+            </View>
+          ) : (
+            <>
+              {/* Trend Alerts */}
+              {trendAlerts.length > 0 && (
+                <View style={styles.insightCard}>
+                  <Text style={styles.insightTitle}>⚠️ Trend Alerts</Text>
+                  {trendAlerts.slice(0, 2).map((alert, idx) => (
+                    <View key={idx} style={styles.alertCard}>
+                      <Text style={styles.alertText}>{alert.message}</Text>
+                    </View>
+                  ))}
+                </View>
+              )}
+
+              {/* Mood Prediction */}
+              {moodPrediction && (
+                <View style={styles.insightCard}>
+                  <Text style={styles.insightTitle}>🔮 Today's Mood Prediction</Text>
+                  <View style={styles.predictionContainer}>
+                    <Text style={styles.predictionEmoji}>
+                      {moodPrediction.predictedMood >= 8 ? '😄' :
+                       moodPrediction.predictedMood >= 6 ? '😊' :
+                       moodPrediction.predictedMood >= 4 ? '😐' : '😔'}
+                    </Text>
+                    <View style={styles.predictionDetails}>
+                      <Text style={styles.predictionLevel}>
+                        Predicted mood: {moodPrediction.predictedMood}/10
+                      </Text>
+                      <Text style={styles.predictionConfidence}>
+                        Confidence: {Math.round(moodPrediction.confidence * 100)}%
+                      </Text>
+                    </View>
+                  </View>
+                  {moodPrediction.recommendations?.[0] && (
+                    <Text style={styles.insightText}>
+                      💡 {moodPrediction.recommendations[0]}
+                    </Text>
+                  )}
+                </View>
+              )}
+
+              {/* Streak & Achievements */}
+              {(streakData || achievements.length > 0) && (
+                <View style={styles.insightCard}>
+                  <Text style={styles.insightTitle}>🏆 Your Progress</Text>
+                  {streakData && (
+                    <View style={styles.streakContainer}>
+                      <Text style={styles.streakText}>🔥 {streakData.currentStreak}</Text>
+                      <Text style={styles.streakLabel}>
+                        day streak • Best: {streakData.longestStreak} days
+                      </Text>
+                    </View>
+                  )}
+                  {achievements.length > 0 && (
+                    <View style={styles.achievementsRow}>
+                      {achievements.slice(0, 4).map((achievement) => (
+                        <View key={achievement.id} style={styles.achievementBadge}>
+                          <Text>{achievement.icon}</Text>
+                          <Text style={styles.achievementText}>{achievement.name}</Text>
+                        </View>
+                      ))}
+                    </View>
+                  )}
+                </View>
+              )}
+
+              {/* Weekly Digest Summary */}
+              {weeklyDigest && (
+                <View style={styles.insightCard}>
+                  <Text style={styles.insightTitle}>📊 This Week</Text>
+                  <Text style={styles.insightText}>
+                    Average mood: {weeklyDigest.averageMood.toFixed(1)}/10 • 
+                    Trend: {weeklyDigest.moodTrend === 'improving' ? '📈 Improving' : 
+                            weeklyDigest.moodTrend === 'declining' ? '📉 Declining' : '➡️ Stable'}
+                  </Text>
+                  {weeklyDigest.keyInsights?.[0] && (
+                    <Text style={styles.insightText}>
+                      {weeklyDigest.keyInsights[0]}
+                    </Text>
+                  )}
+                </View>
+              )}
+            </>
+          )}
         </View>
 
         <BannerAd size="medium" position="bottom" />

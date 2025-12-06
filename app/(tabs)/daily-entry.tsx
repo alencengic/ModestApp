@@ -1,10 +1,11 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import {
   Alert,
   ScrollView,
   View,
   KeyboardAvoidingView,
   Platform,
+  Text,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { DateTime } from "luxon";
@@ -26,6 +27,9 @@ import { useQueryClient } from "@tanstack/react-query";
 import { moodRatingStyles } from "@/views/MoodRating/MoodRating.styles";
 import { productivityRatingStyles } from "@/views/ProductivityRating/ProductivityRating.styles";
 import { useTranslation } from "react-i18next";
+
+// Import new services
+import { checkFoodWarning, getSmartFoodSuggestions, FoodWarning, FoodSuggestion } from "@/services/foodRecommendationService";
 
 const getMoodOptions = (t: any) => [
   { value: "Sad", display: "😞", label: t("daily.poor") },
@@ -88,9 +92,39 @@ export default function DailyEnterScreen() {
     snacks: null,
   });
   const [resetKey, setResetKey] = useState(0);
+  
+  // Food recommendations state
+  const [foodWarning, setFoodWarning] = useState<FoodWarning | null>(null);
+  const [foodSuggestions, setFoodSuggestions] = useState<FoodSuggestion[]>([]);
 
   const { mutateAsync: saveFoodIntake } = useMutationInsertFoodIntake();
   const createSymptom = useCreateSymptom();
+
+  // Check for food warnings when food input changes
+  useEffect(() => {
+    const checkWarnings = async () => {
+      // Get all foods entered
+      const allFoods = Object.values(foodMeals).filter(f => f.trim());
+      if (allFoods.length > 0) {
+        const lastFood = allFoods[allFoods.length - 1];
+        const warning = await checkFoodWarning(lastFood);
+        setFoodWarning(warning);
+      } else {
+        setFoodWarning(null);
+      }
+    };
+    
+    checkWarnings();
+  }, [foodMeals]);
+
+  // Load food suggestions on mount
+  useEffect(() => {
+    const loadSuggestions = async () => {
+      const suggestions = await getSmartFoodSuggestions();
+      setFoodSuggestions(suggestions);
+    };
+    loadSuggestions();
+  }, []);
 
   const handleCompleteAll = async () => {
     try {
@@ -285,6 +319,56 @@ export default function DailyEnterScreen() {
             showsVerticalScrollIndicator={false}
             keyboardShouldPersistTaps="handled"
           >
+            {/* Food Warning Alert */}
+            {foodWarning && (
+              <View style={{
+                backgroundColor: foodWarning.severity === 'high' ? theme.colors.error + '20' : 
+                               foodWarning.severity === 'medium' ? theme.colors.warning + '20' : 
+                               theme.colors.info + '20',
+                padding: theme.spacing.md,
+                borderRadius: theme.borderRadius.md,
+                marginHorizontal: theme.spacing.md,
+                marginBottom: theme.spacing.sm,
+              }}>
+                <Text style={{
+                  color: foodWarning.severity === 'high' ? theme.colors.error : 
+                         foodWarning.severity === 'medium' ? theme.colors.warning : 
+                         theme.colors.info,
+                  fontSize: 14,
+                }}>
+                  {foodWarning.message}
+                </Text>
+              </View>
+            )}
+
+            {/* Food Suggestions */}
+            {foodSuggestions.length > 0 && (
+              <View style={{
+                backgroundColor: theme.colors.surface,
+                padding: theme.spacing.md,
+                borderRadius: theme.borderRadius.md,
+                marginHorizontal: theme.spacing.md,
+                marginBottom: theme.spacing.md,
+              }}>
+                <Text style={{
+                  color: theme.colors.textPrimary,
+                  fontWeight: '600',
+                  marginBottom: theme.spacing.sm,
+                }}>
+                  💡 Suggested foods for your mood:
+                </Text>
+                {foodSuggestions.slice(0, 3).map((suggestion, idx) => (
+                  <Text key={idx} style={{
+                    color: theme.colors.textSecondary,
+                    fontSize: 13,
+                    marginBottom: 2,
+                  }}>
+                    • {suggestion.food} - {suggestion.reason}
+                  </Text>
+                ))}
+              </View>
+            )}
+
             <FoodIntakeForm
               key={`food-form-${resetKey}`}
               autoSave={false}

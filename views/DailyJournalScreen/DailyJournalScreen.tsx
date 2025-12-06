@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import {
   View,
   Text,
@@ -21,6 +21,7 @@ import {
 import { useTheme } from "@/context/ThemeContext";
 import { BannerAd } from "@/components/ads";
 import { useTranslation } from "react-i18next";
+import { searchJournalEntries, saveSearch } from "@/services/searchService";
 
 const CHARACTER_LIMIT = 1000;
 
@@ -34,6 +35,28 @@ const DailyJournalScreen: React.FC = () => {
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [range, setRange] = useState<"day" | "week" | "month">("day");
   const [readDate, setReadDate] = useState<Date>(new Date());
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isSearching, setIsSearching] = useState(false);
+  const [searchResults, setSearchResults] = useState<any[]>([]);
+
+  const handleSearch = useCallback(async (query: string) => {
+    if (!query.trim()) {
+      setSearchResults([]);
+      setIsSearching(false);
+      return;
+    }
+    
+    setIsSearching(true);
+    try {
+      const results = await searchJournalEntries(query);
+      setSearchResults(results);
+      await saveSearch(query);
+    } catch (error) {
+      console.error('Search error:', error);
+    } finally {
+      setIsSearching(false);
+    }
+  }, []);
 
   const styles = StyleSheet.create({
     container: {
@@ -341,6 +364,70 @@ const DailyJournalScreen: React.FC = () => {
       {/* Read View */}
       {activeTab === "read" && (
         <>
+          {/* Search Bar */}
+          <View style={{
+            marginHorizontal: theme.spacing.md,
+            marginBottom: theme.spacing.sm,
+          }}>
+            <TextInput
+              style={{
+                backgroundColor: theme.colors.surface,
+                borderRadius: theme.borderRadius.lg,
+                paddingHorizontal: theme.spacing.md,
+                paddingVertical: theme.spacing.sm,
+                fontSize: 16,
+                color: theme.colors.textPrimary,
+                borderWidth: 1,
+                borderColor: theme.colors.border,
+              }}
+              placeholder="🔍 Search journal entries..."
+              placeholderTextColor={theme.colors.textSecondary}
+              value={searchQuery}
+              onChangeText={(text) => {
+                setSearchQuery(text);
+                handleSearch(text);
+              }}
+            />
+          </View>
+
+          {/* Search Results */}
+          {searchQuery.trim() && searchResults.length > 0 && (
+            <View style={{
+              marginHorizontal: theme.spacing.md,
+              marginBottom: theme.spacing.md,
+              backgroundColor: theme.colors.surface,
+              borderRadius: theme.borderRadius.lg,
+              padding: theme.spacing.md,
+            }}>
+              <Text style={{
+                fontSize: 14,
+                fontWeight: '600',
+                color: theme.colors.textSecondary,
+                marginBottom: theme.spacing.sm,
+              }}>
+                Found {searchResults.length} results
+              </Text>
+              {searchResults.slice(0, 5).map((result, idx) => (
+                <TouchableOpacity
+                  key={idx}
+                  style={{
+                    paddingVertical: theme.spacing.sm,
+                    borderBottomWidth: idx < searchResults.length - 1 ? 1 : 0,
+                    borderBottomColor: theme.colors.divider,
+                  }}
+                  onPress={() => router.push(`/journal-entry-detail?id=${result.id}`)}
+                >
+                  <Text style={{ color: theme.colors.textPrimary, fontSize: 14 }}>
+                    {result.content?.substring(0, 80)}...
+                  </Text>
+                  <Text style={{ color: theme.colors.textSecondary, fontSize: 12, marginTop: 2 }}>
+                    {result.date}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          )}
+
           <View style={styles.filterContainer}>
             <Text style={styles.filterTitle}>{t('dailyJournal.timePeriod')}</Text>
             <View style={styles.buttonGroup}>

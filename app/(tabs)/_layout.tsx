@@ -99,6 +99,15 @@ export default function TabLayout() {
         }}
       />
       <Drawer.Screen
+        name="chat"
+        options={{
+          title: 'AI Support Chat',
+          drawerIcon: ({ color }) => (
+            <IconSymbol size={24} name="face.smiling" color={color} />
+          ),
+        }}
+      />
+      <Drawer.Screen
         name="symptoms"
         options={{
           drawerItemStyle: { display: "none" },

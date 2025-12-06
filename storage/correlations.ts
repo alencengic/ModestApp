@@ -17,12 +17,26 @@ interface FoodIntake {
   date: string;
 }
 
+// Normalized mood scale: Happy=0 (neutral baseline), 
+// positive for better-than-happy, negative for worse-than-happy
 const MOOD_SCORE_MAP: Record<string, number> = {
-  Sad: -2,
-  Neutral: 0,
-  Happy: 1,
-  "Very Happy": 2,
-  Ecstatic: 3,
+  "sad": -1,
+  "neutral": -0.5,
+  "happy": 0,
+  "very happy": 0.5,
+  "ecstatic": 1,
+};
+
+// Helper to get mood score with case-insensitive matching
+const getMoodScore = (mood: string | number): number | undefined => {
+  if (typeof mood === 'number') {
+    // If mood is already a number (1-5 scale), normalize to our scale
+    // 1=Sad, 2=Neutral, 3=Happy, 4=Very Happy, 5=Ecstatic
+    const numericMap: Record<number, number> = { 1: -1, 2: -0.5, 3: 0, 4: 0.5, 5: 1 };
+    return numericMap[mood];
+  }
+  const normalizedMood = mood.toLowerCase().trim();
+  return MOOD_SCORE_MAP[normalizedMood];
 };
 
 const splitMealItems = (mealString: string | null | undefined): string[] => {
@@ -63,8 +77,9 @@ export const getFoodMoodCorrelationData = async (): Promise<
 
   const moodByDate: Record<string, number> = {};
   moodRatings.forEach((rating: any) => {
-    if (MOOD_SCORE_MAP[rating.mood] !== undefined) {
-      moodByDate[rating.date] = MOOD_SCORE_MAP[rating.mood];
+    const moodScore = getMoodScore(rating.mood);
+    if (moodScore !== undefined) {
+      moodByDate[rating.date] = moodScore;
     }
   });
 

@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   RefreshControl,
+  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '@/context/ThemeContext';
@@ -18,11 +19,15 @@ import {
   type WeeklySummary
 } from '@/services/weeklyInsightsService';
 import { DateTime } from 'luxon';
+import { exportDataAsCSV, generateExportSummary } from '@/services/trendsAndExportService';
+import { generateAnonymousMoodInsights, shareInsightsAsImage } from '@/services/socialService';
 
 export default function InsightsScreen() {
   const { theme } = useTheme();
   const queryClient = useQueryClient();
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
+  const [isSharing, setIsSharing] = useState(false);
 
   const { data: weeklyData, isLoading, refetch } = useQuery({
     queryKey: ['weeklyInsights'],
@@ -38,6 +43,34 @@ export default function InsightsScreen() {
       console.error('Error generating insights:', error);
     } finally {
       setIsGenerating(false);
+    }
+  };
+
+  const handleExportData = async () => {
+    setIsExporting(true);
+    try {
+      await exportDataAsCSV();
+      Alert.alert('Success', 'Your data has been exported successfully!');
+    } catch (error) {
+      Alert.alert('Error', 'Failed to export data. Please try again.');
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
+  const handleShareInsights = async () => {
+    setIsSharing(true);
+    try {
+      const insights = await generateAnonymousMoodInsights(30);
+      if (insights) {
+        await shareInsightsAsImage(insights);
+      } else {
+        Alert.alert('No Data', 'Not enough data to generate insights yet.');
+      }
+    } catch (error) {
+      Alert.alert('Error', 'Failed to share insights. Please try again.');
+    } finally {
+      setIsSharing(false);
     }
   };
 
@@ -251,17 +284,41 @@ export default function InsightsScreen() {
       <View style={styles.header}>
         <Text style={styles.title}>Weekly Insights</Text>
         <Text style={styles.weekRange}>{formatWeekRange()}</Text>
-        <TouchableOpacity
-          style={styles.generateButton}
-          onPress={handleGenerateInsights}
-          disabled={isGenerating}
-        >
-          {isGenerating ? (
-            <ActivityIndicator size="small" color={theme.colors.textOnPrimary} />
-          ) : (
-            <Text style={styles.generateButtonText}>Refresh Insights</Text>
-          )}
-        </TouchableOpacity>
+        <View style={{ flexDirection: 'row', gap: theme.spacing.sm, marginTop: theme.spacing.sm }}>
+          <TouchableOpacity
+            style={styles.generateButton}
+            onPress={handleGenerateInsights}
+            disabled={isGenerating}
+          >
+            {isGenerating ? (
+              <ActivityIndicator size="small" color={theme.colors.textOnPrimary} />
+            ) : (
+              <Text style={styles.generateButtonText}>🔄 Refresh</Text>
+            )}
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.generateButton, { backgroundColor: theme.colors.success }]}
+            onPress={handleExportData}
+            disabled={isExporting}
+          >
+            {isExporting ? (
+              <ActivityIndicator size="small" color={theme.colors.textOnPrimary} />
+            ) : (
+              <Text style={styles.generateButtonText}>📥 Export</Text>
+            )}
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.generateButton, { backgroundColor: theme.colors.info }]}
+            onPress={handleShareInsights}
+            disabled={isSharing}
+          >
+            {isSharing ? (
+              <ActivityIndicator size="small" color={theme.colors.textOnPrimary} />
+            ) : (
+              <Text style={styles.generateButtonText}>📤 Share</Text>
+            )}
+          </TouchableOpacity>
+        </View>
       </View>
 
       <ScrollView
