@@ -8,6 +8,7 @@ export interface FoodIntake {
   lunch?: string;
   dinner?: string;
   snacks?: string;
+  water_intake?: number; // Number of glasses/cups of water
   date: string;
   created_at: string;
   updated_at: string;
@@ -18,6 +19,7 @@ export interface FoodIntakeInput {
   lunch: string;
   dinner: string;
   snacks: string;
+  water_intake?: number;
   date: string;
 }
 

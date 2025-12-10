@@ -17,6 +17,7 @@ import { RatingComponent } from "@/components/RatingComponent";
 import FoodIntakeForm, { MealFeeling } from "@/views/FoodIntakeForm";
 import { MealFeelingForm } from "@/views/MealFeelingForm";
 import { MealSymptomForm, MealSymptomData } from "@/views/MealSymptomForm";
+import { WaterIntakeTracker } from "@/views/WaterIntakeTracker";
 import { insertOrUpdateMood } from "@/storage/supabase/moodEntries";
 import { insertOrUpdateProductivity } from "@/storage/supabase/productivityEntries";
 import { useMutationInsertFoodIntake } from "@/hooks/queries/useMutationInsertFoodIntake";
@@ -69,6 +70,7 @@ export default function DailyEnterScreen() {
   const [productivityValue, setProductivityValue] = useState<number | null>(
     null
   );
+  const [waterIntake, setWaterIntake] = useState<number>(0);
   const [foodMeals, setFoodMeals] = useState<Record<MealType, string>>({
     breakfast: "",
     lunch: "",
@@ -141,9 +143,10 @@ export default function DailyEnterScreen() {
         );
       }
 
-      if (Object.values(foodMeals).some((meal) => meal.trim() !== "")) {
+      if (Object.values(foodMeals).some((meal) => meal.trim() !== "") || waterIntake > 0) {
         const dataToSave = {
           ...foodMeals,
+          water_intake: waterIntake,
           date: DateTime.now().toFormat("yyyy-LL-dd"),
         };
         await saveFoodIntake(dataToSave);
@@ -176,6 +179,7 @@ export default function DailyEnterScreen() {
 
       setMoodValue(null);
       setProductivityValue(null);
+      setWaterIntake(0);
       setFoodMeals({ breakfast: "", lunch: "", dinner: "", snacks: "" });
       setMealFeelings({
         breakfast: null,
@@ -381,6 +385,20 @@ export default function DailyEnterScreen() {
         </KeyboardAvoidingView>
       ),
     },
+    {
+      title: t("water.title"),
+      component: (
+        <ScrollView
+          key={`water-${resetKey}`}
+          showsVerticalScrollIndicator={false}
+        >
+          <WaterIntakeTracker
+            value={waterIntake}
+            onChange={setWaterIntake}
+          />
+        </ScrollView>
+      ),
+    },
     ...mealSpecificSteps,
   ];
 
@@ -389,7 +407,7 @@ export default function DailyEnterScreen() {
       <Stepper
         steps={steps}
         onComplete={handleCompleteAll}
-        allowSkipAfterStep={2} // Allow skipping after step 3 (index 2)
+        allowSkipAfterStep={3} // Allow skipping after step 4 (water intake, index 3)
       />
     </SafeAreaView>
   );

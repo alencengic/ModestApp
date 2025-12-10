@@ -14,6 +14,7 @@ interface FoodIntake {
   lunch?: string;
   dinner?: string;
   snacks?: string;
+  water_intake?: number;
   date: string;
 }
 
@@ -704,6 +705,210 @@ export const getTrainingDayAnalysis = async (): Promise<TrainingDayAnalysis> => 
       productivityDifferencePercentage: prodDiffPct,
       confidenceLevel,
       significantDifference,
+      recommendation,
+    },
+  };
+};
+
+// Water-Mood Correlation Analysis
+export interface WaterMoodCorrelation {
+  hydrationLevel: 'low' | 'moderate' | 'good' | 'excellent';
+  glassRange: string;
+  averageMood: number;
+  averageProductivity: number;
+  count: number;
+}
+
+export interface WaterMoodAnalysis {
+  correlations: WaterMoodCorrelation[];
+  totalDaysTracked: number;
+  averageWaterIntake: number;
+  insights: {
+    optimalWaterIntake: number;
+    moodImpact: 'positive' | 'negative' | 'neutral';
+    productivityImpact: 'positive' | 'negative' | 'neutral';
+    recommendation: string;
+  };
+}
+
+export const getWaterMoodCorrelation = async (): Promise<WaterMoodAnalysis> => {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('User not authenticated');
+
+  // Fetch food intakes (which include water_intake) from Supabase
+  const { data: foodIntakes, error: foodError } = await supabase
+    .from('food_intakes')
+    .select('*')
+    .eq('user_id', user.id)
+    .not('water_intake', 'is', null);
+
+  if (foodError) throw foodError;
+
+  // Fetch mood ratings from Supabase
+  const { data: moodRatings, error: moodError } = await supabase
+    .from('mood_ratings')
+    .select('*')
+    .eq('user_id', user.id);
+
+  if (moodError) throw moodError;
+
+  // Fetch productivity ratings from Supabase
+  const { data: productivityRatings, error: prodError } = await supabase
+    .from('productivity_ratings')
+    .select('*')
+    .eq('user_id', user.id);
+
+  if (prodError) throw prodError;
+
+  if (!foodIntakes?.length) {
+    return {
+      correlations: [],
+      totalDaysTracked: 0,
+      averageWaterIntake: 0,
+      insights: {
+        optimalWaterIntake: 8,
+        moodImpact: 'neutral',
+        productivityImpact: 'neutral',
+        recommendation: 'Start tracking your water intake to see how hydration affects your mood and productivity.',
+      },
+    };
+  }
+
+  // Create lookup maps for mood and productivity by date
+  const moodByDate: Record<string, number> = {};
+  moodRatings?.forEach((rating: any) => {
+    const moodScore = getMoodScore(rating.mood);
+    if (moodScore !== undefined) {
+      moodByDate[rating.date] = moodScore;
+    }
+  });
+
+  const prodByDate: Record<string, number> = {};
+  productivityRatings?.forEach((rating: any) => {
+    if (typeof rating.productivity === 'number') {
+      const dateOnly = rating.date.split('T')[0];
+      prodByDate[dateOnly] = rating.productivity - 3; // Normalize to -2 to +2
+    }
+  });
+
+  // Group data by hydration level
+  const hydrationGroups: Record<string, {
+    moodScores: number[];
+    prodScores: number[];
+    waterIntakes: number[];
+  }> = {
+    low: { moodScores: [], prodScores: [], waterIntakes: [] },       // 0-3 glasses
+    moderate: { moodScores: [], prodScores: [], waterIntakes: [] },  // 4-5 glasses
+    good: { moodScores: [], prodScores: [], waterIntakes: [] },      // 6-7 glasses
+    excellent: { moodScores: [], prodScores: [], waterIntakes: [] }, // 8+ glasses
+  };
+
+  let totalWaterIntake = 0;
+  let daysWithWater = 0;
+
+  foodIntakes.forEach((intake: FoodIntake) => {
+    const waterIntake = intake.water_intake || 0;
+    if (waterIntake === 0) return;
+
+    totalWaterIntake += waterIntake;
+    daysWithWater++;
+
+    // Determine hydration level
+    let level: 'low' | 'moderate' | 'good' | 'excellent';
+    if (waterIntake <= 3) level = 'low';
+    else if (waterIntake <= 5) level = 'moderate';
+    else if (waterIntake <= 7) level = 'good';
+    else level = 'excellent';
+
+    hydrationGroups[level].waterIntakes.push(waterIntake);
+
+    // Add mood score if available
+    const moodScore = moodByDate[intake.date];
+    if (moodScore !== undefined) {
+      hydrationGroups[level].moodScores.push(moodScore);
+    }
+
+    // Add productivity score if available
+    const prodScore = prodByDate[intake.date];
+    if (prodScore !== undefined) {
+      hydrationGroups[level].prodScores.push(prodScore);
+    }
+  });
+
+  // Calculate correlations for each hydration level
+  const glassRanges: Record<string, string> = {
+    low: '0-3',
+    moderate: '4-5',
+    good: '6-7',
+    excellent: '8+',
+  };
+
+  const correlations: WaterMoodCorrelation[] = Object.entries(hydrationGroups)
+    .filter(([_, data]) => data.moodScores.length > 0 || data.prodScores.length > 0)
+    .map(([level, data]) => ({
+      hydrationLevel: level as 'low' | 'moderate' | 'good' | 'excellent',
+      glassRange: glassRanges[level],
+      averageMood: data.moodScores.length > 0
+        ? data.moodScores.reduce((a, b) => a + b, 0) / data.moodScores.length
+        : 0,
+      averageProductivity: data.prodScores.length > 0
+        ? data.prodScores.reduce((a, b) => a + b, 0) / data.prodScores.length
+        : 0,
+      count: Math.max(data.moodScores.length, data.prodScores.length),
+    }));
+
+  // Calculate insights
+  const avgWater = daysWithWater > 0 ? totalWaterIntake / daysWithWater : 0;
+
+  // Find optimal water intake (level with best mood)
+  const bestMoodLevel = correlations.reduce((best, curr) =>
+    curr.averageMood > best.averageMood ? curr : best,
+    correlations[0] || { hydrationLevel: 'good', averageMood: 0 }
+  );
+
+  // Determine impact by comparing low vs high hydration
+  const lowHydration = correlations.find(c => c.hydrationLevel === 'low');
+  const highHydration = correlations.find(c => c.hydrationLevel === 'excellent' || c.hydrationLevel === 'good');
+
+  let moodImpact: 'positive' | 'negative' | 'neutral' = 'neutral';
+  let productivityImpact: 'positive' | 'negative' | 'neutral' = 'neutral';
+
+  if (lowHydration && highHydration) {
+    const moodDiff = highHydration.averageMood - lowHydration.averageMood;
+    const prodDiff = highHydration.averageProductivity - lowHydration.averageProductivity;
+
+    moodImpact = moodDiff > 0.2 ? 'positive' : moodDiff < -0.2 ? 'negative' : 'neutral';
+    productivityImpact = prodDiff > 0.3 ? 'positive' : prodDiff < -0.3 ? 'negative' : 'neutral';
+  }
+
+  // Generate recommendation
+  let recommendation = '';
+  const optimalGlasses = bestMoodLevel?.hydrationLevel === 'excellent' ? 8 :
+                         bestMoodLevel?.hydrationLevel === 'good' ? 7 :
+                         bestMoodLevel?.hydrationLevel === 'moderate' ? 5 : 8;
+
+  if (avgWater < 4) {
+    recommendation = `You're averaging only ${avgWater.toFixed(1)} glasses per day. Try to increase your water intake to at least 6-8 glasses for better mood and energy.`;
+  } else if (avgWater < 6) {
+    recommendation = `Good start! You're drinking about ${avgWater.toFixed(1)} glasses daily. Increasing to ${optimalGlasses} glasses could further improve your well-being.`;
+  } else if (avgWater < 8) {
+    recommendation = `Nice! You're drinking ${avgWater.toFixed(1)} glasses daily. You're close to the recommended 8 glasses for optimal hydration.`;
+  } else {
+    recommendation = `Excellent hydration! You're drinking ${avgWater.toFixed(1)} glasses daily. Keep up the great work!`;
+  }
+
+  if (moodImpact === 'positive') {
+    recommendation += ' Your data shows better mood on days with higher water intake.';
+  }
+
+  return {
+    correlations,
+    totalDaysTracked: daysWithWater,
+    averageWaterIntake: avgWater,
+    insights: {
+      optimalWaterIntake: optimalGlasses,
+      moodImpact,
+      productivityImpact,
       recommendation,
     },
   };

@@ -33,6 +33,7 @@ import { calculateMoodPrediction, MoodPrediction } from "@/services/moodPredicti
 import { getAchievements, getStreakData, Achievement, StreakData } from "@/services/achievementService";
 import { generateWeeklySummary, WeeklySummary } from "@/services/weeklyDigestService";
 import { detectTrendAlerts, TrendAlert } from "@/services/trendsAndExportService";
+import { getWaterMoodCorrelation, WaterMoodAnalysis } from "@/storage/correlations";
 
 const getQuickAccessItems = (t: any): {
   title: string;
@@ -77,6 +78,7 @@ export default function HomeScreen() {
   const [streakData, setStreakData] = useState<StreakData | null>(null);
   const [weeklyDigest, setWeeklyDigest] = useState<WeeklySummary | null>(null);
   const [trendAlerts, setTrendAlerts] = useState<TrendAlert[]>([]);
+  const [waterInsights, setWaterInsights] = useState<WaterMoodAnalysis | null>(null);
   const [isLoadingInsights, setIsLoadingInsights] = useState(false);
   const quickAccessItems = getQuickAccessItems(t);
 
@@ -296,12 +298,13 @@ export default function HomeScreen() {
         setIsLoadingInsights(true);
         try {
           // Load all insights in parallel
-          const [prediction, achievementsList, streak, digest, alerts] = await Promise.all([
+          const [prediction, achievementsList, streak, digest, alerts, water] = await Promise.all([
             calculateMoodPrediction().catch(() => null),
             getAchievements().catch(() => []),
             getStreakData().catch(() => null),
             generateWeeklySummary().catch(() => null),
             detectTrendAlerts().catch(() => []),
+            getWaterMoodCorrelation().catch(() => null),
           ]);
 
           setMoodPrediction(prediction);
@@ -309,6 +312,7 @@ export default function HomeScreen() {
           setStreakData(streak);
           setWeeklyDigest(digest);
           setTrendAlerts(alerts);
+          setWaterInsights(water);
         } catch (error) {
           console.error('Error loading insights:', error);
         } finally {
@@ -488,8 +492,8 @@ export default function HomeScreen() {
                 <View style={styles.insightCard}>
                   <Text style={styles.insightTitle}>📊 This Week</Text>
                   <Text style={styles.insightText}>
-                    Average mood: {weeklyDigest.averageMood.toFixed(1)}/10 • 
-                    Trend: {weeklyDigest.moodTrend === 'improving' ? '📈 Improving' : 
+                    Average mood: {weeklyDigest.averageMood.toFixed(1)}/10 •
+                    Trend: {weeklyDigest.moodTrend === 'improving' ? '📈 Improving' :
                             weeklyDigest.moodTrend === 'declining' ? '📉 Declining' : '➡️ Stable'}
                   </Text>
                   {weeklyDigest.keyInsights?.[0] && (
@@ -497,6 +501,31 @@ export default function HomeScreen() {
                       {weeklyDigest.keyInsights[0]}
                     </Text>
                   )}
+                </View>
+              )}
+
+              {/* Water Intake Insights */}
+              {waterInsights && waterInsights.totalDaysTracked > 0 && (
+                <View style={styles.insightCard}>
+                  <Text style={styles.insightTitle}>💧 Hydration Insights</Text>
+                  <View style={styles.streakContainer}>
+                    <Text style={styles.streakText}>
+                      {waterInsights.averageWaterIntake.toFixed(1)}
+                    </Text>
+                    <Text style={styles.streakLabel}>
+                      avg. glasses/day • {waterInsights.totalDaysTracked} days tracked
+                    </Text>
+                  </View>
+                  <Text style={styles.insightText}>
+                    {waterInsights.insights.moodImpact === 'positive'
+                      ? '📈 Higher hydration correlates with better mood!'
+                      : waterInsights.insights.moodImpact === 'negative'
+                      ? '📉 Consider drinking more water for improved mood'
+                      : '💡 Keep tracking to discover hydration patterns'}
+                  </Text>
+                  <Text style={[styles.insightText, { marginTop: 4 }]}>
+                    {waterInsights.insights.recommendation}
+                  </Text>
                 </View>
               )}
             </>
